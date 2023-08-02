@@ -35,35 +35,28 @@ public class AnalizadorLexico {
     }
     
     private String lecturaTkn;
+    private boolean readAll;
+    
     private void analizarLinea(String texto){
-        String lectura = "";
-        boolean takeAll = false;
+        readAll = false;
+        lecturaTkn = "";
         for (index = 0; index < texto.length(); index++) {
             char currentChar = texto.charAt(index);
-            if(!takeAll){
-                if (isAlphaUp(currentChar) || isAlphaDown(currentChar) 
-                        || isNumeric(currentChar)) {
-                    lectura += currentChar;
-                }else if(!isIgnoredCharacter(currentChar) && lectura.length() != 0){
-                    preTokens.add(lectura);
-                    index--;
-                    lectura = "";
-                }else if(!isIgnoredCharacter(currentChar) && lectura.length() == 0){
-                    //faltan condiciones
-                    preTokens.add(String.valueOf(currentChar));
-                }else if(isIgnoredCharacter(currentChar) && lectura.length() != 0){
-                    preTokens.add(lectura);
-                    lectura = "";
-                } //de lo contrario se ignoran los espacio o tabulaciones
+            if(!readAll){
+                evaluateChar(currentChar);
+            }else{
+                lecturaTkn += currentChar;
+                if(currentChar == '"' || currentChar == '\''){
+                    readAll = false;
+                }
             }
-            
         }
-        if(!lectura.equals("")){
-            preTokens.add(lectura);
+        if(!lecturaTkn.equals("")){
+            preTokens.add(lecturaTkn);
 
         }
     }
-    private void readToken(char currentChar){
+    private void evaluateChar(char currentChar){
         if (isAlphaUp(currentChar) || isAlphaDown(currentChar)
                 || isNumeric(currentChar)) {
             lecturaTkn += currentChar;
@@ -73,7 +66,12 @@ public class AnalizadorLexico {
             lecturaTkn = "";
         } else if (!isIgnoredCharacter(currentChar) && lecturaTkn.length() == 0) {
             //faltan condiciones
-            preTokens.add(String.valueOf(currentChar));
+            if(currentChar == '\"' || currentChar == '\'' || currentChar == '#'){ //cadenas y comentarios
+                lecturaTkn += currentChar;
+                readAll = true;
+            }else{
+                preTokens.add(String.valueOf(currentChar));
+            }
         } else if (isIgnoredCharacter(currentChar) && lecturaTkn.length() != 0) {
             preTokens.add(lecturaTkn);
             lecturaTkn = "";
