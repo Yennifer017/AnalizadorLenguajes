@@ -144,6 +144,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
         });
 
         jTextArea1.setColumns(20);
+        jTextArea1.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
 
@@ -196,6 +197,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
         analizadorLexico.analizar(jTextArea1.getText());
         /*StringTokenizer st = new StringTokenizer(jTextArea1.getText());
         while (st.hasMoreTokens()) {
+            System.out.println("-----------------------");
             System.out.println(st.nextToken());
         }*/
     }//GEN-LAST:event_bLexicoActionPerformed
