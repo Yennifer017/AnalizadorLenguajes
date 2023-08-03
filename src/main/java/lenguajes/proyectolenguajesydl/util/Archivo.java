@@ -1,5 +1,5 @@
 
-package lenguajes.proyectolenguajesydl;
+package lenguajes.proyectolenguajesydl.util;
 
 import java.io.*;
 import javax.swing.JFileChooser;

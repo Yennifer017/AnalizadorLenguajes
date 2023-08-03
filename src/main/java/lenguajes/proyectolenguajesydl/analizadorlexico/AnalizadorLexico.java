@@ -21,7 +21,6 @@ public class AnalizadorLexico {
         tokens.clear();
         separarTokens(texto) ;
         showElements(tokens);
-        clasificarTkn();
     }
     public void displayAnalisis(){
         
@@ -51,14 +50,15 @@ public class AnalizadorLexico {
                     lecturaTkn += currentChar;
                 }
                 if(currentChar == '\n' || currentChar == '"' || currentChar == '\''){
-                    saveToken();
+                    saveToken(3);
                     readAll = false;
                 }
             }
             actualizarIndex();
         }
         if(!lecturaTkn.equals("")){
-            tokens.add(new Token(lecturaTkn, noLinea, columna));
+            //tokens.add(new Token(lecturaTkn, noLinea, columna));
+            saveToken(1);
         }
     }
     private void evaluateChar(String texto){
@@ -68,10 +68,12 @@ public class AnalizadorLexico {
             lecturaTkn += currentChar;
             if(isNumeric(currentChar) && lecturaTkn.length() == 1){
                 analyzeNumberTkn(texto);
-                saveToken();
+                saveToken(2);
             }
+        //cuando se interrumpe el flujo por un caracter especial
         } else if (!isIgnoredCharacter(currentChar) && lecturaTkn.length() != 0) {
-            saveToken();
+            saveToken(1);
+            columna--;
             index--;
         //cuando se inicia por un caracter especial
         } else if (!isIgnoredCharacter(currentChar) && lecturaTkn.length() == 0) {
@@ -79,14 +81,14 @@ public class AnalizadorLexico {
             if(currentChar == '\"' || currentChar == '\'' || currentChar == '#'){ //cadenas y comentarios
                 readAll = true;
             }else if(!isCombinable(currentChar)){
-                saveToken();
+                saveToken(4);
             }else if(isCombinable(currentChar)){//cuando es un caracter especial que es pueda combinar
                 analyzeCombinableTkn(texto);
-                saveToken();
+                saveToken(4);
             }
         //cuando se interrumper por un caracter ignorado
         } else if (isIgnoredCharacter(currentChar) && lecturaTkn.length() != 0) {
-            saveToken();
+            saveToken(1);
         } //de lo contrario si se trata de otros caracteres ignorados no hace nada
     }
     private void analyzeCombinableTkn(String texto){
@@ -105,10 +107,12 @@ public class AnalizadorLexico {
         }
     }
     private void analyzeNumberTkn(String texto){
+        boolean onlyOne = true;
         while (true) {            
             if ((index + 1) < texto.length()) {
                 char nextChar = texto.charAt(index + 1);
-                if (isNumeric(nextChar) || nextChar == '.') {
+                if (isNumeric(nextChar) || (nextChar == '.' && onlyOne)) {
+                    onlyOne = false;
                     lecturaTkn += nextChar;
                     actualizarIndex();
                 } else {
@@ -119,12 +123,13 @@ public class AnalizadorLexico {
             }
         }
     }
-    private void saveToken(){
-        tokens.add(new Token(lecturaTkn, noLinea, columna));
+    private void saveToken(int preliminarType){
+        tokens.add(new Token(lecturaTkn, noLinea, columna, typeTkn(preliminarType)));
         lecturaTkn="";
     }
     private void countLine(char character){
         if(character == '\n'){
+            //System.out.println("Se ha contado una linea");
             columna = 0;
             noLinea++;
         }
@@ -138,19 +143,19 @@ public class AnalizadorLexico {
      *********** CONDICIONES PARA CARACTERES ***********
      ***************************************************/
     
-    private boolean isAlphaUp(char character){
+    public static boolean isAlphaUp(char character){
         return ((character >= 'a' && character <= 'z') || character == '_');
     }
-    private boolean isAlphaDown(char character){
+    public static boolean isAlphaDown(char character){
         return (character >= 'A' && character <= 'Z');
     }
-    private boolean isNumeric(char character){
+    public static boolean isNumeric(char character){
         return (character >= '0' && character <= '9');
     }
-    private boolean isIgnoredCharacter(char character){
+    public static boolean isIgnoredCharacter(char character){
         return (character == ' ' || character == 9 || character == '\n');
     }
-    private boolean isCombinable (char character){
+    public static boolean isCombinable (char character){
         return switch (character) {
             case '!', '-', '*', '/', '+', '=', '>', '<' -> true;
             default -> false;
@@ -160,9 +165,120 @@ public class AnalizadorLexico {
     /***********************************************
      *********** CLASIFICACION DE TOKENS ***********
      ***********************************************/
-    private void clasificarTkn(){
-        for (int i = 0; i < tokens.size(); i++) {
-            //String currentTkn = Token.getLexema();
+   
+    
+    private String typeTkn(int preliminarType){
+        switch (preliminarType) {  
+            case 1://cuando empieza con una letra
+                if (isBooleana(lecturaTkn)) {
+                    return "boolean";
+                }else if(isLogico(lecturaTkn)){
+                    return "Logico";
+                }else if(isReservada(lecturaTkn)){
+                    return "Reservada";
+                }else{
+                    return "Identificador";
+                }
+            case 2: //cuando empieza por un numero
+                if(lecturaTkn.contains(".")){
+                    return "foat";
+                }else{
+                    return "int";
+                }
+            case 3: //cuando empiza por comillas o simbolo de comentario
+                char firstC = lecturaTkn.charAt(0);
+                if(firstC == '#'){
+                    return "Comentario";
+                }else {
+                    char lastC = lecturaTkn.charAt(lecturaTkn.length()-1);
+                    if(firstC == lastC){
+                        return "cadena";
+                    }else{
+                        return "unknown";
+                    }
+                }
+            case 4: //cuando es un caracter especial
+                return "caracter especial";
+            default:
+                throw new AssertionError();
         }
+    }
+    private boolean isReservada(String palabra){
+        char inicial = palabra.charAt(0);
+        return switch (inicial) {
+            case 'a' -> switch (palabra) {
+                case "as", "assert" -> true;
+                default -> false;
+            };
+            case 'b' -> switch (palabra) {
+                case "break" -> true;
+                default -> false;
+            };
+            case 'c' -> switch (palabra) {
+                case "class", "continue" -> true;
+                default -> false;
+            };
+            case 'd' -> switch (palabra) {
+                case "def", "del" -> true;
+                default -> false;
+            };
+            case 'e' -> switch (palabra) {
+                case "elif", "else", "except" -> true;
+                default -> false;
+            };
+            case 'f', 'F' -> switch (palabra) {
+                case "False", "finally", "for", "from" -> true;
+                default -> false;
+            };
+            case 'g' -> switch (palabra) {
+                case "global" -> true;
+                default -> false;
+            };
+            case 'i' -> switch (palabra) {
+                case "if", "import", "in", "is" -> true;
+                default -> false;
+            };
+            case 'l' -> switch (palabra) {
+                case "lamda"-> true;
+                default -> false;
+            };
+            case 'n' -> switch (palabra) {
+                case "None", "nonlocal"-> true;
+                default -> false;
+            };
+            case 'p' -> switch (palabra) {
+                case "pass" -> true;
+                default -> false;
+            };
+            case 'r' -> switch (palabra) {
+                case "rase", "return" -> true;
+                default -> false;
+            };
+            case 't', 'T' -> switch (palabra) {
+                case "True", "try" -> true;
+                default -> false;
+            };
+            case 'w' -> switch (palabra) {
+                case "while", "with" -> true;
+                default -> false;
+            };
+            case 'y' -> switch (palabra) {
+                case "yield"-> true;
+                default -> false;
+            };
+            default -> false;
+        };
+    }
+    private boolean isBooleana(String token){
+        return switch (token) {
+            case "True", "False"-> true;
+            default -> false;
+        };
+    }
+    private boolean isLogico(String token){
+        return switch (token) {
+            case "and", "or", "not"-> true;
+            default -> false;
+        };
     }
 }
