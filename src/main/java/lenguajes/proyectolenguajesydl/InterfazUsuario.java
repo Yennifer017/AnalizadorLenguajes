@@ -4,22 +4,25 @@
  */
 package lenguajes.proyectolenguajesydl;
 
-import lenguajes.proyectolenguajesydl.util.NumeroLinea;
+
 import lenguajes.proyectolenguajesydl.util.*;
 import java.util.StringTokenizer;
 import lenguajes.proyectolenguajesydl.analizadorlexico.AnalizadorLexico;
+import lenguajes.proyectolenguajesydl.utiles2.NumeroLinea;
 
 /**
  *
  * @author yenni
  */
 public class InterfazUsuario extends javax.swing.JFrame {
-    NumeroLinea numeracionEditor, numeracionDisplay;
+    //NumeroLinea numeracionEditor, numeracionDisplay;
+    NumeroLinea numEditor, numDisAnalisis;
     /**
      * Creates new form InterfazUsuario
      */
     private Archivo archivo;
     private AnalizadorLexico analizadorLexico;
+    
     public InterfazUsuario() {
         initComponents();
         this.setLocationRelativeTo(null);
@@ -28,10 +31,10 @@ public class InterfazUsuario extends javax.swing.JFrame {
         analizadorLexico = new AnalizadorLexico();
     }
     private void initNumeracion(){
-        numeracionEditor = new NumeroLinea(jTextArea2);
-        numeracionDisplay = new NumeroLinea(displayAnalisis);
-        scrollEditor.setRowHeaderView(numeracionEditor);
-        scrollAnalisis.setRowHeaderView(numeracionDisplay);
+        numEditor = new NumeroLinea(editor);
+        scrollEditor.setRowHeaderView(numEditor);
+        numDisAnalisis = new NumeroLinea(displayAnalisis);
+        scrollDisAnalisis.setRowHeaderView(numDisAnalisis);
     }
 
     /**
@@ -50,12 +53,12 @@ public class InterfazUsuario extends javax.swing.JFrame {
         bSave2 = new javax.swing.JButton();
         bSave3 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        scrollAnalisis = new javax.swing.JScrollPane();
-        displayAnalisis = new javax.swing.JTextArea();
         bClear = new javax.swing.JButton();
         bLexico = new javax.swing.JButton();
         scrollEditor = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
+        editor = new javax.swing.JTextPane();
+        scrollDisAnalisis = new javax.swing.JScrollPane();
+        displayAnalisis = new javax.swing.JTextPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -128,14 +131,6 @@ public class InterfazUsuario extends javax.swing.JFrame {
         jPanel2.setBackground(new java.awt.Color(0, 0, 0));
         jPanel2.setForeground(new java.awt.Color(255, 255, 255));
 
-        displayAnalisis.setEditable(false);
-        displayAnalisis.setBackground(new java.awt.Color(8, 25, 56));
-        displayAnalisis.setColumns(20);
-        displayAnalisis.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
-        displayAnalisis.setForeground(new java.awt.Color(255, 255, 255));
-        displayAnalisis.setRows(5);
-        scrollAnalisis.setViewportView(displayAnalisis);
-
         bClear.setBackground(new java.awt.Color(7, 7, 110));
         bClear.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         bClear.setForeground(new java.awt.Color(255, 255, 255));
@@ -151,9 +146,10 @@ public class InterfazUsuario extends javax.swing.JFrame {
             }
         });
 
-        jTextArea2.setColumns(20);
-        jTextArea2.setRows(5);
-        scrollEditor.setViewportView(jTextArea2);
+        scrollEditor.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        scrollEditor.setViewportView(editor);
+
+        scrollDisAnalisis.setViewportView(displayAnalisis);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -168,22 +164,22 @@ public class InterfazUsuario extends javax.swing.JFrame {
                             .addComponent(bClear, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(bLexico, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
-                        .addComponent(scrollAnalisis)))
+                        .addComponent(scrollDisAnalisis)))
                 .addContainerGap(32, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(26, 26, 26)
+                .addGap(30, 30, 30)
                 .addComponent(scrollEditor, javax.swing.GroupLayout.PREFERRED_SIZE, 316, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(36, 36, 36)
+                .addGap(32, 32, 32)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(scrollAnalisis, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(bClear, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(bLexico, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(30, Short.MAX_VALUE))
+                        .addComponent(bLexico, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(scrollDisAnalisis, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(41, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 60, 952, 590));
@@ -192,11 +188,11 @@ public class InterfazUsuario extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void bOpenFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bOpenFileActionPerformed
-        jTextArea2.setText(archivo.readTextFile(archivo.getPath()));
+        editor.setText(archivo.readTextFile(archivo.getPath()));
     }//GEN-LAST:event_bOpenFileActionPerformed
 
     private void bLexicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bLexicoActionPerformed
-        analizadorLexico.analizar(jTextArea2.getText());
+        analizadorLexico.analizar(editor.getText());
         /*StringTokenizer st = new StringTokenizer(jTextArea1.getText());
         while (st.hasMoreTokens()) {
             System.out.println("-----------------------");
@@ -247,11 +243,11 @@ public class InterfazUsuario extends javax.swing.JFrame {
     private javax.swing.JButton bSave1;
     private javax.swing.JButton bSave2;
     private javax.swing.JButton bSave3;
-    private javax.swing.JTextArea displayAnalisis;
+    private javax.swing.JTextPane displayAnalisis;
+    private javax.swing.JTextPane editor;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JTextArea jTextArea2;
-    private javax.swing.JScrollPane scrollAnalisis;
+    private javax.swing.JScrollPane scrollDisAnalisis;
     private javax.swing.JScrollPane scrollEditor;
     // End of variables declaration//GEN-END:variables
 }
