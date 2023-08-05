@@ -8,7 +8,7 @@ package lenguajes.proyectolenguajesydl;
 import lenguajes.proyectolenguajesydl.util.*;
 import java.util.StringTokenizer;
 import lenguajes.proyectolenguajesydl.analizadorlexico.AnalizadorLexico;
-import lenguajes.proyectolenguajesydl.utiles2.NumeroLinea;
+import lenguajes.proyectolenguajesydl.util.NumeroLinea;
 
 /**
  *
@@ -130,6 +130,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
 
         jPanel2.setBackground(new java.awt.Color(0, 0, 0));
         jPanel2.setForeground(new java.awt.Color(255, 255, 255));
+        jPanel2.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
 
         bClear.setBackground(new java.awt.Color(7, 7, 110));
         bClear.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
@@ -147,8 +148,20 @@ public class InterfazUsuario extends javax.swing.JFrame {
         });
 
         scrollEditor.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        editor.setBackground(new java.awt.Color(0, 0, 44));
+        editor.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 51)));
+        editor.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        editor.setForeground(new java.awt.Color(255, 255, 255));
+        editor.setCaretColor(new java.awt.Color(255, 255, 255));
         scrollEditor.setViewportView(editor);
 
+        displayAnalisis.setEditable(false);
+        displayAnalisis.setBackground(new java.awt.Color(0, 0, 44));
+        displayAnalisis.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 51)));
+        displayAnalisis.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        displayAnalisis.setForeground(new java.awt.Color(255, 255, 255));
+        displayAnalisis.setCaretColor(new java.awt.Color(255, 255, 255));
         scrollDisAnalisis.setViewportView(displayAnalisis);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -198,6 +211,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
             System.out.println("-----------------------");
             System.out.println(st.nextToken());
         }*/
+        displayAnalisis.setText(analizadorLexico.getAnalisis());
     }//GEN-LAST:event_bLexicoActionPerformed
 
     /**
