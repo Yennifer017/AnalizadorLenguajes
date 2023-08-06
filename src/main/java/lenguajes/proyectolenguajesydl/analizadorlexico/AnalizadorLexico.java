@@ -22,6 +22,18 @@ public class AnalizadorLexico {
         tokens.clear();
         separarTokens(texto) ;
     }
+    
+    public boolean containsReservedWord(String texto){
+        tokens.clear();
+        separarTokens(texto);
+        for (int i = 0; i < tokens.size(); i++) {
+            if(tokens.get(i).getType().equals("Reservada")){
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public String getAnalisis(){
         String analisis= "";
         for (int i = 0; i < tokens.size(); i++) {
@@ -182,10 +194,17 @@ public class AnalizadorLexico {
             default -> false;
         };
     }
-    
+    public static boolean isAlphaNumeric(char character){
+        return isAlphaDown(character) || isAlphaUp(character) || isNumeric(character);
+    }
     //clasificacion de tokens
     private boolean isReservada(String palabra){
-        char inicial = palabra.charAt(0);
+        char inicial;
+        try {
+            inicial = palabra.charAt(0); 
+        } catch (IndexOutOfBoundsException e) {
+            return false;
+        }
         return switch (inicial) {
             case 'a' -> switch (palabra) {
                 case "as", "assert" -> true;
@@ -284,7 +303,6 @@ public class AnalizadorLexico {
     /***********************************************
      *********** CLASIFICACION DE TOKENS ***********
      ***********************************************/
-   
     private String getTypeTkn(int preliminarType, String token){
         switch (preliminarType) {  
             case 1://cuando empieza con una letra
