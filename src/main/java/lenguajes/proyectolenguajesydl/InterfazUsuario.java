@@ -136,6 +136,11 @@ public class InterfazUsuario extends javax.swing.JFrame {
         bClear.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         bClear.setForeground(new java.awt.Color(255, 255, 255));
         bClear.setText("Limpiar");
+        bClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bClearActionPerformed(evt);
+            }
+        });
 
         bLexico.setBackground(new java.awt.Color(7, 7, 110));
         bLexico.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
@@ -213,6 +218,11 @@ public class InterfazUsuario extends javax.swing.JFrame {
         }*/
         displayAnalisis.setText(analizadorLexico.getAnalisis());
     }//GEN-LAST:event_bLexicoActionPerformed
+
+    private void bClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bClearActionPerformed
+        editor.setText("");
+        displayAnalisis.setText("");
+    }//GEN-LAST:event_bClearActionPerformed
 
     /**
      * @param args the command line arguments

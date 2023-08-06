@@ -19,7 +19,7 @@ public class Token {
     }
     @Override
     public String toString(){
-        return contenido + " - fila = " + fila + "- columna = " + colStart + " -type: " + tipo; 
+        return contenido + "       fila " + (fila+1) + " columna " + (colStart+1) + " type: " + tipo; 
     }
     
 }

@@ -21,7 +21,6 @@ public class AnalizadorLexico {
     public void analizar(String texto){
         tokens.clear();
         separarTokens(texto) ;
-        showElements(tokens);
     }
     public String getAnalisis(){
         String analisis= "";
@@ -43,6 +42,7 @@ public class AnalizadorLexico {
         }
         System.out.println("El total de lineas es igual a " + noLinea);
     }
+    
     /********************************************
      *********** SEPARACION DE TOKENS ***********
      ********************************************/
@@ -50,9 +50,11 @@ public class AnalizadorLexico {
         readAll = false;
         lecturaTkn = "";
         index = 0;
+        columna = 0;
+        noLinea = 0;
         while(index < texto.length()) {
             char currentChar = texto.charAt(index);
-            countLine(currentChar);
+            //countLine(currentChar);
             if(!readAll){
                 evaluateChar(texto);
             }else{ //cuando se trata de una cadena de caracteres, no se tiene que analizar el mismo
@@ -60,15 +62,15 @@ public class AnalizadorLexico {
                     lecturaTkn += currentChar;
                 }
                 if(currentChar == '\n' || currentChar == '"' || currentChar == '\''){
-                    saveToken(3);
+                    saveToken(3, currentChar == '\n');
                     readAll = false;
                 }
             }
+            countLine(currentChar);
             actualizarIndex();
         }
         if(!lecturaTkn.equals("")){
-            //tokens.add(new Token(lecturaTkn, noLinea, columna));
-            saveToken(1);
+            saveToken(1, true);
         }
     }
     private void evaluateChar(String texto){
@@ -78,11 +80,11 @@ public class AnalizadorLexico {
             lecturaTkn += currentChar;
             if(isNumeric(currentChar) && lecturaTkn.length() == 1){
                 analyzeNumberTkn(texto);
-                saveToken(2);
+                saveToken(2, false);
             }
         //cuando se interrumpe el flujo por un caracter especial
         } else if (!isIgnoredCharacter(currentChar) && lecturaTkn.length() != 0) {
-            saveToken(1);
+            saveToken(1, true);
             columna--;
             index--;
         //cuando se inicia por un caracter especial
@@ -91,14 +93,14 @@ public class AnalizadorLexico {
             if(currentChar == '\"' || currentChar == '\'' || currentChar == '#'){ //cadenas y comentarios
                 readAll = true;
             }else if(!isCombinable(currentChar)){
-                saveToken(4);
+                saveToken(4, false);
             }else if(isCombinable(currentChar)){//cuando es un caracter especial que es pueda combinar
                 analyzeCombinableTkn(texto);
-                saveToken(4);
+                saveToken(4, false);
             }
         //cuando se interrumper por un caracter ignorado
         } else if (isIgnoredCharacter(currentChar) && lecturaTkn.length() != 0) {
-            saveToken(1);
+            saveToken(1, true);
         } //de lo contrario si se trata de otros caracteres ignorados no hace nada
     }
     private void analyzeCombinableTkn(String texto){
@@ -133,15 +135,20 @@ public class AnalizadorLexico {
             }
         }
     }
-    private void saveToken(int preliminarType){
+    private void saveToken(int preliminarType, boolean incrDone){
+        if(!incrDone){
+            columna++;
+        }
         tokens.add(new Token(lecturaTkn, noLinea, columna, 
                 getTypeTkn(preliminarType, lecturaTkn)));
         lecturaTkn="";
+        if(!incrDone){
+            columna--;
+        }
     }
     private void countLine(char character){
         if(character == '\n'){
-            //System.out.println("Se ha contado una linea");
-            columna = 0;
+            columna = -1;
             noLinea++;
         }
     }
