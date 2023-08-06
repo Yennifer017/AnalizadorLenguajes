@@ -1,17 +1,15 @@
 
 package lenguajes.proyectolenguajesydl;
 
- import javax.swing.*;
+import javax.swing.*;
 import java.awt.*;
 import javax.swing.text.*;
 import lenguajes.proyectolenguajesydl.analizadorlexico.AnalizadorLexico;
+import lenguajes.proyectolenguajesydl.analizadorlexico.Expresion;
 
 public class Test extends JFrame {
 
-    private boolean isAlphaNumeric(char character){
-        return AnalizadorLexico.isAlphaDown(character) || AnalizadorLexico.isAlphaUp(character)
-                    || AnalizadorLexico.isNumeric(character);
-    }
+    private Expresion ex = new Expresion();
     private int findLastNonWordChar(String text, int index) {
         //el indice se decrementa antes de la evaluacion, se verifica que sea mayor o igual a 0
         while (--index >= 0) {
@@ -20,7 +18,7 @@ public class Test extends JFrame {
                 break;
             }*/
             char character = text.charAt(index);
-            if(!(isAlphaNumeric(character))){
+            if(!(ex.isAlphaNumeric(character))){
                 break;
             }
         }
@@ -33,7 +31,7 @@ public class Test extends JFrame {
                 break;
             }*/
             char character = text.charAt(index);
-            if(!(isAlphaNumeric(character))){
+            if(!(ex.isAlphaNumeric(character))){
                 break;
             }
             index++;
@@ -72,13 +70,23 @@ public class Test extends JFrame {
                 int wordR = before;
 
                 while (wordR <= after) {
-                    if(wordR == after || !(isAlphaNumeric(text.charAt(wordR)))){
-                        if(aLex.containsReservedWord(text.substring(wordL, wordR))){
-                            setCharacterAttributes(wordL, wordR - wordL, attr, false);
+                    //para cuando hay un caracter que no sea numero / letra
+                    if(wordR == after || !(ex.isAlphaNumeric(text.charAt(wordR)))){
+                        if(aLex.contains(text.substring(wordL, wordR), "Reservada")){
+                            setCharacterAttributes(wordL , wordR - wordL, attr, false);
                         }else {
                             setCharacterAttributes(wordL, wordR - wordL, attrBlack, false);
                         }
                         wordL = wordR;
+                        try {
+                            //si el siguiente no es un ignorado...
+                            if(!ex.isIgnoredCharacter(text.charAt(wordR))){
+                                wordL++;
+                            }  
+                        } catch (Exception e) {
+                            System.out.println("Error");
+                        }
+                        
                     }
                     /*if (wordR == after || String.valueOf(text.charAt(wordR)).matches("\\W")) {
                         if (text.substring(wordL, wordR).matches("(\\W)*(private|public|protected)")) {
@@ -103,8 +111,8 @@ public class Test extends JFrame {
                 }
                 int after = findFirstNonWordChar(text, offs);
 
-                if(aLex.containsReservedWord(text.substring(before, after))){
-                    setCharacterAttributes(before, after - before, attr, false);
+                if(aLex.contains(text.substring(before, after), "Reservada")){
+                    setCharacterAttributes(before , after - before, attr, false);
                 }else {
                     setCharacterAttributes(before, after - before, attrBlack, false);
                 }
@@ -116,7 +124,7 @@ public class Test extends JFrame {
             }
         };
         JTextPane txt = new JTextPane(doc);
-        txt.setText("public class Hi {}");
+        txt.setText("(def class Hi {}");
         add(new JScrollPane(txt));
         setVisible(true);
     }

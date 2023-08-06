@@ -1,13 +1,17 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package lenguajes.proyectolenguajesydl;
 
-
+import java.awt.Color;
 import lenguajes.proyectolenguajesydl.util.*;
 import java.util.StringTokenizer;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 import lenguajes.proyectolenguajesydl.analizadorlexico.AnalizadorLexico;
+import lenguajes.proyectolenguajesydl.analizadorlexico.Expresion;
 import lenguajes.proyectolenguajesydl.util.NumeroLinea;
 
 /**
@@ -17,25 +21,113 @@ import lenguajes.proyectolenguajesydl.util.NumeroLinea;
 public class InterfazUsuario extends javax.swing.JFrame {
     //NumeroLinea numeracionEditor, numeracionDisplay;
     NumeroLinea numEditor, numDisAnalisis;
+    
+    /**
+     * Creacion de los elementos necesarios para hacer funcionar el analizador
+     */ 
+    private Archivo archivo;
+    private AnalizadorLexico lexer = new AnalizadorLexico();
+    private Expresion ex;
+    //se almacena el estilo actual, el default
+    private final StyleContext cont = StyleContext.getDefaultStyleContext();
+    //COLORES, estos como atributos
+    private final AttributeSet attrWhite = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.WHITE);
+    final AttributeSet attrSkyBlue = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, new Color(0,242,255));
+    final AttributeSet attrPurple = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, new Color(177,0,255));   
+    final AttributeSet attrOrange = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.ORANGE);
+    final AttributeSet attrGray = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.GRAY);
+    final AttributeSet attrGreen = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.GREEN);
+    
+    //definicion de un documento para que pueda ser coloreado
+    DefaultStyledDocument doc = new DefaultStyledDocument() {
+        //se sobrescribe el metodo para ingresar un string, agregando algo de codigo extra
+        @Override
+        public void insertString(int offset, String str, AttributeSet a) throws BadLocationException {
+            super.insertString(offset, str, a);
+
+            //obtener todo el texto que se esta escribiendo
+            String text = getText(0, getLength());
+
+            int before = lexer.findLastNonWordChar(text, offset);
+            if (before < 0) { //evitar que se deje un indice negativo
+                before = 0;
+            }
+            int after = lexer.findFirstNonWordChar(text, offset + str.length()); //indice para evaluar todo el cont.
+            int wordL = before;
+            int wordR = before;
+
+            while (wordR <= after) {
+                //para cuando hay un caracter que no sea numero / letra
+                if (wordR == after || !(ex.isAlphaNumeric(text.charAt(wordR)))) {
+                    String currentWord = text.substring(wordL, wordR);
+                    if (lexer.contains(currentWord, "Reservada")) {
+                        setCharacterAttributes(wordL, wordR - wordL, attrPurple, false);
+                    } else if(lexer.contains(currentWord, "boolean")){
+                        setCharacterAttributes(wordL, wordR - wordL, attrOrange, false);
+                    } else {
+                        setCharacterAttributes(wordL, wordR - wordL, attrSkyBlue, false);
+                    }
+                    wordL = wordR;
+                    try {
+                        //si el siguiente no es un ignorado...
+                        if (!ex.isIgnoredCharacter(text.charAt(wordR))) {
+                            wordL++;
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Error");
+                    }
+
+                }
+                wordR++;
+            }
+        }
+
+        @Override
+        public void remove(int offs, int len) throws BadLocationException {
+            super.remove(offs, len);
+            String text = getText(0, getLength());
+            int before = lexer.findLastNonWordChar(text, offs);
+            if (before < 0) {
+                before = 0;
+            }
+            int after = lexer.findFirstNonWordChar(text, offs);
+            
+            String currentWord = text.substring(before, after);
+            if (lexer.contains(currentWord, "Reservada")) {
+                setCharacterAttributes(before, after - before, attrPurple, false);
+            } else if(lexer.contains(currentWord, "boolean")){
+                setCharacterAttributes(before, after - before, attrOrange, false);
+            }else {
+                setCharacterAttributes(before, after - before, attrSkyBlue, false);
+            }
+        }
+    };
+        
+    
     /**
      * Creates new form InterfazUsuario
-     */
-    private Archivo archivo;
-    private AnalizadorLexico analizadorLexico;
-    
+     */    
     public InterfazUsuario() {
         initComponents();
         this.setLocationRelativeTo(null);
         initNumeracion();
         archivo = new Archivo();
-        analizadorLexico = new AnalizadorLexico();
+        //lexer = new AnalizadorLexico();
+        ex = new Expresion();
+        //inicializando estilos 
+        JTextPane txt = new JTextPane(doc);
+        String temp = editor.getText();
+        editor.setStyledDocument(txt.getStyledDocument());
+        editor.setText(temp);
     }
     private void initNumeracion(){
         numEditor = new NumeroLinea(editor);
         scrollEditor.setRowHeaderView(numEditor);
         numDisAnalisis = new NumeroLinea(displayAnalisis);
         scrollDisAnalisis.setRowHeaderView(numDisAnalisis);
+        
     }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -210,13 +302,13 @@ public class InterfazUsuario extends javax.swing.JFrame {
     }//GEN-LAST:event_bOpenFileActionPerformed
 
     private void bLexicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bLexicoActionPerformed
-        analizadorLexico.analizar(editor.getText());
+        lexer.analyzeAll(editor.getText());
         /*StringTokenizer st = new StringTokenizer(jTextArea1.getText());
         while (st.hasMoreTokens()) {
             System.out.println("-----------------------");
             System.out.println(st.nextToken());
         }*/
-        displayAnalisis.setText(analizadorLexico.getAnalisis());
+        displayAnalisis.setText(lexer.getAnalisis());
     }//GEN-LAST:event_bLexicoActionPerformed
 
     private void bClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bClearActionPerformed

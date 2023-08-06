@@ -13,24 +13,27 @@ public class AnalizadorLexico {
     ArrayList<Token> tokens;
     private String lecturaTkn;
     private boolean readAll;
+    private Expresion ex;
     public AnalizadorLexico() {
         noLinea = 0;
         tokens = new ArrayList<>();
+        ex = new Expresion();
     }
 
-    public void analizar(String texto){
+    public void analyzeAll(String texto){
         tokens.clear();
         separarTokens(texto) ;
     }
     
-    public boolean containsReservedWord(String texto){
+    // EN PRUEBA ------------------------------------------------------------
+    public boolean contains(String texto, String typeTkn){
         tokens.clear();
         separarTokens(texto);
         for (int i = 0; i < tokens.size(); i++) {
-            if(tokens.get(i).getType().equals("Reservada")){
+            if(tokens.get(i).getType().equals(typeTkn)){
                 return true;
             }
-        }
+        }  
         return false;
     }
     
@@ -87,31 +90,30 @@ public class AnalizadorLexico {
     }
     private void evaluateChar(String texto){
         char currentChar = texto.charAt(index);
-        if (isAlphaUp(currentChar) || isAlphaDown(currentChar) || 
-                isNumeric(currentChar)){
+        if (ex.isAlphaNumeric(currentChar)){
             lecturaTkn += currentChar;
-            if(isNumeric(currentChar) && lecturaTkn.length() == 1){
+            if(ex.isNumeric(currentChar) && lecturaTkn.length() == 1){
                 analyzeNumberTkn(texto);
                 saveToken(2, false);
             }
         //cuando se interrumpe el flujo por un caracter especial
-        } else if (!isIgnoredCharacter(currentChar) && lecturaTkn.length() != 0) {
+        } else if (!ex.isIgnoredCharacter(currentChar) && lecturaTkn.length() != 0) {
             saveToken(1, true);
             columna--;
             index--;
         //cuando se inicia por un caracter especial
-        } else if (!isIgnoredCharacter(currentChar) && lecturaTkn.length() == 0) {
+        } else if (!ex.isIgnoredCharacter(currentChar) && lecturaTkn.length() == 0) {
             lecturaTkn += currentChar;
             if(currentChar == '\"' || currentChar == '\'' || currentChar == '#'){ //cadenas y comentarios
                 readAll = true;
-            }else if(!isCombinable(currentChar)){
+            }else if(!ex.isCombinable(currentChar)){
                 saveToken(4, false);
-            }else if(isCombinable(currentChar)){//cuando es un caracter especial que es pueda combinar
+            }else if(ex.isCombinable(currentChar)){//cuando es un caracter especial que es pueda combinar
                 analyzeCombinableTkn(texto);
                 saveToken(4, false);
             }
         //cuando se interrumper por un caracter ignorado
-        } else if (isIgnoredCharacter(currentChar) && lecturaTkn.length() != 0) {
+        } else if (ex.isIgnoredCharacter(currentChar) && lecturaTkn.length() != 0) {
             saveToken(1, true);
         } //de lo contrario si se trata de otros caracteres ignorados no hace nada
     }
@@ -119,7 +121,7 @@ public class AnalizadorLexico {
         while (true) {
             if ((index + 1) < texto.length()) {
                 char nextChar = texto.charAt(index + 1);
-                if (isCombinable(nextChar)) {
+                if (ex.isCombinable(nextChar)) {
                     lecturaTkn += nextChar;
                     actualizarIndex();
                 } else {
@@ -135,7 +137,7 @@ public class AnalizadorLexico {
         while (true) {            
             if ((index + 1) < texto.length()) {
                 char nextChar = texto.charAt(index + 1);
-                if (isNumeric(nextChar) || (nextChar == '.' && onlyOne)) {
+                if (ex.isNumeric(nextChar) || (nextChar == '.' && onlyOne)) {
                     onlyOne = false;
                     lecturaTkn += nextChar;
                     actualizarIndex();
@@ -169,35 +171,9 @@ public class AnalizadorLexico {
         columna++;
     }
     
-    /***************************************************
-     *********** CONDICIONES PARA CARACTERES ***********
-     ***************************************************/
-    
-    public static boolean isAlphaUp(char character){
-        return ((character >= 'a' && character <= 'z') || character == '_');
-    }
-    public static boolean isAlphaDown(char character){
-        return (character >= 'A' && character <= 'Z');
-    }
-    public static boolean isNumeric(char character){
-        return (character >= '0' && character <= '9');
-    }
-    public static boolean isIgnoredCharacter(char character){
-        return switch (character) {
-            case ' ', 9, '\r', '\n'-> true;
-            default -> false;
-        };
-    }
-    public static boolean isCombinable (char character){
-        return switch (character) {
-            case '!', '-', '*', '/', '+', '=', '>', '<' -> true;
-            default -> false;
-        };
-    }
-    public static boolean isAlphaNumeric(char character){
-        return isAlphaDown(character) || isAlphaUp(character) || isNumeric(character);
-    }
-    //clasificacion de tokens
+    /***********************************************
+     *********** CLASIFICACION DE TOKENS ***********
+     ***********************************************/
     private boolean isReservada(String palabra){
         char inicial;
         try {
@@ -300,9 +276,6 @@ public class AnalizadorLexico {
         };
     }
     
-    /***********************************************
-     *********** CLASIFICACION DE TOKENS ***********
-     ***********************************************/
     private String getTypeTkn(int preliminarType, String token){
         switch (preliminarType) {  
             case 1://cuando empieza con una letra
@@ -368,4 +341,29 @@ public class AnalizadorLexico {
         }
         return "error";
     }
+    
+    /********************************************
+     *********** OTROS METODOS UTILES ***********
+     ********************************************/
+    public int findLastNonWordChar(String text, int index) {
+        //el indice se decrementa antes de la evaluacion, se verifica que sea mayor o igual a 0
+        while (--index >= 0) {
+            char character = text.charAt(index);
+            if(!(ex.isAlphaNumeric(character))){
+                break;
+            }
+        }
+        return index;
+    }
+    public int findFirstNonWordChar(String text, int index) {
+        while (index < text.length()) {
+            char character = text.charAt(index);
+            if(!(ex.isAlphaNumeric(character))){
+                break;
+            }
+            index++;
+        }
+        return index;
+    }
+    
 }
