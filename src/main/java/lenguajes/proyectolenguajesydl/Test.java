@@ -71,7 +71,7 @@ public class Test extends JFrame {
 
                 while (wordR <= after) {
                     //para cuando hay un caracter que no sea numero / letra
-                    if(wordR == after || !(ex.isAlphaNumeric(text.charAt(wordR)))){
+                    /*if(wordR == after || !(ex.isAlphaNumeric(text.charAt(wordR)))){
                         if(aLex.contains(text.substring(wordL, wordR), "Reservada")){
                             setCharacterAttributes(wordL , wordR - wordL, attr, false);
                         }else {
@@ -87,15 +87,23 @@ public class Test extends JFrame {
                             System.out.println("Error");
                         }
                         
-                    }
-                    /*if (wordR == after || String.valueOf(text.charAt(wordR)).matches("\\W")) {
+                    }*/
+                    if (wordR == after || String.valueOf(text.charAt(wordR)).matches("\\W")) {
                         if (text.substring(wordL, wordR).matches("(\\W)*(private|public|protected)")) {
                             setCharacterAttributes(wordL, wordR - wordL, attr, false);
                         } else {
                             setCharacterAttributes(wordL, wordR - wordL, attrBlack, false);
                         }
                         wordL = wordR;
-                    }*/
+                        /*try {
+                            //si el siguiente no es un ignorado...
+                            if(!ex.isIgnoredCharacter(text.charAt(wordR))){
+                                wordL++;
+                            }  
+                        } catch (Exception e) {
+                           
+                        }*/
+                    }
                     wordR++;
                 }
             }
@@ -111,17 +119,17 @@ public class Test extends JFrame {
                 }
                 int after = findFirstNonWordChar(text, offs);
 
-                if(aLex.contains(text.substring(before, after), "Reservada")){
+                /*if(aLex.contains(text.substring(before, after), "Reservada")){
                     setCharacterAttributes(before , after - before, attr, false);
                 }else {
                     setCharacterAttributes(before, after - before, attrBlack, false);
-                }
-                /*if (text.substring(before, after).matches("(\\W)*(private|public|protected)")) {
+                }*/
+                if (text.substring(before, after).matches("(\\W)*(private|public|protected)")) {
                     setCharacterAttributes(before, after - before, attr, false);
                 } else {
                     setCharacterAttributes(before, after - before, attrBlack, false);
-                }*/
-            }
+                }
+                }
         };
         JTextPane txt = new JTextPane(doc);
         txt.setText("(def class Hi {}");

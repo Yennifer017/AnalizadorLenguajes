@@ -28,6 +28,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
     private Archivo archivo;
     private AnalizadorLexico lexer = new AnalizadorLexico();
     private Expresion ex;
+    
     //se almacena el estilo actual, el default
     private final StyleContext cont = StyleContext.getDefaultStyleContext();
     //COLORES, estos como atributos
@@ -39,71 +40,108 @@ public class InterfazUsuario extends javax.swing.JFrame {
     final AttributeSet attrGreen = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.GREEN);
     
     //definicion de un documento para que pueda ser coloreado
+    private int currrentLine;
     DefaultStyledDocument doc = new DefaultStyledDocument() {
         //se sobrescribe el metodo para ingresar un string, agregando algo de codigo extra
         @Override
         public void insertString(int offset, String str, AttributeSet a) throws BadLocationException {
             super.insertString(offset, str, a);
-
             //obtener todo el texto que se esta escribiendo
             String text = getText(0, getLength());
-
-            int before = lexer.findLastNonWordChar(text, offset);
-            if (before < 0) { //evitar que se deje un indice negativo
-                before = 0;
-            }
-            int after = lexer.findFirstNonWordChar(text, offset + str.length()); //indice para evaluar todo el cont.
-            int wordL = before;
-            int wordR = before;
-
-            while (wordR <= after) {
-                //para cuando hay un caracter que no sea numero / letra
-                if (wordR == after || !(ex.isAlphaNumeric(text.charAt(wordR)))) {
-                    String currentWord = text.substring(wordL, wordR);
-                    if (lexer.contains(currentWord, "Reservada")) {
-                        setCharacterAttributes(wordL, wordR - wordL, attrPurple, false);
-                    } else if(lexer.contains(currentWord, "boolean")){
-                        setCharacterAttributes(wordL, wordR - wordL, attrOrange, false);
-                    } else {
-                        setCharacterAttributes(wordL, wordR - wordL, attrSkyBlue, false);
+            //srt == caracter ingresado
+            //offset == posicion de donde se ingresa el caracter, su inicio
+            if(str.length() == 1){
+                //if(ex.isAlphaNumeric(str.charAt(0))){
+                    int posInit = lexer.findDelimitadorL(text, offset);
+                    int posFinal = lexer.findDelimitadorR(text, offset);
+                    if(posInit == posFinal){
+                        posInit--;
                     }
-                    wordL = wordR;
-                    try {
-                        //si el siguiente no es un ignorado...
-                        if (!ex.isIgnoredCharacter(text.charAt(wordR))) {
-                            wordL++;
-                        }
-                    } catch (Exception e) {
-                        System.out.println("Error");
+                    System.out.println(posInit + "init - final" + posFinal);
+                    String currentTkn = text.substring(posInit, posFinal);
+                    System.out.println(currentTkn);
+                    String currentType = lexer.getTypeTkn(currentTkn);
+                    System.out.println(currentType);
+                    switch (currentType) {
+                        case "Reservada":
+                            setCharacterAttributes(posInit,  currentTkn.length(), attrPurple, false);
+                            break;
+                        case "boolean", "int":
+                            setCharacterAttributes(posInit,  currentTkn.length(), attrOrange, false);
+                            break;
+                        case "Logico":
+                            setCharacterAttributes(posInit,  currentTkn.length(), attrSkyBlue, false);
+                            break;
+                        case "Identificador":
+                            setCharacterAttributes(posInit,  currentTkn.length(), attrWhite, false);
+                            break;    
+                        case "Otro":
+                            setCharacterAttributes(posInit, 1 , attrGreen, false);
+                            break;   
+                        default:
+                            setCharacterAttributes(posInit, 1, attrSkyBlue, false);
                     }
-
-                }
-                wordR++;
+                /*}else if(ex.isOtro(str.charAt(0))){
+                    setCharacterAttributes(offset, 1, attrGreen, false);
+                }else if(!ex.isIgnoredCharacter(str.charAt(0))){
+                    setCharacterAttributes(offset, 1, attrSkyBlue, false);
+                }else if(str.charAt(0) == '"' || str.charAt(0) == '\'' || str.charAt(0) == '#' ){
+                    
+                }*/
+            }else{
+            
             }
+            
+            //System.out.println("offset:" + offset + "-srt:" + str + "-a:" + a);
+
         }
 
         @Override
         public void remove(int offs, int len) throws BadLocationException {
             super.remove(offs, len);
             String text = getText(0, getLength());
-            int before = lexer.findLastNonWordChar(text, offs);
-            if (before < 0) {
-                before = 0;
-            }
-            int after = lexer.findFirstNonWordChar(text, offs);
+            System.out.println(offs + "-offs --- len->" + len);
+            //offs -posicion donde termina el cursor luego de la eliminacion
+            //len cuantos caracteres se eliminarion
             
-            String currentWord = text.substring(before, after);
-            if (lexer.contains(currentWord, "Reservada")) {
-                setCharacterAttributes(before, after - before, attrPurple, false);
-            } else if(lexer.contains(currentWord, "boolean")){
-                setCharacterAttributes(before, after - before, attrOrange, false);
-            }else {
-                setCharacterAttributes(before, after - before, attrSkyBlue, false);
+            try {
+                int posInit = lexer.findDelimitadorL(text, offs);
+                int posFinal = lexer.findDelimitadorR(text, offs);
+                //System.out.println(posInit + "init - final" + posFinal);
+                if(posInit == posFinal){
+                    posInit--;
+                }
+                //System.out.println(posInit + "init - final" + posFinal);
+                String currentTkn = text.substring(posInit, posFinal);
+                //System.out.println(currentTkn);
+                String currentType = lexer.getTypeTkn(currentTkn);
+                //System.out.println(currentType);
+                switch (currentType) {
+                    case "Reservada":
+                        setCharacterAttributes(posInit,  currentTkn.length(), attrPurple, false);
+                        break;
+                    case "boolean", "int":
+                        setCharacterAttributes(posInit,  currentTkn.length(), attrOrange, false);
+                        break;
+                    case "Logico":
+                        setCharacterAttributes(posInit,  currentTkn.length(), attrSkyBlue, false);
+                        break;
+                    case "Identificador":
+                        setCharacterAttributes(posInit,  currentTkn.length(), attrWhite, false);
+                        break;    
+                    case "Otro":
+                        setCharacterAttributes(posInit,  currentTkn.length(), attrGreen, false);
+                        break;   
+                    default:
+                        setCharacterAttributes(posInit, currentTkn.length(), attrSkyBlue, false);
+                } 
+            } catch (IndexOutOfBoundsException e) {
+                System.out.println(e);
             }
         }
     };
-        
     
+        
     /**
      * Creates new form InterfazUsuario
      */    
@@ -125,7 +163,6 @@ public class InterfazUsuario extends javax.swing.JFrame {
         scrollEditor.setRowHeaderView(numEditor);
         numDisAnalisis = new NumeroLinea(displayAnalisis);
         scrollDisAnalisis.setRowHeaderView(numDisAnalisis);
-        
     }
     
 
@@ -249,7 +286,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
         editor.setBackground(new java.awt.Color(0, 0, 44));
         editor.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 51)));
         editor.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
-        editor.setForeground(new java.awt.Color(255, 255, 255));
+        editor.setForeground(new java.awt.Color(0, 153, 204));
         editor.setCaretColor(new java.awt.Color(255, 255, 255));
         scrollEditor.setViewportView(editor);
 

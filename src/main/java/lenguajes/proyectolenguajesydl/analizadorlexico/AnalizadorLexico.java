@@ -289,6 +289,18 @@ public class AnalizadorLexico {
             default: throw new AssertionError();
         }
     }
+    public String getTypeTkn(String preTkn) throws IndexOutOfBoundsException{
+        char initial = preTkn.charAt(0);
+        if (ex.isLetter(initial)) {
+            return sortFistLetter(preTkn);
+        }else if(ex.isNumeric(initial)){
+            return sortFirstNumber(preTkn);
+        }else if(ex.isOtro(initial)){
+            return "Otro";
+        }else{
+            return "en proceso";
+        }
+    }
     private String sortFistLetter(String preTkn){
         if (isBooleana(preTkn)) {
             return "boolean";
@@ -362,6 +374,37 @@ public class AnalizadorLexico {
                 break;
             }
             index++;
+        }
+        return index;
+    }
+    public int findDelimitadorL(String text, int index){
+        while (index >= 0) {            
+            char character = text.charAt(index);
+            if(!ex.isAlphaNumeric(character)){
+                index++;
+                return index;
+            }
+            index--;
+        }
+        if(index<0){
+            index = 0;
+        }
+        return index;
+    }
+    public int findDelimitadorR(String text, int index){
+        int indexInitial = index;
+        while (index<text.length()) {            
+            char character = text.charAt(index);
+            if(!ex.isAlphaNumeric(character)){
+                if(index == indexInitial){
+                    index++;
+                }
+                return index;
+            }
+            index++;
+        }
+        if(index > text.length()){
+            index = text.length();
         }
         return index;
     }

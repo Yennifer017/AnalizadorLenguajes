@@ -40,4 +40,15 @@ public class Expresion {
     public boolean isAlphaNumeric(char character) {
         return isAlphaDown(character) || isAlphaUp(character) || isNumeric(character);
     }
+    public boolean isLetter(char character){
+        return isAlphaDown(character) || isAlphaUp(character);
+    }
+    public boolean isOtro(char character){
+        return switch (character) {
+            case '(', ')', '[', ']', '{', '}', ',', ':', ';' ->
+                true;
+            default ->
+                false;
+        };
+    }
 }
