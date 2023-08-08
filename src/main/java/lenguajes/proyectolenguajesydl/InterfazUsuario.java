@@ -2,16 +2,8 @@ package lenguajes.proyectolenguajesydl;
 
 import java.awt.Color;
 import lenguajes.proyectolenguajesydl.util.*;
-import java.util.StringTokenizer;
-import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 import lenguajes.proyectolenguajesydl.analizadorlexico.AnalizadorLexico;
-import lenguajes.proyectolenguajesydl.analizadorlexico.Expresion;
 import lenguajes.proyectolenguajesydl.util.NumeroLinea;
 
 /**
@@ -19,144 +11,23 @@ import lenguajes.proyectolenguajesydl.util.NumeroLinea;
  * @author yenni
  */
 public class InterfazUsuario extends javax.swing.JFrame {
-    //NumeroLinea numeracionEditor, numeracionDisplay;
+
     NumeroLinea numEditor, numDisAnalisis;
-    
-    /**
-     * Creacion de los elementos necesarios para hacer funcionar el analizador
-     */ 
-    private Archivo archivo;
-    private AnalizadorLexico lexer = new AnalizadorLexico();
-    private Expresion ex;
-    
-    //se almacena el estilo actual, el default
-    private final StyleContext cont = StyleContext.getDefaultStyleContext();
-    //COLORES, estos como atributos
-    private final AttributeSet attrWhite = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.WHITE);
-    final AttributeSet attrSkyBlue = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, new Color(0,242,255));
-    final AttributeSet attrPurple = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, new Color(177,0,255));   
-    final AttributeSet attrOrange = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.ORANGE);
-    final AttributeSet attrGray = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.GRAY);
-    final AttributeSet attrGreen = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.GREEN);
-    
-    //definicion de un documento para que pueda ser coloreado
-    private int currrentLine;
-    DefaultStyledDocument doc = new DefaultStyledDocument() {
-        //se sobrescribe el metodo para ingresar un string, agregando algo de codigo extra
-        @Override
-        public void insertString(int offset, String str, AttributeSet a) throws BadLocationException {
-            super.insertString(offset, str, a);
-            //obtener todo el texto que se esta escribiendo
-            String text = getText(0, getLength());
-            //srt == caracter ingresado
-            //offset == posicion de donde se ingresa el caracter, su inicio
-            if(str.length() == 1){
-                //if(ex.isAlphaNumeric(str.charAt(0))){
-                    int posInit = lexer.findDelimitadorL(text, offset);
-                    int posFinal = lexer.findDelimitadorR(text, offset);
-                    if(posInit == posFinal){
-                        posInit--;
-                    }
-                    System.out.println(posInit + "init - final" + posFinal);
-                    String currentTkn = text.substring(posInit, posFinal);
-                    System.out.println(currentTkn);
-                    String currentType = lexer.getTypeTkn(currentTkn);
-                    System.out.println(currentType);
-                    switch (currentType) {
-                        case "Reservada":
-                            setCharacterAttributes(posInit,  currentTkn.length(), attrPurple, false);
-                            break;
-                        case "boolean", "int":
-                            setCharacterAttributes(posInit,  currentTkn.length(), attrOrange, false);
-                            break;
-                        case "Logico":
-                            setCharacterAttributes(posInit,  currentTkn.length(), attrSkyBlue, false);
-                            break;
-                        case "Identificador":
-                            setCharacterAttributes(posInit,  currentTkn.length(), attrWhite, false);
-                            break;    
-                        case "Otro":
-                            setCharacterAttributes(posInit, 1 , attrGreen, false);
-                            break;   
-                        default:
-                            setCharacterAttributes(posInit, 1, attrSkyBlue, false);
-                    }
-                /*}else if(ex.isOtro(str.charAt(0))){
-                    setCharacterAttributes(offset, 1, attrGreen, false);
-                }else if(!ex.isIgnoredCharacter(str.charAt(0))){
-                    setCharacterAttributes(offset, 1, attrSkyBlue, false);
-                }else if(str.charAt(0) == '"' || str.charAt(0) == '\'' || str.charAt(0) == '#' ){
-                    
-                }*/
-            }else{
-            
-            }
-            
-            //System.out.println("offset:" + offset + "-srt:" + str + "-a:" + a);
-
-        }
-
-        @Override
-        public void remove(int offs, int len) throws BadLocationException {
-            super.remove(offs, len);
-            String text = getText(0, getLength());
-            System.out.println(offs + "-offs --- len->" + len);
-            //offs -posicion donde termina el cursor luego de la eliminacion
-            //len cuantos caracteres se eliminarion
-            
-            try {
-                int posInit = lexer.findDelimitadorL(text, offs);
-                int posFinal = lexer.findDelimitadorR(text, offs);
-                //System.out.println(posInit + "init - final" + posFinal);
-                if(posInit == posFinal){
-                    posInit--;
-                }
-                //System.out.println(posInit + "init - final" + posFinal);
-                String currentTkn = text.substring(posInit, posFinal);
-                //System.out.println(currentTkn);
-                String currentType = lexer.getTypeTkn(currentTkn);
-                //System.out.println(currentType);
-                switch (currentType) {
-                    case "Reservada":
-                        setCharacterAttributes(posInit,  currentTkn.length(), attrPurple, false);
-                        break;
-                    case "boolean", "int":
-                        setCharacterAttributes(posInit,  currentTkn.length(), attrOrange, false);
-                        break;
-                    case "Logico":
-                        setCharacterAttributes(posInit,  currentTkn.length(), attrSkyBlue, false);
-                        break;
-                    case "Identificador":
-                        setCharacterAttributes(posInit,  currentTkn.length(), attrWhite, false);
-                        break;    
-                    case "Otro":
-                        setCharacterAttributes(posInit,  currentTkn.length(), attrGreen, false);
-                        break;   
-                    default:
-                        setCharacterAttributes(posInit, currentTkn.length(), attrSkyBlue, false);
-                } 
-            } catch (IndexOutOfBoundsException e) {
-                System.out.println(e);
-            }
-        }
-    };
-    
-        
+    private final Archivo archivo;
+    private final AnalizadorLexico lexer;
+    private final Pintor pintor;    
     /**
      * Creates new form InterfazUsuario
-     */    
+     */
+    
     public InterfazUsuario() {
         initComponents();
         this.setLocationRelativeTo(null);
         initNumeracion();
         archivo = new Archivo();
-        //lexer = new AnalizadorLexico();
-        ex = new Expresion();
-        //inicializando estilos 
-        JTextPane txt = new JTextPane(doc);
-        String temp = editor.getText();
-        editor.setStyledDocument(txt.getStyledDocument());
-        editor.setText(temp);
+        lexer = new AnalizadorLexico();
+        pintor = new Pintor(lexer);
+        initStyle();
     }
     private void initNumeracion(){
         numEditor = new NumeroLinea(editor);
@@ -164,8 +35,13 @@ public class InterfazUsuario extends javax.swing.JFrame {
         numDisAnalisis = new NumeroLinea(displayAnalisis);
         scrollDisAnalisis.setRowHeaderView(numDisAnalisis);
     }
+    private void initStyle(){
+        JTextPane txt = new JTextPane(pintor.getDefStyleDoc());
+        String temp = editor.getText();
+        editor.setStyledDocument(txt.getStyledDocument());
+        editor.setText(temp);
+    }
     
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -199,6 +75,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
         bOpenFile.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         bOpenFile.setForeground(new java.awt.Color(255, 255, 255));
         bOpenFile.setText("Abrir archivo");
+        bOpenFile.setFocusable(false);
         bOpenFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bOpenFileActionPerformed(evt);
@@ -209,21 +86,25 @@ public class InterfazUsuario extends javax.swing.JFrame {
         bSave.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         bSave.setForeground(new java.awt.Color(255, 255, 255));
         bSave.setText("Guardar");
+        bSave.setFocusable(false);
 
         bSave1.setBackground(new java.awt.Color(7, 7, 110));
         bSave1.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         bSave1.setForeground(new java.awt.Color(255, 255, 255));
         bSave1.setText("Generar Gráfica");
+        bSave1.setFocusable(false);
 
         bSave2.setBackground(new java.awt.Color(7, 7, 110));
         bSave2.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         bSave2.setForeground(new java.awt.Color(255, 255, 255));
         bSave2.setText("Ayuda");
+        bSave2.setFocusable(false);
 
         bSave3.setBackground(new java.awt.Color(7, 7, 110));
         bSave3.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         bSave3.setForeground(new java.awt.Color(255, 255, 255));
         bSave3.setText("Creditos");
+        bSave3.setFocusable(false);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -265,6 +146,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
         bClear.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         bClear.setForeground(new java.awt.Color(255, 255, 255));
         bClear.setText("Limpiar");
+        bClear.setFocusable(false);
         bClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bClearActionPerformed(evt);
@@ -275,6 +157,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
         bLexico.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         bLexico.setForeground(new java.awt.Color(255, 255, 255));
         bLexico.setText("Analizador Léxico");
+        bLexico.setFocusable(false);
         bLexico.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bLexicoActionPerformed(evt);
@@ -285,7 +168,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
 
         editor.setBackground(new java.awt.Color(0, 0, 44));
         editor.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 51)));
-        editor.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        editor.setFont(new java.awt.Font("Dialog", 0, 17)); // NOI18N
         editor.setForeground(new java.awt.Color(0, 153, 204));
         editor.setCaretColor(new java.awt.Color(255, 255, 255));
         scrollEditor.setViewportView(editor);
@@ -293,7 +176,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
         displayAnalisis.setEditable(false);
         displayAnalisis.setBackground(new java.awt.Color(0, 0, 44));
         displayAnalisis.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 51, 51)));
-        displayAnalisis.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        displayAnalisis.setFont(new java.awt.Font("Dialog", 0, 17)); // NOI18N
         displayAnalisis.setForeground(new java.awt.Color(255, 255, 255));
         displayAnalisis.setCaretColor(new java.awt.Color(255, 255, 255));
         scrollDisAnalisis.setViewportView(displayAnalisis);

@@ -2,6 +2,7 @@
 package lenguajes.proyectolenguajesydl.analizadorlexico;
 
 import java.util.ArrayList;
+import lenguajes.proyectolenguajesydl.util.Position;
 
 /**
  *
@@ -85,7 +86,7 @@ public class AnalizadorLexico {
             actualizarIndex();
         }
         if(!lecturaTkn.equals("")){
-            saveToken(1, true);
+            saveToken(true);
         }
     }
     private void evaluateChar(String texto){
@@ -151,12 +152,29 @@ public class AnalizadorLexico {
     }
     private void saveToken(int preliminarType, boolean incrDone){
         if(!incrDone){
+            index++;
             columna++;
         }
-        tokens.add(new Token(lecturaTkn, noLinea, columna, 
-                getTypeTkn(preliminarType, lecturaTkn)));
+        /*tokens.add(new Token(lecturaTkn, noLinea, columna, 
+                getTypeTkn(preliminarType, lecturaTkn)));*/
+        tokens.add(new Token(lecturaTkn, new Position(columna-lecturaTkn.length(), noLinea, 
+                index-lecturaTkn.length()), getTypeTkn(preliminarType, lecturaTkn)));
         lecturaTkn="";
         if(!incrDone){
+            index--;
+            columna--;
+        }
+    }
+    private void saveToken(boolean incrDone){
+        if(!incrDone){
+            index++;
+            columna++;
+        }
+        tokens.add(new Token(lecturaTkn, new Position(columna-lecturaTkn.length(), noLinea, 
+                index-lecturaTkn.length()), getTypeTkn(lecturaTkn)));
+        lecturaTkn="";
+        if(!incrDone){
+            index--;
             columna--;
         }
     }
@@ -297,8 +315,10 @@ public class AnalizadorLexico {
             return sortFirstNumber(preTkn);
         }else if(ex.isOtro(initial)){
             return "Otro";
+        }else if(initial == '#' || initial == '\'' || initial == '"'){
+            return sortString(preTkn);
         }else{
-            return "en proceso";
+            return sortFistSpecialC(preTkn);
         }
     }
     private String sortFistLetter(String preTkn){
@@ -314,7 +334,7 @@ public class AnalizadorLexico {
     }
     private String sortFirstNumber(String preTkn){
         if (preTkn.contains(".")) {
-            return "foat";
+            return "float";
         } else {
             return "int";
         }
@@ -391,16 +411,32 @@ public class AnalizadorLexico {
         }
         return index;
     }
+    
+    public int findDelimitadorL(String text, int index, char where){
+        while (index >= 0) {            
+            char character = text.charAt(index);
+            if(character == where){
+                index++;
+                return index;
+            }
+            index--;
+        }
+        if(index<0){
+            index = 0;
+        }
+        return index;
+    }
+    
     public int findDelimitadorR(String text, int index){
         int indexInitial = index;
         while (index<text.length()) {            
             char character = text.charAt(index);
             if(!ex.isAlphaNumeric(character)){
                 if(index == indexInitial){
-                    index++;
-                }
-                return index;
-            }
+                        index++;
+                    }
+                    return index;
+                }    
             index++;
         }
         if(index > text.length()){
@@ -409,4 +445,24 @@ public class AnalizadorLexico {
         return index;
     }
     
+    public int findDelimitadorR(String text, int index, char where){
+        int indexInitial = index;
+        while (index<text.length()) {            
+            char character = text.charAt(index);
+            if(character == where){
+                if(index == indexInitial){
+                        index++;
+                    }
+                    return index;
+                }    
+            index++;
+        }
+        if(index > text.length()){
+            index = text.length();
+        }
+        return index;
+    }
+    public ArrayList<Token> getTokens(){
+        return tokens;
+    }
 }

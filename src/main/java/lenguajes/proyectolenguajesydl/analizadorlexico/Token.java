@@ -4,28 +4,39 @@
  */
 package lenguajes.proyectolenguajesydl.analizadorlexico;
 
+import lenguajes.proyectolenguajesydl.util.Position;
+
 /**
  *
  * @author yenni
  */
 public class Token {
     private String contenido, type;
-    private int fila, colStart;
-    public Token(String contenido, int fila, int columnaFin, String tipoToken) {
+    private Position position;
+    public Token(String contenido, Position position, String tipoToken) {
         this.contenido = contenido;
-        this.fila = fila;
-        this.colStart = columnaFin - contenido.length();
+        this.position = position;
         this.type = tipoToken;
     }
     @Override
     public String toString(){
-        return contenido + "       fila " + (fila+1) + " columna " + (colStart+1) + " type: " + type; 
+        return contenido + "       fila " + (position.getFila()+1) + " columna " + (position.getColumna()+1) 
+                + " type: " + type; 
     }
     public String getType(){
         return type;
     }
     public int getInicio(){
-        return colStart;
+        return position.getColumna();
     }
-    
+    public int getRelativeIndex(){
+        return position.getIndex();
+    }
+    public int length(){
+        return contenido.length();
+    }
+    public String getContenido(){
+        return contenido;
+    }
+   
 }
