@@ -1,6 +1,5 @@
 package lenguajes.proyectolenguajesydl;
 
-import java.awt.Color;
 import lenguajes.proyectolenguajesydl.util.*;
 import javax.swing.JTextPane;
 import lenguajes.proyectolenguajesydl.analizadorlexico.AnalizadorLexico;

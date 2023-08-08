@@ -26,17 +26,6 @@ public class AnalizadorLexico {
         separarTokens(texto) ;
     }
     
-    // EN PRUEBA ------------------------------------------------------------
-    public boolean contains(String texto, String typeTkn){
-        tokens.clear();
-        separarTokens(texto);
-        for (int i = 0; i < tokens.size(); i++) {
-            if(tokens.get(i).getType().equals(typeTkn)){
-                return true;
-            }
-        }  
-        return false;
-    }
     
     public String getAnalisis(){
         String analisis= "";
@@ -139,8 +128,10 @@ public class AnalizadorLexico {
             if ((index + 1) < texto.length()) {
                 char nextChar = texto.charAt(index + 1);
                 if (ex.isNumeric(nextChar) || (nextChar == '.' && onlyOne)) {
-                    onlyOne = false;
                     lecturaTkn += nextChar;
+                    if(nextChar == '.'){
+                        onlyOne = false;
+                    }
                     actualizarIndex();
                 } else {
                     break;
@@ -342,7 +333,7 @@ public class AnalizadorLexico {
     private String sortString(String preTkn){
         if (preTkn.charAt(0) == '#') {
             return "Comentario";
-        } else if(preTkn.charAt(0) == preTkn.charAt(preTkn.length()-1)){
+        } else if(preTkn.length()>1 && preTkn.charAt(0) == preTkn.charAt(preTkn.length()-1)){
             return "Cadena";
         } else {
             return "error";
@@ -377,26 +368,6 @@ public class AnalizadorLexico {
     /********************************************
      *********** OTROS METODOS UTILES ***********
      ********************************************/
-    public int findLastNonWordChar(String text, int index) {
-        //el indice se decrementa antes de la evaluacion, se verifica que sea mayor o igual a 0
-        while (--index >= 0) {
-            char character = text.charAt(index);
-            if(!(ex.isAlphaNumeric(character))){
-                break;
-            }
-        }
-        return index;
-    }
-    public int findFirstNonWordChar(String text, int index) {
-        while (index < text.length()) {
-            char character = text.charAt(index);
-            if(!(ex.isAlphaNumeric(character))){
-                break;
-            }
-            index++;
-        }
-        return index;
-    }
     public int findDelimitadorL(String text, int index){
         while (index >= 0) {            
             char character = text.charAt(index);
@@ -413,7 +384,7 @@ public class AnalizadorLexico {
     }
     
     public int findDelimitadorL(String text, int index, char where){
-        while (index >= 0) {            
+        while (index >= 0 && text.length()!=0) {            
             char character = text.charAt(index);
             if(character == where){
                 index++;
