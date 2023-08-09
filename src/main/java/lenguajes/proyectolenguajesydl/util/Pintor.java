@@ -70,7 +70,7 @@ public class Pintor {
     public Pintor(AnalizadorLexico lexer) {
         attrWhite = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.WHITE);
         attrSkyBlue = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, new Color(0,242,255));
-        attrPurple = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, new Color(225,156,255));  
+        attrPurple = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, new Color(158,0,255));  
         attrOrange = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.ORANGE);
         attrGray = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.GRAY);
         attrGreen = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.GREEN);
