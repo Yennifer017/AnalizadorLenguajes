@@ -8,19 +8,18 @@ import lenguajes.proyectolenguajesydl.util.Position;
  * @author yenni
  */
 public class Token {
-    private String lexema, type;
+    private String lexema, type, patron;
     private Position position;
-    public Token(String lexema, Position position, String type) {
+    public Token(String lexema, Position position, String type, String patron) {
         this.lexema = lexema;
         this.position = position;
         this.type = type;
+        this.patron = patron;
     }
     @Override
     public String toString(){
         String reporte = "Lexema<" + lexema + ">    Token<" +  type + ">";
         reporte += "    Linea: " + (position.getFila()+1) + " Columna: " + (position.getColumna()+1);
-        /*String reporte = "Token: " + type + "   Patron: " + "PATRON AQUI" + "   Lexema: "; 
-        reporte += lexema  + "   Linea: " + position.getFila() + " Columna: " + position.getColumna();*/
         return reporte;
        
     }
@@ -44,6 +43,9 @@ public class Token {
     }
     public int getColumna(){
         return position.getColumna();
+    }
+    public String getPatron(){
+        return patron;
     }
    
 }

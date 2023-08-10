@@ -149,8 +149,9 @@ public class AnalizadorLexico {
         }
         /*tokens.add(new Token(lecturaTkn, noLinea, columna, 
                 getTypeTkn(preliminarType, lecturaTkn)));*/
+        String typeTkn = getTypeTkn(preliminarType, lecturaTkn);
         tokens.add(new Token(lecturaTkn, new Position(columna-lecturaTkn.length(), noLinea, 
-                index-lecturaTkn.length()), getTypeTkn(preliminarType, lecturaTkn)));
+                index-lecturaTkn.length()), typeTkn, getPatron(lecturaTkn,  typeTkn)));
         lecturaTkn="";
         if(!incrDone){
             index--;
@@ -162,8 +163,9 @@ public class AnalizadorLexico {
             index++;
             columna++;
         }
+        String typeTkn = getTypeTkn(lecturaTkn);
         tokens.add(new Token(lecturaTkn, new Position(columna-lecturaTkn.length(), noLinea, 
-                index-lecturaTkn.length()), getTypeTkn(lecturaTkn)));
+                index-lecturaTkn.length()), typeTkn, getPatron(lecturaTkn, typeTkn)));
         lecturaTkn="";
         if(!incrDone){
             index--;
@@ -325,10 +327,12 @@ public class AnalizadorLexico {
         }
     }
     private String sortFirstNumber(String preTkn){
-        if (preTkn.contains(".")) {
+        if (preTkn.contains(".") && preTkn.charAt(preTkn.length()-1)!='.') {
             return "float";
-        } else {
+        } else if(!preTkn.contains(".")){
             return "int";
+        } else {
+            return "error";
         }
     }
     private String sortString(String preTkn){
@@ -437,4 +441,22 @@ public class AnalizadorLexico {
     public ArrayList<Token> getTokens(){
         return tokens;
     }
+    /*****************************************************
+    **** SETEAR LOS PATRONES PARA LOS TIPOS DE TOKENS ****
+    ******************************************************/
+    private String getPatron(String lexema, String typeTkn) {
+        String patron;
+        patron = switch (typeTkn) {
+            case "Identificador" -> "(([a-zA-Z]|_)+)(\\w|.)*";
+            case "Reservada", "boolean", "Aritmetico", "asignacion", "Comparativo"-> lexema;
+            case "int" -> "[0-9]+";
+            case "float" -> "([0-9]+)[.]([0-9]+)";
+            case "Cadena" -> "[" + lexema.charAt(0) + "](\\w|.)*[" + lexema.charAt(0) + "]";
+            case "Comentario" -> "[#].*";
+            case "Otro" -> String.valueOf(lexema.charAt(0));
+            default -> "No existe";
+        };
+        return patron;
+    }
 }
+

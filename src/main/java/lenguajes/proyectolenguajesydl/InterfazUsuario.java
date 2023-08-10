@@ -1,8 +1,8 @@
 package lenguajes.proyectolenguajesydl;
 
+import java.awt.event.*;
 import lenguajes.proyectolenguajesydl.util.*;
 import javax.swing.JTextPane;
-import javax.swing.table.DefaultTableModel;
 import lenguajes.proyectolenguajesydl.analizadorlexico.AnalizadorLexico;
 import lenguajes.proyectolenguajesydl.util.NumeroLinea;
 
@@ -16,6 +16,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
     private final Archivo archivo;
     private final AnalizadorLexico lexer;
     private final Pintor pintor; 
+    private final Graficador graficador;
     Reportero rep;
     /**
      * Creates new form InterfazUsuario
@@ -29,7 +30,9 @@ public class InterfazUsuario extends javax.swing.JFrame {
         lexer = new AnalizadorLexico();
         pintor = new Pintor(lexer);
         rep = new Reportero();
+        graficador = new Graficador();
         initStyle();
+        initTable();
     }
     private void initNumeracion(){
         numEditor = new NumeroLinea(editor);
@@ -42,6 +45,18 @@ public class InterfazUsuario extends javax.swing.JFrame {
         String temp = editor.getText();
         editor.setStyledDocument(txt.getStyledDocument());
         editor.setText(temp);
+    }
+    private void initTable(){
+        displayReporte.getTableHeader().setReorderingAllowed(false) ;
+        displayReporte.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mousePressed(MouseEvent mouseE){
+                if(mouseE.getClickCount() == 1){
+                    System.out.println(displayReporte.getValueAt(displayReporte.getSelectedRow(), 1));
+                    //cuando haga un clic que haga algo
+                }
+            }
+        });
     }
     
     /**
@@ -223,7 +238,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
 
         displayReporte.setBackground(new java.awt.Color(0, 0, 51));
         displayReporte.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
-        displayReporte.setForeground(new java.awt.Color(204, 204, 204));
+        displayReporte.setForeground(new java.awt.Color(198, 198, 198));
         displayReporte.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
@@ -246,7 +261,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
                 {null, null, null, null, null}
             },
             new String [] {
-                "Token", "Patron", "Lexema", "Linea", "Columna"
+                "Token", "Patron", "Lexema", "L", "C"
             }
         ) {
             Class[] types = new Class [] {
@@ -264,10 +279,21 @@ public class InterfazUsuario extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        displayReporte.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_NEXT_COLUMN);
         displayReporte.setFocusable(false);
         displayReporte.setGridColor(new java.awt.Color(0, 0, 0));
         displayReporte.setSelectionBackground(new java.awt.Color(0, 128, 201));
+        displayReporte.setShowGrid(true);
         jScrollPane1.setViewportView(displayReporte);
+        if (displayReporte.getColumnModel().getColumnCount() > 0) {
+            displayReporte.getColumnModel().getColumn(0).setResizable(false);
+            displayReporte.getColumnModel().getColumn(1).setResizable(false);
+            displayReporte.getColumnModel().getColumn(2).setResizable(false);
+            displayReporte.getColumnModel().getColumn(3).setResizable(false);
+            displayReporte.getColumnModel().getColumn(3).setPreferredWidth(5);
+            displayReporte.getColumnModel().getColumn(4).setResizable(false);
+            displayReporte.getColumnModel().getColumn(4).setPreferredWidth(5);
+        }
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -297,57 +323,15 @@ public class InterfazUsuario extends javax.swing.JFrame {
 
     private void bLexicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bLexicoActionPerformed
         lexer.analyzeAll(editor.getText());
-        /*StringTokenizer st = new StringTokenizer(jTextArea1.getText());
-        while (st.hasMoreTokens()) {
-            System.out.println("-----------------------");
-            System.out.println(st.nextToken());
-        }*/
         displayAnalisis.setText(lexer.getErrors());
-        displayReporte.setModel(new DefaultTableModel(rep.getAnalisisLexico(lexer), 
-                new String [] {"Token", "Patron", "Lexema", "Linea", "Columna"}));
+        rep.setReporte(displayReporte, lexer);
     }//GEN-LAST:event_bLexicoActionPerformed
 
     private void bClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bClearActionPerformed
         editor.setText("");
         displayAnalisis.setText("");
-        displayReporte.setModel(new DefaultTableModel(rep.getAnalisisLexico(lexer), 
-                new String [] {"Token", "Patron", "Lexema", "Linea", "Columna"}));
+        rep.clearTable(displayReporte, true);
     }//GEN-LAST:event_bClearActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(InterfazUsuario.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(InterfazUsuario.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(InterfazUsuario.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(InterfazUsuario.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new InterfazUsuario().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bClear;
