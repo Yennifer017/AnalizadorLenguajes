@@ -67,7 +67,10 @@ public class AnalizadorLexico {
                 if(currentChar != '\n'){
                     lecturaTkn += currentChar;
                 }
-                if(currentChar == '\n' || currentChar == '"' || currentChar == '\''){
+                if(currentChar == '\n'){
+                    saveToken(3, currentChar == '\n');
+                    readAll = false;
+                }else if(currentChar == lecturaTkn.charAt(0) && currentChar != '#'){
                     saveToken(3, currentChar == '\n');
                     readAll = false;
                 }

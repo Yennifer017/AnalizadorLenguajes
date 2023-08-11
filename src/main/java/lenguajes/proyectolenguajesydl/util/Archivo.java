@@ -32,4 +32,17 @@ public class Archivo {
         buscador.showOpenDialog(null); //abrir el buscador
         return buscador.getSelectedFile().getAbsolutePath();
     }
+    
+    public void guardarArchivo(String texto, String ruta) { //reescribe un archivo a partir de un texto
+        try {
+            File archivo = new File(ruta); //obtiene el archivo de la ruta
+            FileWriter escritor = new FileWriter(archivo, false);
+            BufferedWriter buffer = new BufferedWriter(escritor);
+            buffer.write(texto);
+            buffer.close();
+            escritor.close();
+        } catch (IOException error) {
+            System.out.println(error);
+        }
+    }
 }

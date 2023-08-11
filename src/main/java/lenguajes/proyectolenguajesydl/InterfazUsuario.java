@@ -53,7 +53,9 @@ public class InterfazUsuario extends javax.swing.JFrame {
             public void mousePressed(MouseEvent mouseE){
                 if(mouseE.getClickCount() == 1){
                     System.out.println(displayReporte.getValueAt(displayReporte.getSelectedRow(), 1));
-                    //cuando haga un clic que haga algo
+                    String typeTkn = displayReporte.getValueAt(displayReporte.getSelectedRow(), 0).toString();
+                    String lexema = displayReporte.getValueAt(displayReporte.getSelectedRow(), 2).toString();
+                    graficador.graficar(typeTkn, lexema, "CurrentGraph");
                 }
             }
         });
