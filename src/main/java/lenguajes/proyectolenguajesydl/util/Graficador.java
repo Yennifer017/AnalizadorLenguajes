@@ -4,8 +4,6 @@ package lenguajes.proyectolenguajesydl.util;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import lenguajes.proyectolenguajesydl.analizadorlexico.Token;
 
 /**
@@ -14,18 +12,17 @@ import lenguajes.proyectolenguajesydl.analizadorlexico.Token;
  */
 public class Graficador {
     Archivo archivo;
+    Nodo nodo;
     public Graficador() {
         archivo = new Archivo();
+        nodo = new Nodo();
     }
     
-    
-    public void graficar(Token token){
-    
-    }
-    public void graficar(String typeTkn, String lexema, String fileName) throws NullPointerException{
-        String code = initGraphviz(fileName) + getEstructura(typeTkn, lexema) + endGraphviz();
+    public void graficar(Token token, String fileName, String extensionOutput) {
+        String code = initGraphviz(fileName) + getEstructura(token.getType(), token.getContenido()) 
+                + endGraphviz();
         archivo.saveFile(code, fileName + ".dot");
-        String[] cmd = {"dot.exe", "-Tpng", fileName+".dot", "-o", fileName + ".png"};
+        String[] cmd = {"dot.exe", "-Tpng", fileName+".dot", "-o", fileName + extensionOutput};
         
         Runtime rt = Runtime.getRuntime();
         try {
@@ -42,12 +39,15 @@ public class Graficador {
         return "}";
     }
     private String getEstructura(String typeTkn, String lexema){
-        String estructura = "nodo0[color=blue]\n";
+        //String estructura = "nodo0[color=blue]\n";
+        String estructura = nodo.colorear("nodo0", "blue");
         switch (typeTkn) {
-            case "Reservada", "boolean":
-                estructura += "nodo0[label=\"" +lexema.charAt(0) +"\"] \n";
-                estructura += "nodoFinal[label=\"" +lexema.charAt(lexema.length()-1) +"\" shape=doublecircle] \n";
-                estructura += "nodo0 -> ";
+            //causan problemas los aritmeticos otros y asignacion
+            case "Reservada", "boolean", "Asignacion", "Aritmetico", "Otro":
+                estructura += nodo.defineLabel("nodo0", String.valueOf(lexema.charAt(0)))
+                        + nodo.defineLabel("nodoFinal", String.valueOf(lexema.charAt(lexema.length()-1)))
+                        + nodo.defineShape("nodoFinal", "doublecircle")
+                        + "nodo0 -> ";
                 for (int i = 1; i < lexema.length(); i++) {
                     if(i<lexema.length()-1){
                         estructura += lexema.charAt(i) + "-> ";
@@ -56,20 +56,35 @@ public class Graficador {
                     }
                 }
                 break;
-            case "String":
-                
+            case "Cadena":
+                estructura += nodo.defineLabel("nodo0", String.valueOf(lexema.charAt(0))) 
+                        + nodo.defineLabel("nodoFinal", String.valueOf(lexema.charAt(lexema.length()-1)))
+                        + nodo.defineShape("nodoFinal", "doublecircle");
+                        //+ nodo.defineLabel("texto", ".");
+                estructura += "nodo0->" + nodo.repeat("texto") + "-> nodoFinal \n";
+                estructura += "nodo0 -> nodoFinal";
                 break;
             case "int":
-                
+                estructura += nodo.defineLabel("nodo0", "digito")
+                        + nodo.defineShape("nodo0", "doublecircle");
+                estructura += nodo.repeat("nodo0");
                 break;
             case "float":
-                
-                break;
+                estructura += nodo.defineLabel("nodo0", "digito")
+                        + nodo.defineShape("digito", "doublecircle")
+                        + nodo.defineLabel("dot", ".");
+                estructura += nodo.repeat("nodo0") + "-> dot ->" + nodo.repeat("digito");
+                break; 
+                //problemas aqui
             case "Comentario":
-                
+                estructura += nodo.defineLabel("nodo0", "\\" + String.valueOf(lexema.charAt(0)))
+                        + nodo.defineShape("nodo0", "doublecircle")
+                        + nodo.defineLabel("nodoFinal", "\\n")
+                        + nodo.defineShape("nodoFinal", "doublecircle");
+                estructura += nodo.repeat("nodo0") + "->" +  nodo.repeat("texto") + "-> nodoFinal";
                 break;
             default:
-                throw new AssertionError();
+                //throw new AssertionError();
         }
         return estructura;
     }

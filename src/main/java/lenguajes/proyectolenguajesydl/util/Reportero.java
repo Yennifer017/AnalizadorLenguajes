@@ -3,14 +3,14 @@ package lenguajes.proyectolenguajesydl.util;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import lenguajes.proyectolenguajesydl.analizadorlexico.AnalizadorLexico;
+import lenguajes.proyectolenguajesydl.analizadorlexico.Lexer;
 
 /**
  *
  * @author yenni
  */
 public class Reportero {
-    public Object[][] getAnalisisLexico(AnalizadorLexico lexer){
+    public Object[][] getAnalisisLexico(Lexer lexer){
         //Object[filas][columnas]
         int filas = lexer.getTokens().size();
         if(filas<18){
@@ -26,7 +26,7 @@ public class Reportero {
         }
         return reporte;
     }
-    private Object[] getDataRow(AnalizadorLexico lexer, int row) throws IndexOutOfBoundsException{
+    private Object[] getDataRow(Lexer lexer, int row) throws IndexOutOfBoundsException{
         Object[] data = new Object[5];
         data[0] = lexer.getTokens().get(row).getType();
         data[1] = lexer.getTokens().get(row).getPatron();
@@ -50,7 +50,7 @@ public class Reportero {
             }
         }
     }
-    public void setReporte(JTable table, AnalizadorLexico lexer){
+    public void setReporte(JTable table, Lexer lexer){
         clearTable(table, false);
         DefaultTableModel tb = (DefaultTableModel) table.getModel();
         for (int i = 0; i < lexer.getTokens().size(); i++) {

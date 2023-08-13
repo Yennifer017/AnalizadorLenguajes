@@ -1,6 +1,5 @@
 
 package lenguajes.proyectolenguajesydl.analizadorlexico;
-
 import lenguajes.proyectolenguajesydl.util.Position;
 
 /**
@@ -15,6 +14,10 @@ public class Token {
         this.position = position;
         this.type = type;
         this.patron = patron;
+    }
+    public Token(String lexema, String type){
+        this.lexema = lexema;
+        this.type = type;
     }
     @Override
     public String toString(){

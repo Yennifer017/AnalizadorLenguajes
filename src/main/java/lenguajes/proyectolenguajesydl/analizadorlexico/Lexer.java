@@ -8,14 +8,14 @@ import lenguajes.proyectolenguajesydl.util.Position;
  *
  * @author yenni
  */
-public class AnalizadorLexico {
+public class Lexer {
     
     int noLinea, index, columna; //noLinea == fila, index == recorido en el texto
     ArrayList<Token> tokens;
     private String lecturaTkn;
     private boolean readAll;
     private Expresion ex;
-    public AnalizadorLexico() {
+    public Lexer() {
         noLinea = 0;
         tokens = new ArrayList<>();
         ex = new Expresion();
@@ -451,7 +451,7 @@ public class AnalizadorLexico {
         String patron;
         patron = switch (typeTkn) {
             case "Identificador" -> "(([a-zA-Z]|_)+)(\\w|.)*";
-            case "Reservada", "boolean", "Aritmetico", "asignacion", "Comparativo"-> lexema;
+            case "Reservada", "boolean", "Aritmetico", "Asignacion", "Comparativo"-> lexema;
             case "int" -> "[0-9]+";
             case "float" -> "([0-9]+)[.]([0-9]+)";
             case "Cadena" -> "[" + lexema.charAt(0) + "](\\w|.)*[" + lexema.charAt(0) + "]";

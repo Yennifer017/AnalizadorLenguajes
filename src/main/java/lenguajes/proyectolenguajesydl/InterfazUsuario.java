@@ -6,7 +6,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import lenguajes.proyectolenguajesydl.util.*;
 import javax.swing.JTextPane;
-import lenguajes.proyectolenguajesydl.analizadorlexico.AnalizadorLexico;
+import lenguajes.proyectolenguajesydl.analizadorlexico.Lexer;
+import lenguajes.proyectolenguajesydl.analizadorlexico.Token;
 import lenguajes.proyectolenguajesydl.util.NumeroLinea;
 
 /**
@@ -16,24 +17,28 @@ import lenguajes.proyectolenguajesydl.util.NumeroLinea;
 public class InterfazUsuario extends javax.swing.JFrame {
 
     NumeroLinea numEditor, numDisAnalisis;
-    private final Archivo archivo;
-    private final AnalizadorLexico lexer;
-    private final Pintor pintor; 
-    private final Graficador graficador;
+    private Archivo archivo;
+    private Lexer lexer;
+    private Pintor pintor; 
+    private Graficador graficador;
+    private final String FILE_NAME, FILE_EXTENSION;
+    private int counterFile;
     Reportero rep;
     /**
      * Creates new form InterfazUsuario
      */
-    
     public InterfazUsuario() {
         initComponents();
         this.setLocationRelativeTo(null);
         initNumeracion();
         archivo = new Archivo();
-        lexer = new AnalizadorLexico();
+        lexer = new Lexer();
         pintor = new Pintor(lexer);
         rep = new Reportero();
         graficador = new Graficador();
+        FILE_NAME = "graph";
+        FILE_EXTENSION = ".png";
+        counterFile = 0;
         initStyle();
         initTable();
     }
@@ -55,19 +60,19 @@ public class InterfazUsuario extends javax.swing.JFrame {
             @Override
             public void mousePressed(MouseEvent mouseE){
                 if(mouseE.getClickCount() == 1){
-                    System.out.println(displayReporte.getValueAt(displayReporte.getSelectedRow(), 1));
+                    //System.out.println(displayReporte.getValueAt(displayReporte.getSelectedRow(), 1));
                     String typeTkn = displayReporte.getValueAt(displayReporte.getSelectedRow(), 0).toString();
                     String lexema = displayReporte.getValueAt(displayReporte.getSelectedRow(), 2).toString();
-                    //try{
-                        archivo.deleteFile("currentGraph.png"); //se borra el viejo
-                        //se crea uno nuevo
-                        graficador.graficar(typeTkn, lexema, "currentGraph"); 
-                    //}catch(NullPointerException e){
-                        //System.out.println("Error");
-                    //}
+                    archivo.deleteFile(FILE_NAME + counterFile + FILE_EXTENSION); //se borra el viejo
+                    graficador.graficar(new Token(lexema, typeTkn), FILE_NAME + counterFile, FILE_EXTENSION); 
                 }
             }
         });
+    }
+    private void close(){
+        archivo.deleteFile(FILE_NAME + counterFile  + FILE_EXTENSION);
+        archivo.deleteFile(FILE_NAME + counterFile  + ".dot");
+        System.exit(0);
     }
     
     /**
@@ -82,7 +87,6 @@ public class InterfazUsuario extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         bOpenFile = new javax.swing.JButton();
         bSave = new javax.swing.JButton();
-        bSave1 = new javax.swing.JButton();
         bSave2 = new javax.swing.JButton();
         bSave3 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
@@ -95,9 +99,17 @@ public class InterfazUsuario extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         displayReporte = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
+        bGraph = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(7, 7, 110));
@@ -118,17 +130,6 @@ public class InterfazUsuario extends javax.swing.JFrame {
         bSave.setForeground(new java.awt.Color(255, 255, 255));
         bSave.setText("Guardar");
         bSave.setFocusable(false);
-
-        bSave1.setBackground(new java.awt.Color(7, 7, 110));
-        bSave1.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        bSave1.setForeground(new java.awt.Color(255, 255, 255));
-        bSave1.setText("Generar Gráfica");
-        bSave1.setFocusable(false);
-        bSave1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bSave1ActionPerformed(evt);
-            }
-        });
 
         bSave2.setBackground(new java.awt.Color(7, 7, 110));
         bSave2.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
@@ -151,13 +152,11 @@ public class InterfazUsuario extends javax.swing.JFrame {
                 .addComponent(bOpenFile, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(bSave, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(95, 95, 95)
-                .addComponent(bSave1, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 504, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 662, Short.MAX_VALUE)
                 .addComponent(bSave2, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(bSave3, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(31, 31, 31))
+                .addGap(59, 59, 59))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -166,13 +165,12 @@ public class InterfazUsuario extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(bOpenFile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
                     .addComponent(bSave, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(bSave1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(bSave2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(bSave3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(12, 12, 12))
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1350, -1));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1300, -1));
 
         jPanel2.setBackground(new java.awt.Color(0, 0, 0));
         jPanel2.setForeground(new java.awt.Color(255, 255, 255));
@@ -230,7 +228,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
                             .addComponent(bClear, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(bLexico, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
-                        .addComponent(scrollDisAnalisis, javax.swing.GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)))
+                        .addComponent(scrollDisAnalisis, javax.swing.GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -240,7 +238,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
                 .addComponent(scrollEditor, javax.swing.GroupLayout.PREFERRED_SIZE, 316, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(32, 32, 32)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(bClear, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(bLexico, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -248,7 +246,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
                 .addContainerGap(41, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 60, 840, 590));
+        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 60, 790, 590));
 
         jPanel3.setBackground(new java.awt.Color(0, 0, 0));
 
@@ -303,6 +301,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
         jScrollPane1.setViewportView(displayReporte);
         if (displayReporte.getColumnModel().getColumnCount() > 0) {
             displayReporte.getColumnModel().getColumn(0).setResizable(false);
+            displayReporte.getColumnModel().getColumn(0).setPreferredWidth(40);
             displayReporte.getColumnModel().getColumn(1).setResizable(false);
             displayReporte.getColumnModel().getColumn(2).setResizable(false);
             displayReporte.getColumnModel().getColumn(3).setResizable(false);
@@ -311,24 +310,49 @@ public class InterfazUsuario extends javax.swing.JFrame {
             displayReporte.getColumnModel().getColumn(4).setPreferredWidth(5);
         }
 
+        jLabel1.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(243, 243, 243));
+        jLabel1.setText("<html><p align=LEFT> Clic sobre un token y luego sobre el boton \"graficar\" para visualizar la grafica del token seleccionado y mas informacion del mismo</p></html>");
+
+        bGraph.setBackground(new java.awt.Color(7, 7, 110));
+        bGraph.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        bGraph.setForeground(new java.awt.Color(255, 255, 255));
+        bGraph.setText("Generar Gráfica");
+        bGraph.setFocusable(false);
+        bGraph.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bGraphActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(28, 28, 28)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap(29, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(bGraph, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(181, 181, 181))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(32, 32, 32)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 313, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(245, Short.MAX_VALUE))
+                .addGap(29, 29, 29)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(29, 29, 29)
+                .addComponent(bGraph, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(84, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 60, 510, 590));
+        getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 60, 510, 590));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -349,23 +373,36 @@ public class InterfazUsuario extends javax.swing.JFrame {
         rep.clearTable(displayReporte, true);
     }//GEN-LAST:event_bClearActionPerformed
 
-    private void bSave1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSave1ActionPerformed
+    private void bGraphActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bGraphActionPerformed
+        Icon icon = new ImageIcon(FILE_NAME + counterFile + FILE_EXTENSION);
+        try {
+            JOptionPane.showMessageDialog(null, "grafica del token", "grafica del token", 
+            JOptionPane.INFORMATION_MESSAGE, icon);
+            archivo.deleteFile(FILE_NAME + counterFile + ".dot");
+            archivo.deleteFile(FILE_NAME + counterFile + FILE_EXTENSION);
+            counterFile++;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "grafica del token", "grafica del token", 
+            JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_bGraphActionPerformed
 
-        JOptionPane.showMessageDialog(null, "grafica del token", "grafica del token", 
-        JOptionPane.INFORMATION_MESSAGE);
-    }//GEN-LAST:event_bSave1ActionPerformed
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        close();
+    }//GEN-LAST:event_formWindowClosing
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bClear;
+    private javax.swing.JButton bGraph;
     private javax.swing.JButton bLexico;
     private javax.swing.JButton bOpenFile;
     private javax.swing.JButton bSave;
-    private javax.swing.JButton bSave1;
     private javax.swing.JButton bSave2;
     private javax.swing.JButton bSave3;
     private javax.swing.JTextPane displayAnalisis;
     private javax.swing.JTable displayReporte;
     private javax.swing.JTextPane editor;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -373,4 +410,5 @@ public class InterfazUsuario extends javax.swing.JFrame {
     private javax.swing.JScrollPane scrollDisAnalisis;
     private javax.swing.JScrollPane scrollEditor;
     // End of variables declaration//GEN-END:variables
+
 }

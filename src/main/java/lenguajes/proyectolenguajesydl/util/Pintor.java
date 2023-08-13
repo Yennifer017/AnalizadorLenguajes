@@ -7,7 +7,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
-import lenguajes.proyectolenguajesydl.analizadorlexico.AnalizadorLexico;
+import lenguajes.proyectolenguajesydl.analizadorlexico.Lexer;
 import lenguajes.proyectolenguajesydl.analizadorlexico.Expresion;
 import lenguajes.proyectolenguajesydl.analizadorlexico.Token;
 
@@ -26,7 +26,7 @@ public class Pintor {
     
     //definicion de un documento para que pueda ser coloreado
     DefaultStyledDocument doc; 
-    private DefaultStyledDocument getNewDoc(AnalizadorLexico lexer, Expresion ex){
+    private DefaultStyledDocument getNewDoc(Lexer lexer, Expresion ex){
         return new DefaultStyledDocument() {
         //se sobrescribe el metodo para ingresar un string, agregando algo de codigo extra
         @Override
@@ -67,7 +67,7 @@ public class Pintor {
         };
     };
     
-    public Pintor(AnalizadorLexico lexer) {
+    public Pintor(Lexer lexer) {
         attrWhite = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.WHITE);
         attrSkyBlue = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, new Color(0,242,255));
         attrPurple = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, new Color(158,0,255));  
