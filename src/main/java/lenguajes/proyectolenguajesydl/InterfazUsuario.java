@@ -1,6 +1,9 @@
 package lenguajes.proyectolenguajesydl;
 
 import java.awt.event.*;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import lenguajes.proyectolenguajesydl.util.*;
 import javax.swing.JTextPane;
 import lenguajes.proyectolenguajesydl.analizadorlexico.AnalizadorLexico;
@@ -55,7 +58,13 @@ public class InterfazUsuario extends javax.swing.JFrame {
                     System.out.println(displayReporte.getValueAt(displayReporte.getSelectedRow(), 1));
                     String typeTkn = displayReporte.getValueAt(displayReporte.getSelectedRow(), 0).toString();
                     String lexema = displayReporte.getValueAt(displayReporte.getSelectedRow(), 2).toString();
-                    graficador.graficar(typeTkn, lexema, "CurrentGraph");
+                    //try{
+                        archivo.deleteFile("currentGraph.png"); //se borra el viejo
+                        //se crea uno nuevo
+                        graficador.graficar(typeTkn, lexema, "currentGraph"); 
+                    //}catch(NullPointerException e){
+                        //System.out.println("Error");
+                    //}
                 }
             }
         });
@@ -115,6 +124,11 @@ public class InterfazUsuario extends javax.swing.JFrame {
         bSave1.setForeground(new java.awt.Color(255, 255, 255));
         bSave1.setText("Generar Gráfica");
         bSave1.setFocusable(false);
+        bSave1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bSave1ActionPerformed(evt);
+            }
+        });
 
         bSave2.setBackground(new java.awt.Color(7, 7, 110));
         bSave2.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
@@ -334,6 +348,12 @@ public class InterfazUsuario extends javax.swing.JFrame {
         displayAnalisis.setText("");
         rep.clearTable(displayReporte, true);
     }//GEN-LAST:event_bClearActionPerformed
+
+    private void bSave1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSave1ActionPerformed
+
+        JOptionPane.showMessageDialog(null, "grafica del token", "grafica del token", 
+        JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_bSave1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bClear;

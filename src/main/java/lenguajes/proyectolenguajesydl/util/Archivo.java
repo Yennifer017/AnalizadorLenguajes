@@ -33,7 +33,7 @@ public class Archivo {
         return buscador.getSelectedFile().getAbsolutePath();
     }
     
-    public void guardarArchivo(String texto, String ruta) { //reescribe un archivo a partir de un texto
+    public void saveFile(String texto, String ruta) { //reescribe un archivo a partir de un texto
         try {
             File archivo = new File(ruta); //obtiene el archivo de la ruta
             FileWriter escritor = new FileWriter(archivo, false);
@@ -44,5 +44,9 @@ public class Archivo {
         } catch (IOException error) {
             System.out.println(error);
         }
+    }
+    public void deleteFile(String path){
+        File archivo=new File(path);
+        archivo.delete();
     }
 }

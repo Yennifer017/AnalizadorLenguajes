@@ -1,4 +1,6 @@
-digraph CurrentGraph{
+digraph currentGraph{
 rankdir=LR
 nodo0[color=blue]
-nodo0[label="F"]nodoFinal[label="e" shape=doublecircle]nodo0 -> a-> l-> s-> nodoFinal}
+nodo0[label="c"] 
+nodoFinal[label="s" shape=doublecircle] 
+nodo0 -> l-> a-> s-> nodoFinal}

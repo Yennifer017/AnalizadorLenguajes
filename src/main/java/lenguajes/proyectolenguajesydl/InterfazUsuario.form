@@ -122,6 +122,9 @@
             <Property name="text" type="java.lang.String" value="Generar Gr&#xe1;fica"/>
             <Property name="focusable" type="boolean" value="false"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bSave1ActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="bSave2">
           <Properties>
