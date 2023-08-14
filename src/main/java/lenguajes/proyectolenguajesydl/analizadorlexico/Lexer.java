@@ -26,27 +26,19 @@ public class Lexer {
         separarTokens(texto) ;
     }
     
-    
     public String getErrors(){
         String analisis= "";
         for (int i = 0; i < tokens.size(); i++) {
             if(tokens.get(i).getType().equalsIgnoreCase("error")){
                 analisis += tokens.get(i).toString();
+                analisis += "\n";
             }
         }
         if(!analisis.equals("")){
             return analisis;
         }else{
-            return "No hay Errores";
+            return "No hay Errores lexicos :)";
         }
-    }
-    
-    private void showElements(ArrayList<Token> list){
-        for (int i = 0; i < list.size(); i++) {
-            System.out.println("----- TOKEN NO. " + i );
-            System.out.println(list.get(i).toString());
-        }
-        System.out.println("El total de lineas es igual a " + noLinea);
     }
     
     /********************************************
@@ -217,8 +209,8 @@ public class Lexer {
                 case "elif", "else", "except" -> true;
                 default -> false;
             };
-            case 'f', 'F' -> switch (palabra) {
-                case "False", "finally", "for", "from" -> true;
+            case 'f' -> switch (palabra) {
+                case "finally", "for", "from" -> true;
                 default -> false;
             };
             case 'g' -> switch (palabra) {
@@ -230,7 +222,7 @@ public class Lexer {
                 default -> false;
             };
             case 'l' -> switch (palabra) {
-                case "lamda"-> true;
+                case "lambda"-> true;
                 default -> false;
             };
             case 'n' -> switch (palabra) {
@@ -245,8 +237,8 @@ public class Lexer {
                 case "rase", "return" -> true;
                 default -> false;
             };
-            case 't', 'T' -> switch (palabra) {
-                case "True", "try" -> true;
+            case 't' -> switch (palabra) {
+                case "try" -> true;
                 default -> false;
             };
             case 'w' -> switch (palabra) {
@@ -390,22 +382,6 @@ public class Lexer {
         }
         return index;
     }
-    
-    public int findDelimitadorL(String text, int index, char where){
-        while (index >= 0 && text.length()!=0) {            
-            char character = text.charAt(index);
-            if(character == where){
-                index++;
-                return index;
-            }
-            index--;
-        }
-        if(index<0){
-            index = 0;
-        }
-        return index;
-    }
-    
     public int findDelimitadorR(String text, int index){
         int indexInitial = index;
         while (index<text.length()) {            
@@ -424,23 +400,6 @@ public class Lexer {
         return index;
     }
     
-    public int findDelimitadorR(String text, int index, char where){
-        int indexInitial = index;
-        while (index<text.length()) {            
-            char character = text.charAt(index);
-            if(character == where){
-                if(index == indexInitial){
-                        index++;
-                    }
-                    return index;
-                }    
-            index++;
-        }
-        if(index > text.length()){
-            index = text.length();
-        }
-        return index;
-    }
     public ArrayList<Token> getTokens(){
         return tokens;
     }
@@ -450,12 +409,12 @@ public class Lexer {
     private String getPatron(String lexema, String typeTkn) {
         String patron;
         patron = switch (typeTkn) {
-            case "Identificador" -> "(([a-zA-Z]|_)+)(\\w|.)*";
-            case "Reservada", "boolean", "Aritmetico", "Asignacion", "Comparativo"-> lexema;
+            case "Identificador" -> "(([a-zA-Z]|_)+)[.]*";
+            case "Reservada", "boolean", "Aritmetico", "Asignacion", "Comparativo", "Logico"-> lexema;
             case "int" -> "[0-9]+";
-            case "float" -> "([0-9]+)[.]([0-9]+)";
-            case "Cadena" -> "[" + lexema.charAt(0) + "](\\w|.)*[" + lexema.charAt(0) + "]";
-            case "Comentario" -> "[#].*";
+            case "float" -> "([0-9]+)['.']([0-9]+)";
+            case "Cadena" -> "[" + lexema.charAt(0) + "][.]*[" + lexema.charAt(0) + "]";
+            case "Comentario" -> "[#][.]*";
             case "Otro" -> String.valueOf(lexema.charAt(0));
             default -> "No existe";
         };

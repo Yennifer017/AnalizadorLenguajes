@@ -26,7 +26,7 @@ public class Pintor {
     
     //definicion de un documento para que pueda ser coloreado
     DefaultStyledDocument doc; 
-    private DefaultStyledDocument getNewDoc(Lexer lexer, Expresion ex){
+    private DefaultStyledDocument getNewDoc(NumberLine numL, Lexer lexer){
         return new DefaultStyledDocument() {
         //se sobrescribe el metodo para ingresar un string, agregando algo de codigo extra
         @Override
@@ -35,8 +35,8 @@ public class Pintor {
                 //srt == caracter ingresado
                 //offset == posicion de donde se ingresa el caracter, su inicio
                 String text = getText(0, getLength());
-                int posInit = lexer.findDelimitadorL(text, offset, '\n');
-                int posFinal = lexer.findDelimitadorR(text, offset + str.length() - 1, '\n');
+                int posInit = numL.findDelimitadorL(text, offset, '\n');
+                int posFinal = numL.findDelimitadorR(text, offset + str.length() - 1, '\n');
                 String subText = text.substring(posInit, posFinal);
                 //se analizara toda una fila
                 lexer.analyzeAll(subText);
@@ -53,8 +53,8 @@ public class Pintor {
                 //offs -posicion donde termina el cursor luego de la eliminacion
                 //len cuantos caracteres se eliminarion
                 String text = getText(0, getLength());
-                int posInit = lexer.findDelimitadorL(text, offs - 1, '\n');
-                int posFinal = lexer.findDelimitadorR(text, offs, '\n');
+                int posInit = numL.findDelimitadorL(text, offs - 1, '\n');
+                int posFinal = numL.findDelimitadorR(text, offs, '\n');
                 String subText = text.substring(posInit, posFinal);
                 //se analiza toda la fila
                 lexer.analyzeAll(subText);
@@ -67,7 +67,7 @@ public class Pintor {
         };
     };
     
-    public Pintor(Lexer lexer) {
+    public Pintor(NumberLine numLine, Lexer lexer) {
         attrWhite = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.WHITE);
         attrSkyBlue = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, new Color(0,242,255));
         attrPurple = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, new Color(158,0,255));  
@@ -75,7 +75,7 @@ public class Pintor {
         attrGray = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.GRAY);
         attrGreen = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.GREEN);
         attrRed = cont.addAttribute(cont.getEmptySet(), StyleConstants.Foreground, Color.RED);
-        doc = getNewDoc(lexer, new Expresion());
+        doc = getNewDoc(numLine, lexer);
     }
     private void setcurrentAttr(String typeTkn){
         currentAttr = switch (typeTkn) {
