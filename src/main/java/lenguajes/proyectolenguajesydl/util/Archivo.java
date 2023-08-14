@@ -3,6 +3,7 @@ package lenguajes.proyectolenguajesydl.util;
 
 import java.io.*;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -48,5 +49,29 @@ public class Archivo {
     public void deleteFile(String path){
         File archivo=new File(path);
         archivo.delete();
+    }
+    public void saveAs(String text, String extension){
+        String path = JOptionPane.showInputDialog(null, "Ingresa un nombre para guardar el archivo",
+                "Guardando un nuevo archivo", JOptionPane.INFORMATION_MESSAGE);
+        if (path != null && !path.equals("")) {
+            this.saveFile(text, path + extension);
+            JOptionPane.showMessageDialog(null, "Se ha guardado el archivo", ""
+                    + "Guardado exitoso", JOptionPane.ERROR_MESSAGE);
+        } else if (path != null && path.equals("")) {
+            JOptionPane.showMessageDialog(null, """
+                                            No has ingresado un nombre de archivo valido,
+                                            no se ha podido guardar, intentalo de nuevo.""",
+                    "Se ha producido un error", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    public void saveFromExistentPath(String text, String path, String fileName){
+        int option = JOptionPane.showConfirmDialog(null, "¿Guardar el archivo "
+                + fileName + "?", "Guardando archivo..",
+                JOptionPane.CANCEL_OPTION, JOptionPane.OK_CANCEL_OPTION);
+        if (option == 0) { //cuando confirma
+            this.saveFile(text, path);
+            JOptionPane.showMessageDialog(null, "Se ha guardado el archivo", ""
+                    + "Guardado exitoso", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 }

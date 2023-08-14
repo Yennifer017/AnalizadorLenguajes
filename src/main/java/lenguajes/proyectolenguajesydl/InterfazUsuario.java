@@ -1,10 +1,10 @@
 package lenguajes.proyectolenguajesydl;
 
 import java.awt.event.*;
+import java.io.File;
 import javax.swing.*;
 import lenguajes.proyectolenguajesydl.util.*;
-import lenguajes.proyectolenguajesydl.analizadorlexico.Lexer;
-import lenguajes.proyectolenguajesydl.analizadorlexico.Token;
+import lenguajes.proyectolenguajesydl.analizadorlexico.*;
 
 /**
  *
@@ -19,6 +19,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
     private Graficador graficador;
     private final String FILE_NAME, FILE_EXTENSION;
     private int counterFile;
+    private String currentPath;
     Reportero rep;
     /**
      * Creates new form InterfazUsuario
@@ -37,18 +38,31 @@ public class InterfazUsuario extends javax.swing.JFrame {
         counterFile = 0;
         initStyle();
         initTable();
+        initButtons();
+        currentPath = "";
     }
     private void initNumeracion(){
         numEditor = new NumberLine(editor);
         scrollEditor.setRowHeaderView(numEditor);
         numDisAnalisis = new NumberLine(displayAnalisis);
         scrollDisAnalisis.setRowHeaderView(numDisAnalisis);
+        numEditor.updateColumna(displayC);
     }
     private void initStyle(){
         JTextPane txt = new JTextPane(pintor.getDefStyleDoc());
         String temp = editor.getText();
         editor.setStyledDocument(txt.getStyledDocument());
         editor.setText(temp);
+    }
+    private void initButtons(){
+        bSave.setToolTipText("""
+                             Guardar el documento abierto con los cambios correspondientes. 
+                             Si no se ha abierto ningun documento, permite crear uno""");
+        bClear.setToolTipText("Limpia el editor asi como los analisis hechos");
+        bGraph.setToolTipText("""
+                              Graficar el token seleccionado, si se selecciona mas de uno
+                              se graficara el primero""");
+        bSaveAs.setToolTipText("Guardar el codigo en un nuevo archivo");
     }
     private void initTable(){
         displayReporte.getTableHeader().setReorderingAllowed(false) ;
@@ -61,10 +75,9 @@ public class InterfazUsuario extends javax.swing.JFrame {
                         String lexema = displayReporte.getValueAt(displayReporte.getSelectedRow(), 2).toString();
                         archivo.deleteFile(FILE_NAME + counterFile + FILE_EXTENSION); //se borra el viejo
                         graficador.graficar(new Token(lexema, typeTkn), FILE_NAME + counterFile, FILE_EXTENSION);
-                    } catch (Exception e) {
+                    } catch (NullPointerException e) {
                         System.out.println("error");
                     }
-                    //System.out.println(displayReporte.getValueAt(displayReporte.getSelectedRow(), 1));
                      
                 }
             }
@@ -74,6 +87,15 @@ public class InterfazUsuario extends javax.swing.JFrame {
         archivo.deleteFile(FILE_NAME + counterFile  + FILE_EXTENSION);
         archivo.deleteFile(FILE_NAME + counterFile  + ".dot");
         System.exit(0);
+    }
+    private String getMssCTkn(){
+        String typeTkn = displayReporte.getValueAt(displayReporte.getSelectedRow(), 0).toString();
+        String lexema = displayReporte.getValueAt(displayReporte.getSelectedRow(), 2).toString();
+        String patron = displayReporte.getValueAt(displayReporte.getSelectedRow(), 1).toString();
+        String linea = displayReporte.getValueAt(displayReporte.getSelectedRow(), 3).toString();
+        String columna = displayReporte.getValueAt(displayReporte.getSelectedRow(), 4).toString();
+        return "Tipo de token: " + typeTkn + "\nPatron: " + patron + "\nLexema: " + lexema +
+                    "\n\nLinea: " + linea + "\nColumna: " + columna;
     }
     
     /**
@@ -88,9 +110,10 @@ public class InterfazUsuario extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         bOpenFile = new javax.swing.JButton();
         bSave = new javax.swing.JButton();
-        bSave2 = new javax.swing.JButton();
-        bSave3 = new javax.swing.JButton();
+        bHelp = new javax.swing.JButton();
+        bCreditos = new javax.swing.JButton();
         title = new javax.swing.JLabel();
+        bSaveAs = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         bClear = new javax.swing.JButton();
         bLexico = new javax.swing.JButton();
@@ -103,7 +126,6 @@ public class InterfazUsuario extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         displayReporte = new javax.swing.JTable();
-        jLabel1 = new javax.swing.JLabel();
         bGraph = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -134,27 +156,48 @@ public class InterfazUsuario extends javax.swing.JFrame {
         bSave.setForeground(new java.awt.Color(255, 255, 255));
         bSave.setText("Guardar");
         bSave.setFocusable(false);
-
-        bSave2.setBackground(new java.awt.Color(7, 7, 110));
-        bSave2.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        bSave2.setForeground(new java.awt.Color(255, 255, 255));
-        bSave2.setText("Ayuda");
-        bSave2.setFocusable(false);
-
-        bSave3.setBackground(new java.awt.Color(7, 7, 110));
-        bSave3.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        bSave3.setForeground(new java.awt.Color(255, 255, 255));
-        bSave3.setText("Creditos");
-        bSave3.setFocusable(false);
-        bSave3.addActionListener(new java.awt.event.ActionListener() {
+        bSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bSave3ActionPerformed(evt);
+                bSaveActionPerformed(evt);
+            }
+        });
+
+        bHelp.setBackground(new java.awt.Color(7, 7, 110));
+        bHelp.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        bHelp.setForeground(new java.awt.Color(255, 255, 255));
+        bHelp.setText("Ayuda");
+        bHelp.setFocusable(false);
+        bHelp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bHelpActionPerformed(evt);
+            }
+        });
+
+        bCreditos.setBackground(new java.awt.Color(7, 7, 110));
+        bCreditos.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        bCreditos.setForeground(new java.awt.Color(255, 255, 255));
+        bCreditos.setText("Creditos");
+        bCreditos.setFocusable(false);
+        bCreditos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bCreditosActionPerformed(evt);
             }
         });
 
         title.setFont(new java.awt.Font("Magneto", 1, 36)); // NOI18N
         title.setForeground(new java.awt.Color(255, 255, 255));
         title.setText("Parser - pY");
+
+        bSaveAs.setBackground(new java.awt.Color(7, 7, 110));
+        bSaveAs.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        bSaveAs.setForeground(new java.awt.Color(255, 255, 255));
+        bSaveAs.setText("Guardar como");
+        bSaveAs.setFocusable(false);
+        bSaveAs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bSaveAsActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -165,12 +208,14 @@ public class InterfazUsuario extends javax.swing.JFrame {
                 .addComponent(bOpenFile, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(bSave, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(194, 194, 194)
-                .addComponent(title, javax.swing.GroupLayout.PREFERRED_SIZE, 353, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 115, Short.MAX_VALUE)
-                .addComponent(bSave2, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(bSave3, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(bSaveAs, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(94, 94, 94)
+                .addComponent(title, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 106, Short.MAX_VALUE)
+                .addComponent(bHelp, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(bCreditos, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(59, 59, 59))
         );
         jPanel1Layout.setVerticalGroup(
@@ -179,9 +224,10 @@ public class InterfazUsuario extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(bOpenFile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
-                    .addComponent(bSave, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(bSave2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(bSave3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(bHelp, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(bCreditos, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(bSaveAs, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(bSave, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(12, 12, 12))
             .addComponent(title, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -206,7 +252,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
         bLexico.setBackground(new java.awt.Color(7, 7, 110));
         bLexico.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         bLexico.setForeground(new java.awt.Color(255, 255, 255));
-        bLexico.setText("Analizador Léxico");
+        bLexico.setText("Analisis Lexico");
         bLexico.setFocusable(false);
         bLexico.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -361,10 +407,6 @@ public class InterfazUsuario extends javax.swing.JFrame {
             displayReporte.getColumnModel().getColumn(4).setPreferredWidth(5);
         }
 
-        jLabel1.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(243, 243, 243));
-        jLabel1.setText("<html><p align=LEFT> Clic sobre un token y luego sobre el boton \"graficar\" para visualizar la grafica del token seleccionado y mas informacion del mismo</p></html>");
-
         bGraph.setBackground(new java.awt.Color(7, 7, 110));
         bGraph.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         bGraph.setForeground(new java.awt.Color(255, 255, 255));
@@ -382,14 +424,12 @@ public class InterfazUsuario extends javax.swing.JFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(28, 28, 28)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(29, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(bGraph, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(181, 181, 181))
+                .addGap(180, 180, 180))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -397,10 +437,8 @@ public class InterfazUsuario extends javax.swing.JFrame {
                 .addGap(32, 32, 32)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 313, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(29, 29, 29)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(29, 29, 29)
                 .addComponent(bGraph, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(84, Short.MAX_VALUE))
+                .addContainerGap(169, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 60, 510, 590));
@@ -409,7 +447,8 @@ public class InterfazUsuario extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void bOpenFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bOpenFileActionPerformed
-        editor.setText(archivo.readTextFile(archivo.getPath()));
+        currentPath = archivo.getPath();
+        editor.setText(archivo.readTextFile(currentPath));
     }//GEN-LAST:event_bOpenFileActionPerformed
 
     private void bLexicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bLexicoActionPerformed
@@ -425,17 +464,28 @@ public class InterfazUsuario extends javax.swing.JFrame {
     }//GEN-LAST:event_bClearActionPerformed
 
     private void bGraphActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bGraphActionPerformed
-        Icon icon = new ImageIcon(FILE_NAME + counterFile + FILE_EXTENSION);
         try {
-            JOptionPane.showMessageDialog(null, "grafica del token", "grafica del token", 
-            JOptionPane.INFORMATION_MESSAGE, icon);
-            archivo.deleteFile(FILE_NAME + counterFile + ".dot");
-            archivo.deleteFile(FILE_NAME + counterFile + FILE_EXTENSION);
-            counterFile++;
+            Icon icon = new ImageIcon(FILE_NAME + counterFile + FILE_EXTENSION);
+            if(!displayReporte.getValueAt(displayReporte.getSelectedRow(), 0).toString().equals("error")){
+                JOptionPane.showMessageDialog(null, getMssCTkn(), "grafica del token", 
+                JOptionPane.INFORMATION_MESSAGE, icon);
+            }else{
+                JOptionPane.showMessageDialog(null, """
+                                            Se ha seleccionado un token conflictivo,
+                                            pues se trata de un error lexico, por favor
+                                            selecciona un token valido e intentalo otra vez""", "Error lexico seleccionado", 
+                JOptionPane.ERROR_MESSAGE);
+            }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "grafica del token", "grafica del token", 
-            JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, """
+                                            No se ha seleccionado un token valido,
+                                            por favor seleciona uno valido de la tabla
+                                            del reporte e intentalo otra vez""", "Se ha producido un error", 
+            JOptionPane.ERROR_MESSAGE);
         }
+        archivo.deleteFile(FILE_NAME + counterFile + ".dot");
+        archivo.deleteFile(FILE_NAME + counterFile + FILE_EXTENSION);
+        counterFile++;
         displayReporte.clearSelection();
     }//GEN-LAST:event_bGraphActionPerformed
 
@@ -443,7 +493,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
         close();
     }//GEN-LAST:event_formWindowClosing
 
-    private void bSave3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSave3ActionPerformed
+    private void bCreditosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bCreditosActionPerformed
         JOptionPane.showMessageDialog(null, """
                                             Proyecto realizado a base de muchos desvelos
                                             y dolores de cabez... digo de mucho esfuerzo y dedicacion. 
@@ -452,7 +502,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
                                             para el laboratorio de Lenguajes formales y de programacion 
                                             Segundo semestre del 2023""", "Creditos", 
             JOptionPane.INFORMATION_MESSAGE);
-    }//GEN-LAST:event_bSave3ActionPerformed
+    }//GEN-LAST:event_bCreditosActionPerformed
 
     private void editorCaretPositionChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_editorCaretPositionChanged
         numEditor.updateColumna(displayC);
@@ -464,21 +514,44 @@ public class InterfazUsuario extends javax.swing.JFrame {
 
     private void editorKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_editorKeyTyped
         numEditor.updateColumna(displayC);
+        displayAnalisis.setText("");
+        rep.clearTable(displayReporte, true);
     }//GEN-LAST:event_editorKeyTyped
+
+    private void bHelpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bHelpActionPerformed
+        JOptionPane.showMessageDialog(null, """
+                                            Puedes consultar el manual de usuario en el 
+                                            siguiente enlace:
+                                            //enlace aqui""", "Ayuda", 
+            JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_bHelpActionPerformed
+
+    private void bSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSaveActionPerformed
+        File file = new File(currentPath);
+        if(file.exists()){ //cuando se tiene un archivo abierto
+            archivo.saveFromExistentPath(editor.getText(), currentPath, file.getName());
+        }else{ //cuando se crea desde 0
+            archivo.saveAs(editor.getText(), ".txt");
+        }
+    }//GEN-LAST:event_bSaveActionPerformed
+
+    private void bSaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSaveAsActionPerformed
+        archivo.saveAs(editor.getText(), ".txt");
+    }//GEN-LAST:event_bSaveAsActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bClear;
+    private javax.swing.JButton bCreditos;
     private javax.swing.JButton bGraph;
+    private javax.swing.JButton bHelp;
     private javax.swing.JButton bLexico;
     private javax.swing.JButton bOpenFile;
     private javax.swing.JButton bSave;
-    private javax.swing.JButton bSave2;
-    private javax.swing.JButton bSave3;
+    private javax.swing.JButton bSaveAs;
     private javax.swing.JTextPane displayAnalisis;
     private javax.swing.JLabel displayC;
     private javax.swing.JTable displayReporte;
     private javax.swing.JTextPane editor;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -488,5 +561,4 @@ public class InterfazUsuario extends javax.swing.JFrame {
     private javax.swing.JScrollPane scrollEditor;
     private javax.swing.JLabel title;
     // End of variables declaration//GEN-END:variables
-
 }

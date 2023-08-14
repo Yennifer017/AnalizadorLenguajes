@@ -52,12 +52,14 @@
                   <Component id="bOpenFile" min="-2" pref="126" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="bSave" min="-2" pref="116" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="194" max="-2" attributes="0"/>
-                  <Component id="title" min="-2" pref="353" max="-2" attributes="0"/>
-                  <EmptySpace pref="115" max="32767" attributes="0"/>
-                  <Component id="bSave2" min="-2" pref="141" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Component id="bSave3" min="-2" pref="141" max="-2" attributes="0"/>
+                  <Component id="bSaveAs" min="-2" pref="130" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="94" max="-2" attributes="0"/>
+                  <Component id="title" min="-2" pref="314" max="-2" attributes="0"/>
+                  <EmptySpace pref="106" max="32767" attributes="0"/>
+                  <Component id="bHelp" min="-2" pref="141" max="-2" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Component id="bCreditos" min="-2" pref="141" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="59" max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -68,9 +70,10 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="1" attributes="0">
                       <Component id="bOpenFile" alignment="0" pref="37" max="32767" attributes="0"/>
+                      <Component id="bHelp" alignment="0" max="32767" attributes="0"/>
+                      <Component id="bCreditos" alignment="0" max="32767" attributes="0"/>
+                      <Component id="bSaveAs" alignment="0" max="32767" attributes="0"/>
                       <Component id="bSave" alignment="0" max="32767" attributes="0"/>
-                      <Component id="bSave2" alignment="0" max="32767" attributes="0"/>
-                      <Component id="bSave3" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
               </Group>
@@ -111,8 +114,11 @@
             <Property name="text" type="java.lang.String" value="Guardar"/>
             <Property name="focusable" type="boolean" value="false"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bSaveActionPerformed"/>
+          </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="bSave2">
+        <Component class="javax.swing.JButton" name="bHelp">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="6e" green="7" red="7" type="rgb"/>
@@ -126,8 +132,11 @@
             <Property name="text" type="java.lang.String" value="Ayuda"/>
             <Property name="focusable" type="boolean" value="false"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bHelpActionPerformed"/>
+          </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="bSave3">
+        <Component class="javax.swing.JButton" name="bCreditos">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="6e" green="7" red="7" type="rgb"/>
@@ -142,7 +151,7 @@
             <Property name="focusable" type="boolean" value="false"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bSave3ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bCreditosActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="title">
@@ -155,6 +164,24 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Parser - pY"/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="bSaveAs">
+          <Properties>
+            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="6e" green="7" red="7" type="rgb"/>
+            </Property>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Dialog" size="12" style="1"/>
+            </Property>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="ff" green="ff" red="ff" type="rgb"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Guardar como"/>
+            <Property name="focusable" type="boolean" value="false"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bSaveAsActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -258,7 +285,7 @@
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ff" green="ff" red="ff" type="rgb"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Analizador L&#xe9;xico"/>
+            <Property name="text" type="java.lang.String" value="Analisis Lexico"/>
             <Property name="focusable" type="boolean" value="false"/>
           </Properties>
           <Events>
@@ -381,18 +408,15 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
+              <Group type="102" attributes="0">
                   <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="jScrollPane1" max="32767" attributes="0"/>
-                      <Component id="jLabel1" pref="0" max="32767" attributes="0"/>
-                  </Group>
+                  <Component id="jScrollPane1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace pref="29" max="32767" attributes="0"/>
               </Group>
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="32767" attributes="0"/>
                   <Component id="bGraph" min="-2" pref="141" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="181" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="180" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -402,10 +426,8 @@
                   <EmptySpace min="-2" pref="32" max="-2" attributes="0"/>
                   <Component id="jScrollPane1" min="-2" pref="313" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
-                  <Component id="jLabel1" min="-2" pref="56" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
                   <Component id="bGraph" min="-2" pref="47" max="-2" attributes="0"/>
-                  <EmptySpace pref="84" max="32767" attributes="0"/>
+                  <EmptySpace pref="169" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -483,17 +505,6 @@
             </Component>
           </SubComponents>
         </Container>
-        <Component class="javax.swing.JLabel" name="jLabel1">
-          <Properties>
-            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
-              <Font name="Dialog" size="14" style="0"/>
-            </Property>
-            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="f3" green="f3" red="f3" type="rgb"/>
-            </Property>
-            <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;p align=LEFT&gt; Clic sobre un token y luego sobre el boton &quot;graficar&quot; para visualizar la grafica del token seleccionado y mas informacion del mismo&lt;/p&gt;&lt;/html&gt;"/>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JButton" name="bGraph">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">

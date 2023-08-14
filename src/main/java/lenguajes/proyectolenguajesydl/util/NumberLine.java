@@ -425,6 +425,7 @@ public class NumberLine extends JPanel
         label.setText(String.valueOf(columna));
     }
     public int findDelimitadorL(String text, int index, char where){
+        text = text.replace("\r", "");
         while (index >= 0 && text.length()!=0 && index<text.length()) {            
             char character = text.charAt(index);
             if(character == where){

@@ -1,6 +1,5 @@
 
 package lenguajes.proyectolenguajesydl.analizadorlexico;
-
 import java.util.ArrayList;
 import lenguajes.proyectolenguajesydl.util.Position;
 
