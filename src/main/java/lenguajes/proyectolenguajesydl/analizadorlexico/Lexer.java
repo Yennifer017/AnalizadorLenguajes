@@ -39,7 +39,18 @@ public class Lexer {
             return "No hay Errores lexicos :)";
         }
     }
-    
+    public String getReporte(){
+        String analisis= "";
+        for (int i = 0; i < tokens.size(); i++) {
+                analisis += tokens.get(i).toString();
+                analisis += "\n";
+        }
+        if(!analisis.equals("")){
+            return analisis;
+        }else{
+            return "No hay tokens que mostrar";
+        }
+    }
     /********************************************
      *********** SEPARACION DE TOKENS ***********
      ********************************************/

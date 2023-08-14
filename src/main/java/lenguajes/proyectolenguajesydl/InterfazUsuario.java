@@ -7,7 +7,7 @@ import lenguajes.proyectolenguajesydl.util.*;
 import lenguajes.proyectolenguajesydl.analizadorlexico.*;
 
 /**
- *
+ *2
  * @author yenni
  */
 public class InterfazUsuario extends javax.swing.JFrame {
@@ -60,9 +60,12 @@ public class InterfazUsuario extends javax.swing.JFrame {
                              Si no se ha abierto ningun documento, permite crear uno""");
         bClear.setToolTipText("Limpia el editor asi como los analisis hechos");
         bGraph.setToolTipText("""
-                              Graficar el token seleccionado, si se selecciona mas de uno
-                              se graficara el primero""");
+                             Graficar el token seleccionado, si se selecciona mas de uno
+                             se graficara el primero""");
         bSaveAs.setToolTipText("Guardar el codigo en un nuevo archivo");
+        bSaveReporte.setToolTipText("""
+                             Realiza un análisis léxico de lo contenido en el editor
+                             y permite guardar un archivo de texto con dicho contenido""");
     }
     private void initTable(){
         displayReporte.getTableHeader().setReorderingAllowed(false) ;
@@ -127,6 +130,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         displayReporte = new javax.swing.JTable();
         bGraph = new javax.swing.JButton();
+        bSaveReporte = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -418,27 +422,43 @@ public class InterfazUsuario extends javax.swing.JFrame {
             }
         });
 
+        bSaveReporte.setBackground(new java.awt.Color(7, 7, 110));
+        bSaveReporte.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        bSaveReporte.setForeground(new java.awt.Color(255, 255, 255));
+        bSaveReporte.setText("Guardar Reporte");
+        bSaveReporte.setFocusable(false);
+        bSaveReporte.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bSaveReporteActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(28, 28, 28)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(28, 28, 28)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(78, 78, 78)
+                        .addComponent(bGraph, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(56, 56, 56)
+                        .addComponent(bSaveReporte, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(29, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(bGraph, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(180, 180, 180))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(32, 32, 32)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 313, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(29, 29, 29)
-                .addComponent(bGraph, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(169, Short.MAX_VALUE))
+                .addGap(30, 30, 30)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(bGraph, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bSaveReporte, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(168, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 60, 510, 590));
@@ -539,6 +559,13 @@ public class InterfazUsuario extends javax.swing.JFrame {
         archivo.saveAs(editor.getText(), ".txt");
     }//GEN-LAST:event_bSaveAsActionPerformed
 
+    private void bSaveReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSaveReporteActionPerformed
+        lexer.analyzeAll(editor.getText());
+        displayAnalisis.setText(lexer.getErrors());
+        rep.setReporte(displayReporte, lexer);
+        archivo.saveAs(lexer.getReporte(), ".txt");
+    }//GEN-LAST:event_bSaveReporteActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bClear;
     private javax.swing.JButton bCreditos;
@@ -548,6 +575,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
     private javax.swing.JButton bOpenFile;
     private javax.swing.JButton bSave;
     private javax.swing.JButton bSaveAs;
+    private javax.swing.JButton bSaveReporte;
     private javax.swing.JTextPane displayAnalisis;
     private javax.swing.JLabel displayC;
     private javax.swing.JTable displayReporte;

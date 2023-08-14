@@ -52,16 +52,29 @@ public class Archivo {
     }
     public void saveAs(String text, String extension){
         String path = JOptionPane.showInputDialog(null, "Ingresa un nombre para guardar el archivo",
-                "Guardando un nuevo archivo", JOptionPane.INFORMATION_MESSAGE);
+                "Guardando un nuevo archivo", JOptionPane.QUESTION_MESSAGE);
         if (path != null && !path.equals("")) {
-            this.saveFile(text, path + extension);
-            JOptionPane.showMessageDialog(null, "Se ha guardado el archivo", ""
-                    + "Guardado exitoso", JOptionPane.ERROR_MESSAGE);
+            File file = new File(path + extension);
+            if(!file.exists()){ 
+                this.saveFile(text, path + extension);
+                JOptionPane.showMessageDialog(null, "Se ha guardado el archivo", ""
+                        + "Guardado exitoso", JOptionPane.INFORMATION_MESSAGE);
+            }else{
+                int opcion = JOptionPane.showConfirmDialog(null, """
+                        Se ha encontrado un archivo con el mismo nombre especificado.
+                        ¿Deseas sobreescribirlo?""", "sobreescribiendo archivo...", 
+                        JOptionPane.OK_CANCEL_OPTION, JOptionPane.OK_CANCEL_OPTION);
+                if(opcion == 0){
+                    this.saveFile(text, path + extension);
+                    JOptionPane.showMessageDialog(null, "Se ha guardado el archivo", ""
+                            + "Guardado exitoso", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
         } else if (path != null && path.equals("")) {
             JOptionPane.showMessageDialog(null, """
                                             No has ingresado un nombre de archivo valido,
                                             no se ha podido guardar, intentalo de nuevo.""",
-                    "Se ha producido un error", JOptionPane.INFORMATION_MESSAGE);
+                    "Se ha producido un error", JOptionPane.ERROR_MESSAGE);
         }
     }
     public void saveFromExistentPath(String text, String path, String fileName){
