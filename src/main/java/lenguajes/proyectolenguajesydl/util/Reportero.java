@@ -10,8 +10,7 @@ import lenguajes.proyectolenguajesydl.analizadorlexico.Lexer;
  * @author yenni
  */
 public class Reportero {
-    public Object[][] getAnalisisLexico(Lexer lexer){
-        //Object[filas][columnas]
+    /*public Object[][] getAnalisisLexico(Lexer lexer){
         int filas = lexer.getTokens().size();
         if(filas<18){
             filas =18;
@@ -25,14 +24,15 @@ public class Reportero {
             reporte[j][4] = lexer.getTokens().get(j).getColumna() + 1;
         }
         return reporte;
-    }
-    private Object[] getDataRow(Lexer lexer, int row) throws IndexOutOfBoundsException{
-        Object[] data = new Object[5];
+    }*/
+    private Object[] getDataRow(Lexer lexer, int row) {
+        Object[] data = new Object[6];
         data[0] = lexer.getTokens().get(row).getType();
-        data[1] = lexer.getTokens().get(row).getPatron();
-        data[2] = lexer.getTokens().get(row).getContenido();
-        data[3] = lexer.getTokens().get(row).getFila() + 1;
-        data[4] = lexer.getTokens().get(row).getColumna() + 1;
+        data[1] = lexer.getTokens().get(row).getSubType();
+        data[2] = lexer.getTokens().get(row).getPatron();
+        data[3] = lexer.getTokens().get(row).getContenido();
+        data[4] = lexer.getTokens().get(row).getFila() + 1;
+        data[5] = lexer.getTokens().get(row).getColumna() + 1;
         return data;
     }
     private Object[] getNullRow(int columas){
@@ -46,7 +46,7 @@ public class Reportero {
         }
         if(rellenar){
             for (int i = 0; i < 18; i++) {
-                tb.addRow(getNullRow(5));
+                tb.addRow(getNullRow(table.getColumnCount()));
             }
         }
     }
@@ -58,7 +58,7 @@ public class Reportero {
         }
         if(lexer.getTokens().size()<18){
             for (int i = lexer.getTokens().size(); i < 18; i++) {
-                tb.addRow(getNullRow(5));
+                tb.addRow(getNullRow(table.getColumnCount()));
             }
         }
     }

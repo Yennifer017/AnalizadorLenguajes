@@ -33,7 +33,7 @@ public class Pintor {
                 int posFinal = numL.findDelimitadorR(text, offset + str.length() - 1, '\n');
                 String subText = text.substring(posInit, posFinal);
                 //se analizara toda una fila
-                lexer.analyzeAll(subText);
+                lexer.analyze(subText);
                 for (int i = 0; i < lexer.getTokens().size(); i++) {
                     Token currentTkn = lexer.getTokens().get(i);
                     setcurrentAttr(currentTkn.getType());
@@ -51,7 +51,7 @@ public class Pintor {
                 int posFinal = numL.findDelimitadorR(text, offs, '\n');
                 String subText = text.substring(posInit, posFinal);
                 //se analiza toda la fila
-                lexer.analyzeAll(subText);
+                lexer.analyze(subText);
                 for (int i = 0; i < lexer.getTokens().size(); i++) {
                     Token currentTkn = lexer.getTokens().get(i);
                     setcurrentAttr(currentTkn.getType());

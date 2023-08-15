@@ -7,7 +7,7 @@ import lenguajes.proyectolenguajesydl.util.*;
 import lenguajes.proyectolenguajesydl.analizadorlexico.*;
 
 /**
- *2
+ *
  * @author yenni
  */
 public class InterfazUsuario extends javax.swing.JFrame {
@@ -75,7 +75,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
                 if(mouseE.getClickCount() == 1){
                     try {
                         String typeTkn = displayReporte.getValueAt(displayReporte.getSelectedRow(), 0).toString();
-                        String lexema = displayReporte.getValueAt(displayReporte.getSelectedRow(), 2).toString();
+                        String lexema = displayReporte.getValueAt(displayReporte.getSelectedRow(), 3).toString();
                         archivo.deleteFile(FILE_NAME + counterFile + FILE_EXTENSION); //se borra el viejo
                         graficador.graficar(new Token(lexema, typeTkn), FILE_NAME + counterFile, FILE_EXTENSION);
                     } catch (NullPointerException e) {
@@ -93,11 +93,12 @@ public class InterfazUsuario extends javax.swing.JFrame {
     }
     private String getMssCTkn(){
         String typeTkn = displayReporte.getValueAt(displayReporte.getSelectedRow(), 0).toString();
-        String lexema = displayReporte.getValueAt(displayReporte.getSelectedRow(), 2).toString();
-        String patron = displayReporte.getValueAt(displayReporte.getSelectedRow(), 1).toString();
-        String linea = displayReporte.getValueAt(displayReporte.getSelectedRow(), 3).toString();
-        String columna = displayReporte.getValueAt(displayReporte.getSelectedRow(), 4).toString();
-        return "Tipo de token: " + typeTkn + "\nPatron: " + patron + "\nLexema: " + lexema +
+        String subType = displayReporte.getValueAt(displayReporte.getSelectedRow(), 1).toString();
+        String lexema = displayReporte.getValueAt(displayReporte.getSelectedRow(), 3).toString();
+        String patron = displayReporte.getValueAt(displayReporte.getSelectedRow(), 2).toString();
+        String linea = displayReporte.getValueAt(displayReporte.getSelectedRow(), 4).toString();
+        String columna = displayReporte.getValueAt(displayReporte.getSelectedRow(), 5).toString();
+        return "Tipo: " + typeTkn + "\nToken: " + subType + "\nPatron: " + patron + "\nLexema: " + lexema +
                     "\n\nLinea: " + linea + "\nColumna: " + columna;
     }
     
@@ -356,34 +357,34 @@ public class InterfazUsuario extends javax.swing.JFrame {
         displayReporte.setForeground(new java.awt.Color(198, 198, 198));
         displayReporte.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
             },
             new String [] {
-                "Token", "Patron", "Lexema", "L", "C"
+                "Type", "Token", "Patron", "Lexema", "L", "C"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+                false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -401,14 +402,12 @@ public class InterfazUsuario extends javax.swing.JFrame {
         displayReporte.setShowGrid(true);
         jScrollPane1.setViewportView(displayReporte);
         if (displayReporte.getColumnModel().getColumnCount() > 0) {
-            displayReporte.getColumnModel().getColumn(0).setResizable(false);
             displayReporte.getColumnModel().getColumn(0).setPreferredWidth(40);
-            displayReporte.getColumnModel().getColumn(1).setResizable(false);
-            displayReporte.getColumnModel().getColumn(2).setResizable(false);
-            displayReporte.getColumnModel().getColumn(3).setResizable(false);
-            displayReporte.getColumnModel().getColumn(3).setPreferredWidth(5);
-            displayReporte.getColumnModel().getColumn(4).setResizable(false);
-            displayReporte.getColumnModel().getColumn(4).setPreferredWidth(5);
+            displayReporte.getColumnModel().getColumn(1).setPreferredWidth(40);
+            displayReporte.getColumnModel().getColumn(4).setPreferredWidth(40);
+            displayReporte.getColumnModel().getColumn(4).setMaxWidth(40);
+            displayReporte.getColumnModel().getColumn(5).setPreferredWidth(40);
+            displayReporte.getColumnModel().getColumn(5).setMaxWidth(40);
         }
 
         bGraph.setBackground(new java.awt.Color(7, 7, 110));

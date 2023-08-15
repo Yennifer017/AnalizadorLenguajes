@@ -20,11 +20,20 @@ public class Lexer {
         ex = new Regex();
     }
 
-    public void analyzeAll(String texto){
+    public void analyze(String texto){
         tokens.clear();
         separarTokens(texto) ;
     }
-    
+    public void analyzeAll(String texto){
+        tokens.clear();
+        separarTokens(texto);
+        for (int i = 0; i < tokens.size(); i++) {
+            Token currentTkn = tokens.get(i);
+            currentTkn.setSubType(getSubTypeTkn(currentTkn.getContenido(), 
+                    currentTkn.getType()));
+            currentTkn.setPatron(getPatron(currentTkn.getContenido(), currentTkn.getType()));
+        }
+    }
     public String getErrors(){
         String analisis= "";
         for (int i = 0; i < tokens.size(); i++) {
@@ -50,6 +59,9 @@ public class Lexer {
         }else{
             return "No hay tokens que mostrar";
         }
+    }
+    public ArrayList<Token> getTokens(){
+        return tokens;
     }
     /********************************************
      *********** SEPARACION DE TOKENS ***********
@@ -156,7 +168,7 @@ public class Lexer {
                 getTypeTkn(preliminarType, lecturaTkn)));*/
         String typeTkn = getTypeTkn(preliminarType, lecturaTkn);
         tokens.add(new Token(lecturaTkn, new Position(columna-lecturaTkn.length(), noLinea, 
-                index-lecturaTkn.length()), typeTkn, getPatron(lecturaTkn,  typeTkn)));
+                index-lecturaTkn.length()), typeTkn));
         lecturaTkn="";
         if(!incrDone){
             index--;
@@ -170,7 +182,7 @@ public class Lexer {
         }
         String typeTkn = getTypeTkn(lecturaTkn);
         tokens.add(new Token(lecturaTkn, new Position(columna-lecturaTkn.length(), noLinea, 
-                index-lecturaTkn.length()), typeTkn, getPatron(lecturaTkn, typeTkn)));
+                index-lecturaTkn.length()), typeTkn));
         lecturaTkn="";
         if(!incrDone){
             index--;
@@ -191,107 +203,6 @@ public class Lexer {
     /***********************************************
      *********** CLASIFICACION DE TOKENS ***********
      ***********************************************/
-    private boolean isReservada(String palabra){
-        char inicial;
-        try {
-            inicial = palabra.charAt(0); 
-        } catch (IndexOutOfBoundsException e) {
-            return false;
-        }
-        return switch (inicial) {
-            case 'a' -> switch (palabra) {
-                case "as", "assert" -> true;
-                default -> false;
-            };
-            case 'b' -> switch (palabra) {
-                case "break" -> true;
-                default -> false;
-            };
-            case 'c' -> switch (palabra) {
-                case "class", "continue" -> true;
-                default -> false;
-            };
-            case 'd' -> switch (palabra) {
-                case "def", "del" -> true;
-                default -> false;
-            };
-            case 'e' -> switch (palabra) {
-                case "elif", "else", "except" -> true;
-                default -> false;
-            };
-            case 'f' -> switch (palabra) {
-                case "finally", "for", "from" -> true;
-                default -> false;
-            };
-            case 'g' -> switch (palabra) {
-                case "global" -> true;
-                default -> false;
-            };
-            case 'i' -> switch (palabra) {
-                case "if", "import", "in", "is" -> true;
-                default -> false;
-            };
-            case 'l' -> switch (palabra) {
-                case "lambda"-> true;
-                default -> false;
-            };
-            case 'n' -> switch (palabra) {
-                case "None", "nonlocal"-> true;
-                default -> false;
-            };
-            case 'p' -> switch (palabra) {
-                case "pass" -> true;
-                default -> false;
-            };
-            case 'r' -> switch (palabra) {
-                case "rase", "return" -> true;
-                default -> false;
-            };
-            case 't' -> switch (palabra) {
-                case "try" -> true;
-                default -> false;
-            };
-            case 'w' -> switch (palabra) {
-                case "while", "with" -> true;
-                default -> false;
-            };
-            case 'y' -> switch (palabra) {
-                case "yield"-> true;
-                default -> false;
-            };
-            default -> false;
-        };
-    }
-    private boolean isBooleana(String token){
-        return switch (token) {
-            case "True", "False"-> true;
-            default -> false;
-        };
-    }
-    private boolean isLogico(String token){
-        return switch (token) {
-            case "and", "or", "not"-> true;
-            default -> false;
-        };
-    }
-    private boolean isAritmetico(String preTkn){
-        return switch (preTkn) {
-            case "+", "-", "**", "/", "//", "%", "*" -> true;
-            default -> false;
-        };
-    }
-    private boolean isComparativo(String preTkn){
-        return switch(preTkn) {
-            case "==", "!=", ">", "<", ">=", "<=" -> true;
-            default -> false;
-        };
-    }
-    private boolean isOtro(char character){
-        return switch(character) {
-            case '(', ')', '{', '}', '[', ']', ',', ';', ':' -> true;
-            default -> false;
-        };
-    }
     
     private String getTypeTkn(int preliminarType, String token){
         switch (preliminarType) {  
@@ -321,11 +232,11 @@ public class Lexer {
         }
     }
     private String sortFistLetter(String preTkn){
-        if (isBooleana(preTkn)) {
+        if (ex.isBooleana(preTkn)) {
             return "boolean";
-        } else if (isLogico(preTkn)) {
+        } else if (ex.isLogico(preTkn)) {
             return "Logico";
-        } else if (isReservada(preTkn)) {
+        } else if (ex.isReservada(preTkn)) {
             return "Reservada";
         } else {
             return "Identificador";
@@ -353,16 +264,16 @@ public class Lexer {
         if (preTkn.length() == 1) { //cuando solo es un caracter
             if (preTkn.equals("=")) {
                 return "Asignacion";
-            } else if (isOtro(preTkn.charAt(0))) {
+            } else if (ex.isOtro(preTkn.charAt(0))) {
                 return "Otro";
             } 
         }
         //cuando es mas de un caracter
-        if (isAritmetico(preTkn)) {
+        if (ex.isAritmetico(preTkn)) {
             return "Aritmetico";
-        } else if (isComparativo(preTkn)) {
+        } else if (ex.isComparativo(preTkn)) {
             return "Comparativo";
-        } else if (isAritmetico(String.valueOf(preTkn.charAt(0)))) {
+        } else if (ex.isAritmetico(String.valueOf(preTkn.charAt(0)))) {
             if (preTkn.length() == 2 && preTkn.charAt(1) == '=') {
                 return "Asignacion";
             } else if (preTkn.length() == 3
@@ -375,46 +286,8 @@ public class Lexer {
         return "error";
     }
     
-    /********************************************
-     *********** OTROS METODOS UTILES ***********
-     ********************************************/
-    public int findDelimitadorL(String text, int index){
-        while (index >= 0) {            
-            char character = text.charAt(index);
-            if(!ex.isAlphaNumeric(character)){
-                index++;
-                return index;
-            }
-            index--;
-        }
-        if(index<0){
-            index = 0;
-        }
-        return index;
-    }
-    public int findDelimitadorR(String text, int index){
-        int indexInitial = index;
-        while (index<text.length()) {            
-            char character = text.charAt(index);
-            if(!ex.isAlphaNumeric(character)){
-                if(index == indexInitial){
-                        index++;
-                    }
-                    return index;
-                }    
-            index++;
-        }
-        if(index > text.length()){
-            index = text.length();
-        }
-        return index;
-    }
-    
-    public ArrayList<Token> getTokens(){
-        return tokens;
-    }
     /*****************************************************
-    **** SETEAR LOS PATRONES PARA LOS TIPOS DE TOKENS ****
+    **** SETEAR Atributos de los tokens ****
     ******************************************************/
     private String getPatron(String lexema, String typeTkn) {
         String patron;
@@ -429,6 +302,63 @@ public class Lexer {
             default -> "No existe";
         };
         return patron;
+    }
+    private String getSubTypeTkn(String lexema, String typeTkn){
+        switch (typeTkn) {
+            case "Identificador", "Reservada", "boolean", "Logico", "int", "float", "Cadena", "Comentario":
+                return typeTkn;
+            case "Aritmetico":
+                return getSubTypeAritmetico(lexema);
+            case "Comparativo":
+                return getSubTypeComp(lexema);
+            case "Otro":
+                return getSubTypeOtro(lexema);
+            case "Asignacion":
+                if(lexema.length() != 1){
+                    String arit = lexema.substring(0, lexema.length()-1);
+                    return getSubTypeAritmetico(arit) + " " + typeTkn;
+                }else{  
+                    return typeTkn;
+                }
+            default:
+                return "error";
+        }
+    }
+    private String getSubTypeAritmetico(String lexema){
+        return switch (lexema) {
+            case "+" -> "suma";
+            case "-" -> "resta";
+            case "**" -> "exponente";
+            case "/", "//" -> "division";
+            case "%" -> "modulo";
+            case "*" -> "multiplicacion";
+            default -> "error";
+        };
+    }
+    private String getSubTypeComp(String lexema){
+        return switch (lexema) {
+            case "==" -> "igual";
+            case "!=" -> "diferente";
+            case ">"  -> "mayor que";
+            case "<"  -> "menor que";
+            case ">=" -> "mayor o igual que";
+            case "<=" -> "menor o igual que";
+            default -> "error";
+        };
+    }
+    private String getSubTypeOtro(String lexema){
+        return switch (lexema) {
+            case "(" -> "parentesisL";
+            case ")" -> "parentesisR";
+            case "{" -> "llaveL";
+            case "}" -> "llaveR";
+            case "[" -> "corcheteL";
+            case "]" -> "corcheteR";
+            case "," -> "coma";
+            case ":" -> "dos puntos";
+            case ";" -> "punto y coma";
+            default -> "error";
+        };
     }
 }
 
