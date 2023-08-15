@@ -305,8 +305,10 @@ public class Lexer {
     }
     private String getSubTypeTkn(String lexema, String typeTkn){
         switch (typeTkn) {
-            case "Identificador", "Reservada", "boolean", "Logico", "int", "float", "Cadena", "Comentario":
+            case "Identificador", "Reservada", "boolean", "int", "float", "Cadena", "Comentario":
                 return typeTkn;
+            case "Logico":
+                return lexema;
             case "Aritmetico":
                 return getSubTypeAritmetico(lexema);
             case "Comparativo":
