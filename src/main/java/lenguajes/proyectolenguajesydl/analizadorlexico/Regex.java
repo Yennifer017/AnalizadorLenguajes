@@ -5,7 +5,7 @@ package lenguajes.proyectolenguajesydl.analizadorlexico;
  *
  * @author yenni
  */
-public class Expresion {
+public class Regex {
     
     public boolean isAlphaUp(char character) {
         return ((character >= 'a' && character <= 'z') || character == '_');

@@ -2,14 +2,8 @@
 package lenguajes.proyectolenguajesydl.util;
 
 import java.awt.Color;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
-import lenguajes.proyectolenguajesydl.analizadorlexico.Lexer;
-import lenguajes.proyectolenguajesydl.analizadorlexico.Expresion;
-import lenguajes.proyectolenguajesydl.analizadorlexico.Token;
+import javax.swing.text.*;
+import lenguajes.proyectolenguajesydl.analizadorlexico.*;
 
 /**
  *

@@ -13,11 +13,11 @@ public class Lexer {
     ArrayList<Token> tokens;
     private String lecturaTkn;
     private boolean readAll;
-    private Expresion ex;
+    private Regex ex;
     public Lexer() {
         noLinea = 0;
         tokens = new ArrayList<>();
-        ex = new Expresion();
+        ex = new Regex();
     }
 
     public void analyzeAll(String texto){
