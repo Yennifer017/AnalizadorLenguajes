@@ -20,7 +20,7 @@ public class Token {
     }
     @Override
     public String toString(){
-        String reporte = "Lexema<" + lexema + ">    Token<" +  subType + ">";
+        String reporte = "Lexema<" + lexema + ">    Token<" +  type + ">";
         reporte += "    Linea: " + (position.getFila()+1) + " Columna: " + (position.getColumna()+1);
         return reporte;
        

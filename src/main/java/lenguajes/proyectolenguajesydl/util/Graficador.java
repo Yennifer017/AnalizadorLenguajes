@@ -4,7 +4,6 @@ package lenguajes.proyectolenguajesydl.util;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import lenguajes.proyectolenguajesydl.analizadorlexico.Regex;
 import lenguajes.proyectolenguajesydl.analizadorlexico.Token;
 
 /**
@@ -19,8 +18,8 @@ public class Graficador {
         nodo = new Nodo();
     }
     
-    public void graficar(Token token, String fileName, String extensionOutput) {
-        String code = initGraphviz(fileName) + getEstructura(token.getType(), token.getContenido()) 
+    public void graficarLexema(Token token, String fileName, String extensionOutput) {
+        String code = initGraphviz(fileName) + getEstrLexema(token.getType(), token.getContenido()) 
                 + endGraphviz();
         archivo.saveFile(code, fileName + ".dot");
         String[] cmd = {"dot.exe", "-Tpng", fileName+".dot", "-o", fileName + extensionOutput};
@@ -39,11 +38,22 @@ public class Graficador {
     private String endGraphviz(){
         return "}";
     }
-    private String getEstructura(String typeTkn, String lexema){
-        //String estructura = "nodo0[color=blue]\n";
+    private String getEstrLexema(String typeTkn, String lexema){
         String estructura = nodo.colorear("nodo0", "blue");
         switch (typeTkn) {
-            case "Reservada", "boolean", "Aritmetico", "Otro", "Comparativo", "Logico", "Asignacion" 
+            case "Reservada", "boolean", "Aritmetico", "Otro", "Comparativo", "Logico", "Asignacion",
+                    "Identificador", "Cadena", "int", "float", "Comentario"
+                    -> estructura += getEstrEspecifica(lexema);
+            default -> {
+                return "";
+            }
+        }
+        return estructura;
+    }
+    private String getEstrAutomata(String typeTkn, String lexema){
+    String estructura = nodo.colorear("nodo0", "blue");
+        switch (typeTkn) {
+            case "Reservada", "boolean", "Aritmetico", "Otro", "Comparativo", "Logico", "Asignacion"
                     -> estructura += getEstrEspecifica(lexema);
             case "Identificador" -> {
                 estructura += nodo.defineLabel("nodo0", "letra")
@@ -75,7 +85,6 @@ public class Graficador {
             }
             case "Comentario" -> estructura += getEstrDelimitado(String.valueOf(lexema.charAt(0)), 
                         "SaltoDeLinea") + nodo.repeat("nodo0", false);
-            
             default -> {
                 return "";
             }

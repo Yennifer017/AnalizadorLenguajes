@@ -10,29 +10,14 @@ import lenguajes.proyectolenguajesydl.analizadorlexico.Lexer;
  * @author yenni
  */
 public class Reportero {
-    /*public Object[][] getAnalisisLexico(Lexer lexer){
-        int filas = lexer.getTokens().size();
-        if(filas<18){
-            filas =18;
-        }
-        Object[][] reporte = new Object[filas][5];
-        for (int j = 0; j < lexer.getTokens().size(); j++) { //por cada fila hacer...
-            reporte[j][0] = lexer.getTokens().get(j).getType();
-            reporte[j][1] = lexer.getTokens().get(j).getPatron();
-            reporte[j][2] = lexer.getTokens().get(j).getContenido();
-            reporte[j][3] = lexer.getTokens().get(j).getFila() + 1;
-            reporte[j][4] = lexer.getTokens().get(j).getColumna() + 1;
-        }
-        return reporte;
-    }*/
+
     private Object[] getDataRow(Lexer lexer, int row) {
-        Object[] data = new Object[6];
+        Object[] data = new Object[5];
         data[0] = lexer.getTokens().get(row).getType();
-        data[1] = lexer.getTokens().get(row).getSubType();
-        data[2] = lexer.getTokens().get(row).getPatron();
-        data[3] = lexer.getTokens().get(row).getContenido();
-        data[4] = lexer.getTokens().get(row).getFila() + 1;
-        data[5] = lexer.getTokens().get(row).getColumna() + 1;
+        data[1] = lexer.getTokens().get(row).getPatron();
+        data[2] = lexer.getTokens().get(row).getContenido();
+        data[3] = lexer.getTokens().get(row).getFila() + 1;
+        data[4] = lexer.getTokens().get(row).getColumna() + 1;
         return data;
     }
     private Object[] getNullRow(int columas){
