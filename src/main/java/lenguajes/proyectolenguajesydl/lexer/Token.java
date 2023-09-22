@@ -1,5 +1,5 @@
 
-package lenguajes.proyectolenguajesydl.analizadorlexico;
+package lenguajes.proyectolenguajesydl.lexer;
 import lenguajes.proyectolenguajesydl.util.Position;
 
 /**
@@ -52,6 +52,9 @@ public class Token {
     }
     public String getPatron(){
         return patron;
+    }
+    public Position getPosition(){
+        return position;
     }
     /*
      * seters

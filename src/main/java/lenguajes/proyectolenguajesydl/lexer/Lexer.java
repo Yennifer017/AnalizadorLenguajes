@@ -1,6 +1,7 @@
 
-package lenguajes.proyectolenguajesydl.analizadorlexico;
+package lenguajes.proyectolenguajesydl.lexer;
 import java.util.ArrayList;
+import java.util.List;
 import lenguajes.proyectolenguajesydl.util.Position;
 
 /**
@@ -10,7 +11,7 @@ import lenguajes.proyectolenguajesydl.util.Position;
 public class Lexer {
     
     int noLinea, index, columna; //noLinea == fila, index == recorido en el texto
-    ArrayList<Token> tokens;
+    List<Token> tokens;
     private String lecturaTkn;
     private boolean readAll;
     private Regex ex;
@@ -61,7 +62,10 @@ public class Lexer {
         }
     }
     public ArrayList<Token> getTokens(){
-        return tokens;
+        return (ArrayList<Token>) tokens;
+    }
+    public Token getToken(int index){
+        return tokens.get(index);
     }
     /********************************************
      *********** SEPARACION DE TOKENS ***********
@@ -97,6 +101,8 @@ public class Lexer {
         }
     }
     private void evaluateChar(String texto){
+        //<editor-fold defaultstate="collapsed" desc="evalua caracter por caracter e interrumpe el flujo cuando encuentra un caracter terminal">
+       
         char currentChar = texto.charAt(index);
         if (ex.isAlphaNumeric(currentChar)){
             lecturaTkn += currentChar;
@@ -124,6 +130,7 @@ public class Lexer {
         } else if (ex.isIgnoredCharacter(currentChar) && lecturaTkn.length() != 0) {
             saveToken(1, true);
         } //de lo contrario si se trata de otros caracteres ignorados no hace nada
+        //</editor-fold>
     }
     private void analyzeCombinableTkn(String texto){
         while (true) {
@@ -305,9 +312,9 @@ public class Lexer {
     }
     private String getSubTypeTkn(String lexema, String typeTkn){
         switch (typeTkn) {
-            case "Identificador", "Reservada", "boolean", "int", "float", "Cadena", "Comentario":
+            case "Asignacion", "Identificador", "int", "float", "Cadena", "Comentario":
                 return typeTkn;
-            case "Logico":
+            case "Reservada", "boolean", "Logico":
                 return lexema;
             case "Aritmetico":
                 return getSubTypeAritmetico(lexema);
@@ -315,13 +322,13 @@ public class Lexer {
                 return getSubTypeComp(lexema);
             case "Otro":
                 return getSubTypeOtro(lexema);
-            case "Asignacion":
+            /*case "Asignacion":
                 if(lexema.length() != 1){
                     String arit = lexema.substring(0, lexema.length()-1);
-                    return getSubTypeAritmetico(arit) + " " + typeTkn;
+                    return getSubTypeAritmetico(arit) + "_" + typeTkn;
                 }else{  
                     return typeTkn;
-                }
+                }*/
             default:
                 return "error";
         }
@@ -341,10 +348,10 @@ public class Lexer {
         return switch (lexema) {
             case "==" -> "igual";
             case "!=" -> "diferente";
-            case ">"  -> "mayor que";
-            case "<"  -> "menor que";
-            case ">=" -> "mayor o igual que";
-            case "<=" -> "menor o igual que";
+            case ">"  -> "mayor_que";
+            case "<"  -> "menor_que";
+            case ">=" -> "mayor_o_igual_que";
+            case "<=" -> "menor_o_igual_que";
             default -> "error";
         };
     }
@@ -357,8 +364,8 @@ public class Lexer {
             case "[" -> "corcheteL";
             case "]" -> "corcheteR";
             case "," -> "coma";
-            case ":" -> "dos puntos";
-            case ";" -> "punto y coma";
+            case ":" -> "dos_puntos";
+            case ";" -> "punto_y_coma";
             default -> "error";
         };
     }

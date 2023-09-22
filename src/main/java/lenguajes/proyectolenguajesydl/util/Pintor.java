@@ -1,9 +1,10 @@
 
 package lenguajes.proyectolenguajesydl.util;
 
+import lenguajes.proyectolenguajesydl.lexer.Token;
+import lenguajes.proyectolenguajesydl.lexer.Lexer;
 import java.awt.Color;
 import javax.swing.text.*;
-import lenguajes.proyectolenguajesydl.analizadorlexico.*;
 
 /**
  *

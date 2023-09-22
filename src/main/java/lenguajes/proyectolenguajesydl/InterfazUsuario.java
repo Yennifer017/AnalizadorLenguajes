@@ -1,10 +1,12 @@
 package lenguajes.proyectolenguajesydl;
 
+import lenguajes.proyectolenguajesydl.lexer.Token;
+import lenguajes.proyectolenguajesydl.lexer.Lexer;
 import java.awt.event.*;
 import java.io.File;
 import javax.swing.*;
+import lenguajes.proyectolenguajesydl.parser.Parser;
 import lenguajes.proyectolenguajesydl.util.*;
-import lenguajes.proyectolenguajesydl.analizadorlexico.*;
 
 /**
  *
@@ -15,6 +17,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
     NumberLine numEditor, numDisAnalisis;
     private Archivo archivo;
     private Lexer lexer;
+    private Parser parser;
     private Pintor pintor; 
     private Graficador graficador;
     private final String FILE_NAME, FILE_EXTENSION;
@@ -36,6 +39,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
         FILE_NAME = "graph";
         FILE_EXTENSION = ".png";
         counterFile = 0;
+        parser = new Parser();
         initStyle();
         initTable();
         initButtons();
@@ -126,6 +130,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
         displayAnalisis = new javax.swing.JTextPane();
         lCol = new javax.swing.JLabel();
         displayC = new javax.swing.JLabel();
+        bSintactico = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         displayReporte = new javax.swing.JTable();
@@ -306,6 +311,17 @@ public class InterfazUsuario extends javax.swing.JFrame {
         displayC.setForeground(new java.awt.Color(204, 204, 204));
         displayC.setText("0000");
 
+        bSintactico.setBackground(new java.awt.Color(7, 7, 110));
+        bSintactico.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        bSintactico.setForeground(new java.awt.Color(255, 255, 255));
+        bSintactico.setText("Analisis Sintactico");
+        bSintactico.setFocusable(false);
+        bSintactico.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bSintacticoActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -321,7 +337,8 @@ public class InterfazUsuario extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(displayC, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(bLexico, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
-                            .addComponent(bClear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(bClear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(bSintactico, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addComponent(scrollDisAnalisis, javax.swing.GroupLayout.DEFAULT_SIZE, 596, Short.MAX_VALUE)))
                 .addContainerGap())
@@ -331,20 +348,22 @@ public class InterfazUsuario extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(30, 30, 30)
                 .addComponent(scrollEditor, javax.swing.GroupLayout.PREFERRED_SIZE, 316, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(32, 32, 32)
                         .addComponent(scrollDisAnalisis, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lCol, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(displayC))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(bClear, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(bLexico, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(41, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(bLexico, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(bSintactico, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(39, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 60, 790, 590));
@@ -563,6 +582,12 @@ public class InterfazUsuario extends javax.swing.JFrame {
         archivo.saveAs(lexer.getReporte(), ".txt");
     }//GEN-LAST:event_bSaveReporteActionPerformed
 
+    private void bSintacticoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSintacticoActionPerformed
+        lexer.analyzeAll(editor.getText());
+        displayAnalisis.setText(lexer.getErrors());
+        parser.analiceAll(lexer);
+    }//GEN-LAST:event_bSintacticoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bClear;
     private javax.swing.JButton bCreditos;
@@ -573,6 +598,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
     private javax.swing.JButton bSave;
     private javax.swing.JButton bSaveAs;
     private javax.swing.JButton bSaveReporte;
+    private javax.swing.JButton bSintactico;
     private javax.swing.JTextPane displayAnalisis;
     private javax.swing.JLabel displayC;
     private javax.swing.JTable displayReporte;

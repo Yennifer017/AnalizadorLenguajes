@@ -1,0 +1,79 @@
+Lexema<# identificadores >    Token<Comentario>    Linea: 3 Columna: 1
+Lexema<miVariable>    Token<Identificador>    Linea: 4 Columna: 1
+Lexema<asignacionX>    Token<Identificador>    Linea: 4 Columna: 13
+Lexema<# aritmeticos>    Token<Comentario>    Linea: 6 Columna: 1
+Lexema<5>    Token<int>    Linea: 8 Columna: 1
+Lexema<++>    Token<error>    Linea: 8 Columna: 2
+Lexema<5>    Token<int>    Linea: 8 Columna: 4
+Lexema<1.2>    Token<float>    Linea: 8 Columna: 6
+Lexema<**>    Token<Aritmetico>    Linea: 8 Columna: 9
+Lexema<3>    Token<int>    Linea: 8 Columna: 11
+Lexema<2>    Token<int>    Linea: 8 Columna: 14
+Lexema<//>    Token<Aritmetico>    Linea: 8 Columna: 15
+Lexema<2>    Token<int>    Linea: 8 Columna: 17
+Lexema<## comparacion>    Token<Comentario>    Linea: 10 Columna: 1
+Lexema<==>    Token<Comparativo>    Linea: 12 Columna: 1
+Lexema<# ## logicos>    Token<Comentario>    Linea: 14 Columna: 1
+Lexema<and>    Token<Logico>    Linea: 16 Columna: 1
+Lexema<or>    Token<Logico>    Linea: 16 Columna: 5
+Lexema<## # kw>    Token<Comentario>    Linea: 18 Columna: 1
+Lexema<def>    Token<Reservada>    Linea: 20 Columna: 1
+Lexema<class>    Token<Reservada>    Linea: 20 Columna: 5
+Lexema<async>    Token<Identificador>    Linea: 20 Columna: 11
+Lexema<else>    Token<Reservada>    Linea: 20 Columna: 17
+Lexema<if>    Token<Reservada>    Linea: 20 Columna: 22
+Lexema<for>    Token<Reservada>    Linea: 20 Columna: 25
+Lexema<is>    Token<Reservada>    Linea: 20 Columna: 29
+Lexema<in>    Token<Reservada>    Linea: 20 Columna: 32
+Lexema<import>    Token<Reservada>    Linea: 20 Columna: 35
+Lexema<lambdaa>    Token<Identificador>    Linea: 20 Columna: 42
+Lexema<## constantes>    Token<Comentario>    Linea: 23 Columna: 1
+Lexema<"cadena con espacios">    Token<Cadena>    Linea: 25 Columna: 1
+Lexema<'comilla simple'>    Token<Cadena>    Linea: 25 Columna: 23
+Lexema<1>    Token<int>    Linea: 25 Columna: 40
+Lexema<2>    Token<int>    Linea: 25 Columna: 42
+Lexema<1.2>    Token<float>    Linea: 25 Columna: 44
+Lexema<2.1>    Token<float>    Linea: 25 Columna: 48
+Lexema<## otros >    Token<Comentario>    Linea: 27 Columna: 1
+Lexema<(>    Token<Otro>    Linea: 29 Columna: 1
+Lexema<x>    Token<Identificador>    Linea: 29 Columna: 2
+Lexema<,>    Token<Otro>    Linea: 29 Columna: 3
+Lexema<y>    Token<Identificador>    Linea: 29 Columna: 4
+Lexema<)>    Token<Otro>    Linea: 29 Columna: 5
+Lexema<)>    Token<Otro>    Linea: 29 Columna: 6
+Lexema<)>    Token<Otro>    Linea: 29 Columna: 7
+Lexema<(>    Token<Otro>    Linea: 29 Columna: 9
+Lexema<XX>    Token<Identificador>    Linea: 29 Columna: 11
+Lexema<,>    Token<Otro>    Linea: 29 Columna: 13
+Lexema<yYY>    Token<Identificador>    Linea: 29 Columna: 15
+Lexema<(>    Token<Otro>    Linea: 29 Columna: 18
+Lexema<.>    Token<error>    Linea: 29 Columna: 20
+Lexema<:>    Token<Otro>    Linea: 29 Columna: 22
+Lexema<{>    Token<Otro>    Linea: 29 Columna: 25
+Lexema<}>    Token<Otro>    Linea: 29 Columna: 26
+Lexema<{>    Token<Otro>    Linea: 29 Columna: 27
+Lexema<{>    Token<Otro>    Linea: 29 Columna: 28
+Lexema<.>    Token<error>    Linea: 29 Columna: 30
+Lexema<,>    Token<Otro>    Linea: 29 Columna: 31
+Lexema<,>    Token<Otro>    Linea: 29 Columna: 32
+Lexema<.>    Token<error>    Linea: 29 Columna: 33
+Lexema<1>    Token<int>    Linea: 31 Columna: 1
+Lexema<(>    Token<Otro>    Linea: 31 Columna: 2
+Lexema<asignacion>    Token<Identificador>    Linea: 34 Columna: 1
+Lexema<+=>    Token<Asignacion>    Linea: 34 Columna: 12
+Lexema<aritmetico>    Token<Identificador>    Linea: 35 Columna: 1
+Lexema<+>    Token<Aritmetico>    Linea: 35 Columna: 12
+Lexema<**>    Token<Aritmetico>    Linea: 35 Columna: 14
+Lexema<parentesis>    Token<Identificador>    Linea: 36 Columna: 1
+Lexema<(>    Token<Otro>    Linea: 36 Columna: 12
+Lexema<7>    Token<int>    Linea: 36 Columna: 14
+Lexema<(>    Token<Otro>    Linea: 36 Columna: 15
+Lexema<)>    Token<Otro>    Linea: 36 Columna: 16
+Lexema<(>    Token<Otro>    Linea: 36 Columna: 17
+Lexema<(>    Token<Otro>    Linea: 36 Columna: 18
+Lexema<id>    Token<Identificador>    Linea: 37 Columna: 1
+Lexema<'¡X ha ganado, bien hecho!'>    Token<Cadena>    Linea: 38 Columna: 1
+Lexema<snake_food>    Token<Identificador>    Linea: 40 Columna: 1
+Lexema<.>    Token<error>    Linea: 40 Columna: 11
+Lexema<goto>    Token<Identificador>    Linea: 40 Columna: 12
+Lexema<segments>    Token<Identificador>    Linea: 42 Columna: 1

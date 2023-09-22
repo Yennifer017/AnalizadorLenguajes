@@ -3,7 +3,7 @@ package lenguajes.proyectolenguajesydl.util;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import lenguajes.proyectolenguajesydl.analizadorlexico.Lexer;
+import lenguajes.proyectolenguajesydl.lexer.Lexer;
 
 /**
  *

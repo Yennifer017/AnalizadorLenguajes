@@ -4,7 +4,7 @@ package lenguajes.proyectolenguajesydl.util;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import lenguajes.proyectolenguajesydl.analizadorlexico.Token;
+import lenguajes.proyectolenguajesydl.lexer.Token;
 
 /**
  *

@@ -1,5 +1,5 @@
 
-package lenguajes.proyectolenguajesydl.analizadorlexico;
+package lenguajes.proyectolenguajesydl.lexer;
 
 /**
  *

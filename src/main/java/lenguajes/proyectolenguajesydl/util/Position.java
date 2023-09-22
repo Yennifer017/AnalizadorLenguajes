@@ -14,6 +14,11 @@ public class Position {
         this.index = index;
     }
 
+    public Position(int columna, int fila) {
+        this.columna = columna;
+        this.fila = fila;
+    }
+
     public int getColumna() {
         return columna;
     }
