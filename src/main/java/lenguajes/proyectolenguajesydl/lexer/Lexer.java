@@ -67,6 +67,17 @@ public class Lexer {
     public Token getToken(int index){
         return tokens.get(index);
     }
+    /**
+     * Elimina elementos que no sirven, como los comentarios HAY ALGO MALO AQUI
+     */
+    public void deleteNoUtilTkns() {
+        for (int i = 0; i < tokens.size(); i++) {
+            if (tokens.get(i).getType().equals("Comentario")) {
+                tokens.remove(i);
+                i--;
+            }
+        }
+    }
     /********************************************
      *********** SEPARACION DE TOKENS ***********
      ********************************************/
