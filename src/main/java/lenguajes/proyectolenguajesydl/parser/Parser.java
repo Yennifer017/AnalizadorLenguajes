@@ -13,7 +13,7 @@ import lenguajes.proyectolenguajesydl.util.Position;
 public class Parser {
 
     private Lexer lexer;
-    private List<SintaxError> errors;
+    private List<SyntaxError> errors;
     private int currentNoTkn;
     private int breaksAllowed;
     private Separator separator;
@@ -35,12 +35,21 @@ public class Parser {
         currentNoTkn = 0;
         lexer.deleteNoUtilTkns();
         analiceBlock(lexer.getTokens().size());
-        /*while (currentNoTkn < lexer.getTokens().size()) {
-            int endStmt = this.findEndOfStmt(lexer.getTokens(), currentNoTkn);
-            System.out.println("fin de statment:" + endStmt);
-            analiceStmt(endStmt, lexer.getTokens());
-        }*/
-        visualizarErrores();
+    }
+
+    public String getErrors() {
+        String analisis = "ERRORES SINTACTICOS: \n";
+        for (int i = 0; i < errors.size(); i++) {
+            SyntaxError error = errors.get(i);
+            analisis += "Fila: " + (error.getPosition().getFila() + 1)
+                    + " -- Columna: " + (error.getPosition().getColumna() + 1)
+                    + " -- Detalles: " + error.getDetails();
+            analisis += "\n";
+        }
+        if (analisis.equals("ERRORES SINTACTICOS: \n")) {
+            analisis += "No hay Errores sintacticos :D";
+        }
+        return analisis;
     }
 
     /**
@@ -74,24 +83,12 @@ public class Parser {
 
             }
             default -> {
-                errors.add(new SintaxError(inicial.getPosition(),
+                errors.add(new SyntaxError(inicial.getPosition(),
                         "identificador, if, for, while o def esperado"));
 
             }
         }
         currentNoTkn = fin;
-    }
-
-    private void visualizarErrores() {
-        System.out.println("total de errores =" + errors.size());
-        for (int i = 0; i < errors.size(); i++) {
-            SintaxError e = errors.get(i);
-            System.out.println(e.getDetails());
-            System.out.println("fila" + e.getPosition().getFila() + "- columna" + e.getPosition().getColumna());
-        }
-        if (errors.isEmpty()) {
-            System.out.println("no hay errores que mostrar");
-        }
     }
 
     /**
@@ -121,7 +118,7 @@ public class Parser {
                         case "Asignacion" ->
                             status = 3;
                         default -> {
-                            errors.add(new SintaxError(tokens.get(currentNoTkn).getPosition(),
+                            errors.add(new SyntaxError(tokens.get(currentNoTkn).getPosition(),
                                     "Se esperaba una coma o una asignacion"));
                             currentNoTkn--; // nos deja en la misma posicion
                             status = 3;
@@ -133,7 +130,7 @@ public class Parser {
                         case "Identificador" ->
                             status = 1;
                         default -> {
-                            errors.add(new SintaxError(tokens.get(currentNoTkn).getPosition(),
+                            errors.add(new SyntaxError(tokens.get(currentNoTkn).getPosition(),
                                     "Se esperaba un identificador"));
                             currentNoTkn--; // nos deja en la misma posicion
                             status = 1;
@@ -149,7 +146,7 @@ public class Parser {
                         case "coma" ->
                             status = 5;
                         default -> {
-                            errors.add(new SintaxError(tokens.get(currentNoTkn).getPosition(),
+                            errors.add(new SyntaxError(tokens.get(currentNoTkn).getPosition(),
                                     "Se esperaba una coma"));
                             currentNoTkn--; // nos deja en la misma posicion
                             status = 5;
@@ -174,7 +171,7 @@ public class Parser {
                     message = "Se esperaba una expresion";
             }
             Token endTkn = tokens.get(currentNoTkn - 1);
-            errors.add(new SintaxError(new Position(endTkn.getColumna() + endTkn.length(), endTkn.getFila()),
+            errors.add(new SyntaxError(new Position(endTkn.getColumna() + endTkn.length(), endTkn.getFila()),
                     message));
         }
     }
@@ -184,20 +181,26 @@ public class Parser {
         while (currentNoTkn < fin) {
             switch (status) {
                 case 0 -> {
-                    validateIfStmt(tokens);
+                    validateConditionalStmt(tokens, "if");
                     status = 1;
                 }
                 case 1 -> {
-                    String typeTkn = tokens.get(currentNoTkn).getSubType();
-                    if(!typeTkn.equals("elif") && !typeTkn.equals("else")){
+                    /*String typeTkn = tokens.get(currentNoTkn).getSubType();
+                    if (!typeTkn.equals("elif") && !typeTkn.equals("else")) {
                         int endOfBlock = separator.findEndOfBlock(tokens, currentNoTkn);
                         analiceBlock(endOfBlock);
-                    }
+                    }*/
+                    analiceSubBlock(tokens);
                     status = 2;
                 }
                 case 2 -> {
-                    System.out.println("casificacion de elif_stm y else_block aun no disponible");
-                    //clasificar y validar elif_stmt OR else_block
+                    String typeTkn = tokens.get(currentNoTkn).getSubType();
+                    switch (typeTkn) {
+                        case "elif" ->
+                            validateElifBlock(tokens, fin);
+                        case "else" ->
+                            validateElseBlock();
+                    }
                     status = 3;
                 }
             }
@@ -205,7 +208,44 @@ public class Parser {
         }//end of while
     }
 
-    private void validateIfStmt(List<Token> tokens) {
+    private void validateElifBlock(List<Token> tokens, int end) {
+        int status = 0;
+        while (currentNoTkn < end) {
+            switch (status) {
+                case 0 -> {
+                    validateConditionalStmt(tokens, "elif");
+                    status = 1;
+                }
+                case 1 -> {
+                    analiceSubBlock(tokens);
+                    status = 2;
+                }
+                case 2 -> {
+                    String type = tokens.get(currentNoTkn).getSubType();
+                    switch (type) {
+                        case "elif" -> {
+                            validateConditionalStmt(tokens, "elif");
+                            status = 1;
+                        }
+                        case "else" -> {
+                            validateElseBlock();
+                            status = 3;
+                        }
+                        default ->
+                            throw new AssertionError();
+                    }
+                }
+            }
+            currentNoTkn++;
+        }//end of while
+
+    }
+
+    private void validateElseBlock() {
+        System.out.println("analisis del bloque else aun no determinado");
+    }
+
+    private void validateConditionalStmt(List<Token> tokens, String conditional) {
         boolean read = true;
         int status = 0;
         int end = separator.findEndOfLine(tokens, currentNoTkn);
@@ -214,8 +254,8 @@ public class Parser {
             String type = tokens.get(currentNoTkn).getSubType();
             switch (status) {
                 case 0 -> {
-                    if (!type.equals("if")) {
-                        throw new AssertionError("No se esta validando un if statment");
+                    if (!type.equals(conditional)) {
+                        throw new AssertionError("No se esta validando un conditional statment");
                     }
                     status = 1;
                 }
@@ -229,7 +269,7 @@ public class Parser {
                         case "dos_puntos" ->
                             status = 3;
                         default -> {
-                            errors.add(new SintaxError(tokens.get(currentNoTkn).getPosition(),
+                            errors.add(new SyntaxError(tokens.get(currentNoTkn).getPosition(),
                                     "Se esperaban dos puntos"));
                         }
                     }
@@ -239,7 +279,7 @@ public class Parser {
             currentNoTkn++;
         } //end of while
         if (currentNoTkn != end) {
-            errors.add(new SintaxError(tokens.get(currentNoTkn).getPosition(),"codigo inesperado a la derecha"));
+            errors.add(new SyntaxError(tokens.get(currentNoTkn).getPosition(), "codigo inesperado a la derecha"));
         } else if (status != 3) {
             String message = "Error inesperado";
             switch (status) {
@@ -249,10 +289,24 @@ public class Parser {
                     message = "Se esperaban dos puntos";
             }
             Token endTkn = tokens.get(currentNoTkn - 1);
-            errors.add(new SintaxError(new Position(endTkn.getColumna() + endTkn.length(), endTkn.getFila()),
+            errors.add(new SyntaxError(new Position(endTkn.getColumna() + endTkn.length(), endTkn.getFila()),
                     message));
         }
         currentNoTkn = end - 1;
+    }
+
+    private void validateElseStmt() {
+
+    }
+
+    private void analiceSubBlock(List<Token> tokens) {
+        String typeTkn = tokens.get(currentNoTkn).getSubType();
+        if (!typeTkn.equals("elif") && !typeTkn.equals("else")) {
+            int endOfBlock = separator.findEndOfBlock(tokens, currentNoTkn);
+            analiceBlock(endOfBlock);
+        } else {
+            currentNoTkn--;
+        }
     }
 
     private int validateOneLine(int init, int fin, List<Token> tokens) {
@@ -261,7 +315,7 @@ public class Parser {
         while (i < tokens.size() && i < fin) {
             int currentLine = tokens.get(i).getFila();
             if (currentLine != line) {
-                errors.add(new SintaxError(tokens.get(i).getPosition(), "IdentationError"));
+                errors.add(new SyntaxError(tokens.get(i).getPosition(), "IdentationError"));
                 break;
             }
             i++;
@@ -273,7 +327,7 @@ public class Parser {
         int end = separator.findEndOfExpression(tokens, currentNoTkn, typeTknEnd, currentLine);
         if (currentNoTkn == end) {
             Token tkn = tokens.get(currentNoTkn);
-            errors.add(new SintaxError(new Position(tkn.getColumna() + tkn.length(),
+            errors.add(new SyntaxError(new Position(tkn.getColumna(),
                     currentLine), "Se esperaba una expresion"));
         } else if ((currentNoTkn + 1) == end) {
             boolean isValid = switch (tokens.get(currentNoTkn).getSubType()) {
@@ -283,7 +337,7 @@ public class Parser {
                     false;
             };
             if (!isValid) {
-                errors.add(new SintaxError(tokens.get(currentNoTkn).getPosition(),
+                errors.add(new SyntaxError(tokens.get(currentNoTkn).getPosition(),
                         "Se esperaba una expresion"));
             }
         } else {

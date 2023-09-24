@@ -9,7 +9,7 @@ import lombok.*;
  * @author yenni
  */
 @AllArgsConstructor @Getter
-public class SintaxError {
+public class SyntaxError {
     private Position position;
     private String details;
 }

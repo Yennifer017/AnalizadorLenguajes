@@ -584,8 +584,10 @@ public class InterfazUsuario extends javax.swing.JFrame {
 
     private void bSintacticoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSintacticoActionPerformed
         lexer.analyzeAll(editor.getText());
-        displayAnalisis.setText(lexer.getErrors());
         parser.analiceAll(lexer);
+        displayAnalisis.setText(lexer.getErrors() 
+                + "\n---------------------------------------\n" 
+                + parser.getErrors());
     }//GEN-LAST:event_bSintacticoActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

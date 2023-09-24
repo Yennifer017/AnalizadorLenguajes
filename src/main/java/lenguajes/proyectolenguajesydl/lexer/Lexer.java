@@ -36,18 +36,17 @@ public class Lexer {
         }
     }
     public String getErrors(){
-        String analisis= "";
+        String analisis= "ERRORES LEXICOS: \n";
         for (int i = 0; i < tokens.size(); i++) {
             if(tokens.get(i).getType().equalsIgnoreCase("error")){
                 analisis += tokens.get(i).toString();
                 analisis += "\n";
             }
         }
-        if(!analisis.equals("")){
-            return analisis;
-        }else{
-            return "No hay Errores lexicos :)";
+        if(analisis.equals("ERRORES LEXICOS: \n")){
+            analisis += "No hay Errores lexicos :)";
         }
+        return analisis;
     }
     public String getReporte(){
         String analisis= "";

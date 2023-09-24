@@ -30,9 +30,9 @@ public class Separator {
                 includeElse = true;
         }
         for (int i = init + 1; i < tokens.size(); i++) {
-            if (tokens.get(i).getInicio() == identation) {
+            if (tokens.get(i).getInicio() <= identation) {
                 String typeTknEnd = tokens.get(i).getSubType();
-                if (!(typeTknEnd.endsWith("elif") && includeElif)
+                if (!(typeTknEnd.equals("elif") && includeElif)
                         && !(typeTknEnd.equals("else") && includeElse)) {
                     return i;
                 }
