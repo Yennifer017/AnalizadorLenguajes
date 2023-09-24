@@ -32,7 +32,7 @@ public class Token {
     public String getSubType(){
         return subType;
     }
-    public int getInicio(){
+    public int getColumna(){
         return position.getColumna();
     }
     public int getRelativeIndex(){
@@ -44,11 +44,8 @@ public class Token {
     public String getContenido(){
         return lexema;
     }
-    public int getFila(){
+    public int getLine(){
         return position.getFila();
-    }
-    public int getColumna(){
-        return position.getColumna();
     }
     public String getPatron(){
         return patron;

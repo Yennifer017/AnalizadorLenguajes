@@ -19,7 +19,7 @@ public class Separator {
     public int findEndOfStmt(List<Token> tokens, int init) {
         boolean includeElif = false, includeElse = false;
         Token initTkn = tokens.get(init);
-        int identation = initTkn.getInicio();
+        int identation = initTkn.getColumna();
         //identifica los statments que necesitan incluir elif y/o else
         switch (initTkn.getSubType()) {
             case "if" -> { //los que aceptan elif y else
@@ -30,7 +30,7 @@ public class Separator {
                 includeElse = true;
         }
         for (int i = init + 1; i < tokens.size(); i++) {
-            if (tokens.get(i).getInicio() <= identation) {
+            if (tokens.get(i).getColumna() <= identation) {
                 String typeTknEnd = tokens.get(i).getSubType();
                 if (!(typeTknEnd.equals("elif") && includeElif)
                         && !(typeTknEnd.equals("else") && includeElse)) {
@@ -49,9 +49,10 @@ public class Separator {
      * @return el fin del bloque
      */
     public int findEndOfBlock(List<Token> tokens, int init) {
-        int line = tokens.get(init).getFila();
+        int identation = tokens.get(init).getColumna();
+        
         for (int i = init + 1; i < tokens.size(); i++) {
-            if (tokens.get(i).getInicio() < line) {
+            if (tokens.get(i).getColumna() < identation) {
                 return i;
             }
         }
@@ -61,7 +62,7 @@ public class Separator {
     public int findEndOfExpression(List<Token> tokens, int init, String typeTknEnd, int noLine) {
         //fin de expresion puede ser: otra linea, un caracter indicado, 
         int i = init;
-        while (i < tokens.size() && tokens.get(i).getFila() == noLine
+        while (i < tokens.size() && tokens.get(i).getLine() == noLine
                 && !tokens.get(i).getSubType().equals(typeTknEnd)) {
             i++;
         }
@@ -69,9 +70,9 @@ public class Separator {
     }
 
     public int findEndOfLine(List<Token> tokens, int init){
-        int line = tokens.get(init).getFila();
+        int line = tokens.get(init).getLine();
         for (int i = init + 1; i < tokens.size(); i++) {
-            if(tokens.get(i).getFila() != line){
+            if(tokens.get(i).getLine() != line){
                 return i;
             }
         }

@@ -16,7 +16,7 @@ public class Reportero {
         data[0] = lexer.getTokens().get(row).getType();
         data[1] = lexer.getTokens().get(row).getPatron();
         data[2] = lexer.getTokens().get(row).getContenido();
-        data[3] = lexer.getTokens().get(row).getFila() + 1;
+        data[3] = lexer.getTokens().get(row).getLine() + 1;
         data[4] = lexer.getTokens().get(row).getColumna() + 1;
         return data;
     }

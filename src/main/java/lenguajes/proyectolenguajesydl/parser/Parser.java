@@ -15,18 +15,22 @@ public class Parser {
     private Lexer lexer;
     private List<SyntaxError> errors;
     private int currentNoTkn;
-    private int breaksAllowed;
+    private int breaksAllowed, returnsAllowed;
     private Separator separator;
 
-    public Parser(Lexer lexer) {
+    /*public Parser(Lexer lexer) {
         this.lexer = lexer;
         this.errors = new ArrayList<>();
         separator = new Separator();
-    }
+        breaksAllowed = 0;
+        returnsAllowed = 0;
+    }*/
 
     public Parser() {
         this.errors = new ArrayList<>();
         separator = new Separator();
+        breaksAllowed = 0;
+        returnsAllowed = 0;
     }
 
     public void analiceAll(Lexer lexer) {
@@ -67,7 +71,7 @@ public class Parser {
         Token inicial = tokens.get(currentNoTkn);
         switch (inicial.getSubType()) {
             case "Identificador" -> {
-                analiceAssignation(fin, tokens);
+                validateAssignation(fin, tokens);
             }
             case "if" -> {
                 validateIfBlock(fin, tokens);
@@ -76,11 +80,19 @@ public class Parser {
                 System.out.println("entro a un for");
             }
             case "while" -> {
-                System.out.println("entro a un while");
+                validateWhileBlock(tokens, fin);
             }
             case "def" -> {
                 System.out.println("entro a un def");
 
+            }
+            case "break" -> {
+                if(breaksAllowed > 0 ){
+                    //analizar la linea de break
+                }else{
+                    errors.add(new SyntaxError(inicial.getPosition(), 
+                            "Sentencia 'break' usado fuera de un ciclo"));
+                }
             }
             default -> {
                 errors.add(new SyntaxError(inicial.getPosition(),
@@ -94,9 +106,9 @@ public class Parser {
     /**
      * ********ANALICE DEPENDING OF THE TYPE OF THE BLOCK**********************
      */
-    private void analiceAssignation(int fin, List<Token> tokens) {
+    private void validateAssignation(int fin, List<Token> tokens) {
         //verificar que solo sea de una linea
-        int noLine = tokens.get(currentNoTkn).getFila();
+        int noLine = tokens.get(currentNoTkn).getLine();
         fin = validateOneLine(currentNoTkn, fin, tokens);
         int status = 0;
         while (currentNoTkn < fin) {
@@ -171,7 +183,7 @@ public class Parser {
                     message = "Se esperaba una expresion";
             }
             Token endTkn = tokens.get(currentNoTkn - 1);
-            errors.add(new SyntaxError(new Position(endTkn.getColumna() + endTkn.length(), endTkn.getFila()),
+            errors.add(new SyntaxError(new Position(endTkn.getColumna() + endTkn.length(), endTkn.getLine()),
                     message));
         }
     }
@@ -185,11 +197,6 @@ public class Parser {
                     status = 1;
                 }
                 case 1 -> {
-                    /*String typeTkn = tokens.get(currentNoTkn).getSubType();
-                    if (!typeTkn.equals("elif") && !typeTkn.equals("else")) {
-                        int endOfBlock = separator.findEndOfBlock(tokens, currentNoTkn);
-                        analiceBlock(endOfBlock);
-                    }*/
                     analiceSubBlock(tokens);
                     status = 2;
                 }
@@ -199,7 +206,7 @@ public class Parser {
                         case "elif" ->
                             validateElifBlock(tokens, fin);
                         case "else" ->
-                            validateElseBlock();
+                            validateElseBlock(tokens, fin);
                     }
                     status = 3;
                 }
@@ -228,7 +235,7 @@ public class Parser {
                             status = 1;
                         }
                         case "else" -> {
-                            validateElseBlock();
+                            validateElseBlock(tokens, end);
                             status = 3;
                         }
                         default ->
@@ -239,10 +246,6 @@ public class Parser {
             currentNoTkn++;
         }//end of while
 
-    }
-
-    private void validateElseBlock() {
-        System.out.println("analisis del bloque else aun no determinado");
     }
 
     private void validateConditionalStmt(List<Token> tokens, String conditional) {
@@ -261,7 +264,7 @@ public class Parser {
                 }
                 case 1 -> {
                     validateExpression(tokens, "dos_puntos",
-                            tokens.get(currentNoTkn).getFila());
+                            tokens.get(currentNoTkn).getLine());
                     status = 2;
                 }
                 case 2 -> {
@@ -289,31 +292,126 @@ public class Parser {
                     message = "Se esperaban dos puntos";
             }
             Token endTkn = tokens.get(currentNoTkn - 1);
-            errors.add(new SyntaxError(new Position(endTkn.getColumna() + endTkn.length(), endTkn.getFila()),
+            errors.add(new SyntaxError(new Position(endTkn.getColumna() + endTkn.length(), endTkn.getLine()),
                     message));
         }
         currentNoTkn = end - 1;
     }
 
-    private void validateElseStmt() {
-
+    private void validateElseStmt(List<Token> tokens) {
+        boolean read = true;
+        int status = 0;
+        int end = separator.findEndOfLine(tokens, currentNoTkn);
+        while (currentNoTkn < end && read) {
+            String type = tokens.get(currentNoTkn).getSubType();
+            switch (status) {
+                case 0 -> {
+                    if (!type.equals("else")) {
+                        throw new AssertionError("No se esta validando un else statment");
+                    }
+                    status = 1;
+                }
+                case 1 -> {
+                    if (!type.equals("dos_puntos")) {
+                        errors.add(new SyntaxError(tokens.get(currentNoTkn).getPosition(),
+                                "Se esperaban dos puntos"));
+                    }
+                    status = 2;
+                    read = false;
+                }
+            }
+            currentNoTkn++;
+        } //end of while
+        if (currentNoTkn != end) {
+            errors.add(new SyntaxError(tokens.get(currentNoTkn).getPosition(), "codigo inesperado a la derecha"));
+        } else if (status != 2) {
+            String message = "Error inesperado";
+            switch (status) {
+                case 1 ->
+                    message = "Dos puntos esperados";
+            }
+            Token endTkn = tokens.get(currentNoTkn - 1);
+            errors.add(new SyntaxError(new Position(endTkn.getColumna() + endTkn.length(), endTkn.getLine()),
+                    message));
+        }
+        currentNoTkn = end - 1;
     }
 
+    private void validateElseBlock(List<Token> tokens, int end) {
+        int status = 0;
+        while (currentNoTkn < end) {
+            switch (status) {
+                case 0 -> {
+                    validateElseStmt(tokens);
+                    status = 1;
+                }
+                case 1 -> {
+                    analiceBlock(end);
+                    status = 2;
+                }
+            }
+            currentNoTkn++;
+        } //end of while
+    }
+
+    private void validateWhileBlock(List<Token> tokens, int end) {
+        breaksAllowed++;
+        int status = 0;
+        while (currentNoTkn < end) {
+            switch (status) {
+                case 0 -> {
+                    validateConditionalStmt(tokens, "while");
+                    status = 1;
+                }
+                case 1 -> analiceBlock(end);
+            }
+            currentNoTkn++;
+        }//end of while
+        breaksAllowed--;
+    }
+
+    private void validateForBlock(List<Token> tokens, int end){
+    
+    }
+    
+    private void validateForStmt(List<Token> tokens){
+    
+    }
+    
+    private void validateDefBlock(List<Token> tokens, int end){
+    
+    }
+    
+    private void validateDefStmt(List<Token> tokens){
+    
+    }
+    
+    private void validateBreakStmt(List<Token> tokens, int end){
+    
+    }
+    
+    private void validateReturnStmt(List<Token> tokens, int end){
+    
+    }
+    
+    private void validateUseFunction(List<Token> tokens, int end){
+        
+    }
+    
     private void analiceSubBlock(List<Token> tokens) {
         String typeTkn = tokens.get(currentNoTkn).getSubType();
         if (!typeTkn.equals("elif") && !typeTkn.equals("else")) {
             int endOfBlock = separator.findEndOfBlock(tokens, currentNoTkn);
             analiceBlock(endOfBlock);
-        } else {
-            currentNoTkn--;
         }
+        currentNoTkn--;
     }
 
     private int validateOneLine(int init, int fin, List<Token> tokens) {
-        int line = tokens.get(init).getFila();
+        int line = tokens.get(init).getLine();
         int i = init;
         while (i < tokens.size() && i < fin) {
-            int currentLine = tokens.get(i).getFila();
+            int currentLine = tokens.get(i).getLine();
             if (currentLine != line) {
                 errors.add(new SyntaxError(tokens.get(i).getPosition(), "IdentationError"));
                 break;
