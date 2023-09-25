@@ -367,12 +367,12 @@ public class Lexer {
     }
     private String getSubTypeOtro(String lexema){
         return switch (lexema) {
-            case "(" -> "parentesisL";
-            case ")" -> "parentesisR";
-            case "{" -> "llaveL";
-            case "}" -> "llaveR";
-            case "[" -> "corcheteL";
-            case "]" -> "corcheteR";
+            case "(" -> "pL";
+            case ")" -> "pR";
+            case "{" -> "lL";
+            case "}" -> "lR";
+            case "[" -> "cL";
+            case "]" -> "cR";
             case "," -> "coma";
             case ":" -> "dos_puntos";
             case ";" -> "punto_y_coma";

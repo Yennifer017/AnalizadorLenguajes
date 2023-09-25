@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Enum.java to edit this template
- */
+
 package lenguajes.proyectolenguajesydl.lexer;
 
 /**
@@ -11,13 +8,13 @@ package lenguajes.proyectolenguajesydl.lexer;
 public enum TipoTokenEnum {
     IDENTIFICADOR("Identificador");
     
-    public final String value;
+    public final String name;
 
-    private TipoTokenEnum(String value) {
-        this.value = value;
+    private TipoTokenEnum(String name) {
+        this.name = name;
     }
     @Override
     public String toString(){
-        return this.value;
+        return this.name;
     }
 }
