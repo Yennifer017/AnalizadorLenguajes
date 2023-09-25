@@ -30,7 +30,12 @@ public class Parser {
         this.lexer = lexer;
         currentNoTkn = 0;
         lexer.deleteNoUtilTkns();
-        analiceBlock(lexer.getTokens().size());
+        try {
+            analiceSubBlock(lexer.getTokens(), lexer.getToken(currentNoTkn).getColumna());
+        } catch (NullPointerException e) {
+            System.out.println("No hay codigo para analizar");
+        }
+        
     }
 
     public String getErrors() {
@@ -67,7 +72,7 @@ public class Parser {
             case "if" ->
                 validateIfBlock(fin, tokens);
             case "for" ->
-                System.out.println("entro a un for");
+                validateForBlock(tokens, fin);
             case "while" ->
                 validateWhileBlock(tokens, fin);
             case "def" ->
@@ -85,7 +90,7 @@ public class Parser {
                     validateReturnStmt(tokens, fin);
                 } else {
                     errors.add(new SyntaxError(inicial.getPosition(),
-                            "Sentencia 'return' usado fuera de un ciclo"));
+                            "Sentencia 'return' usado fuera de una declaracion de funcion"));
                 }
             }
             default ->
@@ -182,6 +187,7 @@ public class Parser {
 
     private void validateIfBlock(int fin, List<Token> tokens) {
         int status = 0;
+        int bigIdentation = tokens.get(currentNoTkn).getColumna();
         while (currentNoTkn < fin) {
             switch (status) {
                 case 0 -> {
@@ -189,7 +195,7 @@ public class Parser {
                     status = 1;
                 }
                 case 1 -> {
-                    analiceSubBlock(tokens);
+                    analiceSubBlock(tokens, bigIdentation);
                     status = 2;
                 }
                 case 2 -> {
@@ -209,6 +215,7 @@ public class Parser {
 
     private void validateElifBlock(List<Token> tokens, int end) {
         int status = 0;
+        int bigIdentation = tokens.get(currentNoTkn).getColumna();
         while (currentNoTkn < end) {
             switch (status) {
                 case 0 -> {
@@ -216,7 +223,7 @@ public class Parser {
                     status = 1;
                 }
                 case 1 -> {
-                    analiceSubBlock(tokens);
+                    analiceSubBlock(tokens, bigIdentation);
                     status = 2;
                 }
                 case 2 -> {
@@ -330,6 +337,7 @@ public class Parser {
     }
 
     private void validateElseBlock(List<Token> tokens, int end) {
+        int bigIdentation = tokens.get(currentNoTkn).getColumna();
         int status = 0;
         while (currentNoTkn < end) {
             switch (status) {
@@ -338,7 +346,7 @@ public class Parser {
                     status = 1;
                 }
                 case 1 -> {
-                    analiceBlock(end);
+                    analiceSubBlock(tokens, bigIdentation);
                     status = 2;
                 }
             }
@@ -347,6 +355,7 @@ public class Parser {
     }
 
     private void validateWhileBlock(List<Token> tokens, int end) {
+        int bigIdentation = tokens.get(currentNoTkn).getColumna();
         breaksAllowed++;
         int status = 0;
         while (currentNoTkn < end) {
@@ -356,7 +365,7 @@ public class Parser {
                     status = 1;
                 }
                 case 1 ->
-                    analiceBlock(end);
+                    analiceSubBlock(tokens, bigIdentation);
             }
             currentNoTkn++;
         }//end of while
@@ -364,11 +373,71 @@ public class Parser {
     }
 
     private void validateForBlock(List<Token> tokens, int end) {
-
+        breaksAllowed++;
+        int status = 0;
+        int bigIdentation = tokens.get(currentNoTkn).getColumna();
+        while (currentNoTkn < end) {   
+            switch (status) {
+                case 0 -> {
+                    validateForStmt(tokens);
+                    status = 1;
+                }
+                case 1 -> {
+                    analiceSubBlock(tokens, bigIdentation);
+                    status = 2;
+                }
+                case 2 -> validateElseBlock(tokens, end);
+            }
+            currentNoTkn++;
+        }
+        breaksAllowed--;
     }
 
     private void validateForStmt(List<Token> tokens) {
-
+        int status = 0;
+        int end = separator.findEndOfLine(tokens, currentNoTkn);
+        boolean read = true;
+        while (currentNoTkn < end && read) {
+            Token tkn = tokens.get(currentNoTkn);
+            switch (status) {
+                case 0 -> {
+                    if(!tkn.getSubType().equals("for")){
+                        throw new AssertionError("No se esta validando un for_stmt");
+                    }
+                    status = 1;
+                }
+                case 1 -> {
+                    validateOnePos(tkn, "Identificador", "identificador");
+                    status = 2;
+                }
+                case 2 -> {
+                    validateOnePos(tkn, "in", "'in'");
+                    status = 3;
+                }
+                case 3 -> {
+                    validateExpression(tokens, "dos_puntos", tokens.get(currentNoTkn).getLine());
+                    status = 4;
+                }
+                case 4 -> {
+                    validateOnePos(tkn, "dos_puntos", "dos puntos");
+                    status = 5;
+                }
+                case 5 -> read = false;
+            }
+            currentNoTkn++;
+        }//end of while
+        String error;
+        if(status != 4){
+            error = switch (status) {
+                case 1 -> "Identificador esperado";
+                case 2 -> "'in' esperado";
+                case 3 -> "Se esperaban dos puntos";
+                default -> "Error inesperado";
+            };
+        }else if(currentNoTkn != end){
+            error = "Codigo inesperado a la derecha";
+        }
+        currentNoTkn =  end - 1;
     }
 
     private void validateDefBlock(List<Token> tokens, int end) {
@@ -504,10 +573,10 @@ public class Parser {
 
     }
 
-    private void analiceSubBlock(List<Token> tokens) {
+    private void analiceSubBlock(List<Token> tokens, int bigIdentation) {
         String typeTkn = tokens.get(currentNoTkn).getSubType();
         if (!typeTkn.equals("elif") && !typeTkn.equals("else")) {
-            int endOfBlock = separator.findEndOfBlock(tokens, currentNoTkn);
+            int endOfBlock = separator.findEndOfBlock(tokens, currentNoTkn, bigIdentation, errors);
             analiceBlock(endOfBlock);
         }
         currentNoTkn--;

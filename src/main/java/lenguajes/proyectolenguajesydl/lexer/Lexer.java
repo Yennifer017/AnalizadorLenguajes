@@ -64,7 +64,12 @@ public class Lexer {
         return (ArrayList<Token>) tokens;
     }
     public Token getToken(int index){
-        return tokens.get(index);
+        try {
+            return tokens.get(index);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
+        
     }
     /**
      * Elimina elementos que no sirven, como los comentarios HAY ALGO MALO AQUI

@@ -48,12 +48,18 @@ public class Separator {
      * @param init inicio
      * @return el fin del bloque
      */
-    public int findEndOfBlock(List<Token> tokens, int init) {
+    public int findEndOfBlock(List<Token> tokens, int init, int bigIdentation, List<SyntaxError> errors) {
         int identation = tokens.get(init).getColumna();
         
         for (int i = init + 1; i < tokens.size(); i++) {
             if (tokens.get(i).getColumna() < identation) {
-                return i;
+                if(tokens.get(i).getColumna() <= bigIdentation){
+                    return i;
+                }else{
+                    errors.add(new SyntaxError(tokens.get(i).getPosition(),
+                            "Identation Error" ));
+                    //agregar un error de identacion
+                }
             }
         }
         return tokens.size();
