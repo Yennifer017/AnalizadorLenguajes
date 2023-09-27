@@ -17,12 +17,14 @@ public class Parser {
     private int currentNoTkn;
     private int breaksAllowed, returnsAllowed;
     private Separator separator;
+    private ExpressionVerificator eVerificator;
 
     public Parser() {
         this.errors = new ArrayList<>();
         separator = new Separator();
         breaksAllowed = 0;
         returnsAllowed = 0;
+        eVerificator = new ExpressionVerificator(this.errors);
     }
 
     public void analiceAll(Lexer lexer) {
@@ -598,11 +600,18 @@ public class Parser {
 
     private void validateExpression(List<Token> tokens, String typeTknEnd, int currentLine) {
         int end = separator.findEndOfExpression(tokens, currentNoTkn, typeTknEnd, currentLine);
-        if (currentNoTkn == end) {
+        System.out.println("fin de expresion" +  end);
+        if (currentNoTkn == end) { //cuando la expresion no exite
             Token tkn = tokens.get(currentNoTkn);
             errors.add(new SyntaxError(new Position(tkn.getColumna(),
                     currentLine), "Se esperaba una expresion"));
-        } else if ((currentNoTkn + 1) == end) {
+        } else{
+            List<Token> expression = tokens.subList(currentNoTkn, end);
+            eVerificator.validate(expression);
+        }
+        currentNoTkn = end - 1; //no perder la secuencia incluso si ocurre algun error
+        
+        /*else if ((currentNoTkn + 1) == end) {
             boolean isValid = switch (tokens.get(currentNoTkn).getSubType()) {
                 case "int", "float", "Cadena", "True", "False", "Identificador" ->
                     true;
@@ -616,7 +625,7 @@ public class Parser {
         } else {
             System.out.println("evaluar una expresion de mas de un parametro, aun no soportado");
         }
-        currentNoTkn = end - 1;
+        currentNoTkn = end - 1;*/
     }
 
 }

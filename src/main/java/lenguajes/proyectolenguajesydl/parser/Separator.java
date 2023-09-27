@@ -1,6 +1,8 @@
 package lenguajes.proyectolenguajesydl.parser;
 
 import java.util.List;
+import java.util.Stack;
+import lenguajes.proyectolenguajesydl.lexer.Regex;
 import lenguajes.proyectolenguajesydl.lexer.Token;
 
 /**
@@ -9,6 +11,12 @@ import lenguajes.proyectolenguajesydl.lexer.Token;
  */
 public class Separator {
 
+    private Regex ex;
+    public Separator() {
+        ex = new Regex();
+    }
+
+    
     /**
      * identifica el fin de un statment, como el de un if, for, while, etc
      *
@@ -67,12 +75,28 @@ public class Separator {
 
     public int findEndOfExpression(List<Token> tokens, int init, String typeTknEnd, int noLine) {
         //fin de expresion puede ser: otra linea, un caracter indicado, 
-        int i = init;
-        while (i < tokens.size() && tokens.get(i).getLine() == noLine
-                && !tokens.get(i).getSubType().equals(typeTknEnd)) {
-            i++;
+        Stack<String> stack = new Stack<>();
+       
+        for (int i = init; i < tokens.size(); i++) {
+            Token currentTkn = tokens.get(i);
+            String subT = currentTkn.getSubType();
+            switch (subT) {
+                case "pL", "cL", "lL" -> stack.push(subT);
+                case "pR", "cR", "lR" -> { //AQUI HAY UN ERROR
+                    if(!stack.isEmpty()){
+                        if(ex.isComplementario(stack.peek(), subT)){
+                            stack.pop();
+                        }
+                    }
+                }
+            }
+            if( (currentTkn.getLine() != noLine) 
+                    || (currentTkn.getSubType().equals(typeTknEnd) && stack.isEmpty()) ){
+                return i;
+            }    
         }
-        return i;
+        return tokens.size();
+        
     }
 
     public int findEndOfLine(List<Token> tokens, int init){
