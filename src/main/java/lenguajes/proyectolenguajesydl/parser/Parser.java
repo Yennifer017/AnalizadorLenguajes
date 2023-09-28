@@ -308,6 +308,7 @@ public class Parser {
             switch (status) {
                 case 0 -> {
                     if (!type.equals("else")) {
+                        System.out.println(currentNoTkn + "numero de token desde else stmt");
                         throw new AssertionError("No se esta validando un else statment");
                     }
                     status = 1;
@@ -428,18 +429,20 @@ public class Parser {
             }
             currentNoTkn++;
         }//end of while
-        String error;
-        if(status != 4){
-            error = switch (status) {
+        String message;
+        if(status != 5){
+            message = switch (status) {
                 case 1 -> "Identificador esperado";
                 case 2 -> "'in' esperado";
                 case 3 -> "Se esperaban dos puntos";
                 default -> "Error inesperado";
             };
-        }else if(currentNoTkn != end){
-            error = "Codigo inesperado a la derecha";
+            errors.add(new SyntaxError(tokens.get(currentNoTkn).getPosition(), message));
+        }else if(currentNoTkn != end && status == 5){
+            errors.add(new SyntaxError(tokens.get(currentNoTkn).getPosition(),
+                    "Codigo inesperado a la derecha"));
         }
-        currentNoTkn =  end - 1;
+        currentNoTkn = end - 1;
     }
 
     private void validateDefBlock(List<Token> tokens, int end) {
@@ -568,11 +571,31 @@ public class Parser {
     }
 
     private void validateReturnStmt(List<Token> tokens, int end) {
-
+        int status = 0;
+        while (currentNoTkn<end) { 
+            switch (status) {
+                case 0 -> {
+                    if(!tokens.get(currentNoTkn).getSubType().equals("return")){
+                        throw new AssertionError("No se esta tratando de validar un return statement");
+                    }
+                    status = 1;
+                }
+                case 1 -> {
+                    validateExpression(tokens, "", tokens.get(currentNoTkn).getLine());
+                    status = 2;
+                }
+            }
+            currentNoTkn++;
+        } //end of while
+        if(status != 2 ){
+            Token endTkn = tokens.get(currentNoTkn - 1);
+            errors.add(new SyntaxError(new Position(endTkn.getColumna() + endTkn.length(), endTkn.getLine()),
+                    "Expresion esperada"));
+        }
     }
 
     private void validateUseFunction(List<Token> tokens, int end) {
-
+        
     }
 
     private void analiceSubBlock(List<Token> tokens, int bigIdentation) {

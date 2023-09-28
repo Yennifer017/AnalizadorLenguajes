@@ -38,12 +38,14 @@ public class Separator {
                 includeElse = true;
         }
         for (int i = init + 1; i < tokens.size(); i++) {
-            if (tokens.get(i).getColumna() <= identation) {
+            if (tokens.get(i).getColumna() == identation) {
                 String typeTknEnd = tokens.get(i).getSubType();
                 if (!(typeTknEnd.equals("elif") && includeElif)
                         && !(typeTknEnd.equals("else") && includeElse)) {
                     return i;
                 }
+            }else if(tokens.get(i).getColumna()<identation){
+                return i;
             }
         }
         return tokens.size();
