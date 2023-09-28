@@ -49,12 +49,20 @@ public class ExpressionVerificator {
             case "O" -> "Operacion (aritmetica, comparativa, otra) esperada";
             case "E+" -> "Codigo a la derecha no esperado";
             case "SR+" -> "Separador de cierre inesperado";
-            case "pL" -> "Se esperaba cerrar la expresion cierre";    
+            case "pL" -> "Se esperaba un token de cierre";
+            case "n" -> "Se esperaba un numero (int o float) o un identificador";   
             default -> "Error inesperado";
         };
-        Token tkn = expression.get(noTkn-1);
-        errors.add(new SyntaxError(new Position(tkn.getColumna() + tkn.length(), tkn.getLine()),
+        Token tkn;
+        if(noTkn>0){
+            tkn = expression.get(noTkn-1);
+            errors.add(new SyntaxError(new Position(tkn.getColumna() + tkn.length(), tkn.getLine()),
                         message));
+        }else{
+            tkn = expression.get(noTkn);
+            errors.add(new SyntaxError(new Position(tkn.getColumna(), tkn.getLine()),
+                        message));
+        }
     }
 
     private void validateExpression() {
@@ -103,20 +111,52 @@ public class ExpressionVerificator {
                 case "pR" -> {
                     read = validateSeparatorR();
                 }
-                default -> read = false;
+                case "suma", "resta" -> {
+                    read = validateNumbers();
+                }
+                case "exponente", "division", "modulo", "multiplicacion" ->{
+                    read = validateOperations();
+                }
+                default -> {
+                    read = false;
+                    noTkn--;
+                }
             }
 
             noTkn++;
             tknRest = expression.size() - noTkn;
         }
         //sobra un token
-        validateOneTkn();
-        /*if(!stack.isEmpty() && stack.peek().equals("E")){
-            validateOneTkn();
-        }*/
+        validateLastTkn();
         
     }
+    private void validateLastTkn(){
+        if(!stack.isEmpty() && noTkn < expression.size()){
+            Token tkn = expression.get(noTkn);
+            switch (tkn.getSubType()) {
 
+                case "int", "float", "Cadena", "True", "False", "Identificador":
+                    if(stack.peek().equals("E")){
+                        stack.pop();
+                        noTkn++;
+                    }
+                    break;
+                case "pR":
+                    if(ex.isComplementario(stack.peek(), tkn.getSubType())){
+                        stack.pop();
+                        noTkn++;
+                    }
+                    
+                    break;
+                default:
+                    
+            }
+        }else if(noTkn != expression.size()){
+            stack.push("E+");
+        }
+    }
+    
+    
     private boolean validateValues(){
         if(expressionOK()){ //si se esperaba una expresion
             noTkn++;
@@ -154,6 +194,7 @@ public class ExpressionVerificator {
             stack.push("E");
             return true;
         }
+        noTkn--;
         return false;
     }
     private boolean validateSeparatorR(){
@@ -181,5 +222,48 @@ public class ExpressionVerificator {
             System.out.println("una excepcion ocurrio con la pila");
             return false;
         }
+    }
+    
+    private boolean validateNumbers(){
+        if(noTkn == 0){ //si viene de primero
+            stack.pop();
+            stack.push("n");
+            noTkn++;
+            switch (expression.get(noTkn).getSubType()) {
+                case "int", "float", "Identificador" -> {
+                    stack.pop();
+                    return true;
+                }
+                default -> {
+                    noTkn--;
+                    return false;
+                }
+            }
+        }else{
+            if(!stack.isEmpty()){
+                if(stack.peek().equals("E")){
+                    stack.pop();
+                }else{
+                    return false;
+                }
+            }
+            stack.push("E");
+            return true;
+        }
+        
+    }
+    
+    private boolean validateOperations(){
+        if(noTkn != 0){ //que no sea el inicial
+            Token anterior = expression.get(noTkn-1);
+            switch (anterior.getSubType()) {
+                case "exponente", "division", "modulo", "multiplicacion":
+                    return false;
+                default:
+                    stack.push("E");
+                    return true;
+            }
+        }
+        return false;
     }
 }

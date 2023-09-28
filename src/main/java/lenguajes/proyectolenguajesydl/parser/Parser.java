@@ -610,22 +610,6 @@ public class Parser {
             eVerificator.validate(expression);
         }
         currentNoTkn = end - 1; //no perder la secuencia incluso si ocurre algun error
-        
-        /*else if ((currentNoTkn + 1) == end) {
-            boolean isValid = switch (tokens.get(currentNoTkn).getSubType()) {
-                case "int", "float", "Cadena", "True", "False", "Identificador" ->
-                    true;
-                default ->
-                    false;
-            };
-            if (!isValid) {
-                errors.add(new SyntaxError(tokens.get(currentNoTkn).getPosition(),
-                        "Se esperaba una expresion"));
-            }
-        } else {
-            System.out.println("evaluar una expresion de mas de un parametro, aun no soportado");
-        }
-        currentNoTkn = end - 1;*/
     }
 
 }
