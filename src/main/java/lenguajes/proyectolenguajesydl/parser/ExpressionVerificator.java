@@ -17,18 +17,45 @@ public class ExpressionVerificator {
     private int noTkn;
     private List<Token> expression;
     private Regex ex;
-
-    public ExpressionVerificator() {
-    }
-
-    public ExpressionVerificator(List<SyntaxError> errors) {
-        this.errors = errors;
+    private Separator separator;
+    private Parser parser;
+    protected ExpressionVerificator(Parser parser) {
+        this.errors = parser.getErrors();
+        this.parser = parser;
         stack = new Stack<>();
         ex = new Regex();
         noTkn = 0;
+        separator = new Separator();
     }
 
-    public void validate(List<Token> expression) {
+    public int validate(List<Token> tokens, String typeTknEnd, int currentLine, int init) {
+        /*int end = separator.findEndOfExpression(tokens, init, typeTknEnd, currentLine);
+        if (init == end) { //cuando la expresion no exite
+            Token tkn = tokens.get(init);
+            errors.add(new SyntaxError(new Position(tkn.getColumna(),
+                    currentLine), "Se esperaba una expresion"));
+        } else {
+            validate(tokens.subList(init, end));
+        }
+        return end - 1; //no perder la secuencia incluso si ocurre algun error*/
+        String[] delimtador = {typeTknEnd};
+        return validate(tokens, delimtador , currentLine, init);
+    }
+    
+    public int validate(List<Token> tokens, String[] delimitadors, int currentLine, int init) {
+        int end = separator.findEndOfExpression(tokens, init, delimitadors, currentLine);
+        System.out.println("fin de expresion" + end);
+        if (init == end) { //cuando la expresion no exite
+            Token tkn = tokens.get(init);
+            errors.add(new SyntaxError(new Position(tkn.getColumna(),
+                    currentLine), "Se esperaba una expresion"));
+        } else {
+            validate(tokens.subList(init, end));
+        }
+        return end - 1; //no perder la secuencia incluso si ocurre algun error
+    }
+    
+    private void validate(List<Token> expression) {
         stack.clear();
         noTkn = 0;
         this.expression = expression;
@@ -37,7 +64,12 @@ public class ExpressionVerificator {
         if (!stack.isEmpty()) {
             //while (!stack.isEmpty()) {
                 String element = stack.pop();
+            try {
                 addErrors(element);
+            } catch (Exception e) {
+                System.out.println("Ocurrio una excepcion inesperada");
+            }
+                
             //}
         }
     }
@@ -102,21 +134,16 @@ public class ExpressionVerificator {
         while (tknRest > 1 && read) {
             String type = expression.get(noTkn).getSubType();
             switch (type) {
-                case "Identificador", "int", "float", "Cadena", "True", "False" -> {
+                case "Identificador", "int", "float", "Cadena", "True", "False" -> 
                     read = validateValues();
-                }
-                case "pL" -> {
+                case "pL" -> 
                     read = validateSeparatorL();
-                }
-                case "pR" -> {
+                case "pR" -> 
                     read = validateSeparatorR();
-                }
-                case "suma", "resta" -> {
+                case "suma", "resta" -> 
                     read = validateNumbers();
-                }
-                case "exponente", "division", "modulo", "multiplicacion" ->{
+                case "exponente", "division", "modulo", "multiplicacion" ->
                     read = validateOperations();
-                }
                 default -> {
                     read = false;
                     noTkn--;
@@ -158,18 +185,35 @@ public class ExpressionVerificator {
     
     
     private boolean validateValues(){
-        if(expressionOK()){ //si se esperaba una expresion
-            noTkn++;
-            String nextT = expression.get(noTkn).getSubType();
-            switch (nextT) {
-                case "pR" -> { //cuando se cierran parentesis
-                    return validateSeparatorR();
-                }
-                default -> {
-                    return isOperation();
+        if (expressionOK()) { //si se esperaba una expresion
+            if (expression.get(noTkn).getSubType().equals("Identificador") 
+                    && expression.get(noTkn + 1).getSubType().equals("pL")) {
+                noTkn++;
+                //String[] delimitadors = {"coma", "pR"};
+                //VERIFICAR QUE NO HAGA NADA RARO*******************************************************
+                int end = separator.findEndOfExpression(expression, noTkn, "pR", 
+                        expression.get(noTkn).getLine());
+                /*parser.validateStructure(expression.subList(noTkn, end),
+                        Structure.USE_FUNCTION , errors);*/
+                List<Token> sentence = expression.subList(noTkn, end);
+                parser.validateStructure(sentence,
+                        Structure.USE_FUNCTION , errors);
+                noTkn = end - 1;
+                return true;
+                
+            } else {
+                noTkn++;
+                String nextT = expression.get(noTkn).getSubType();
+
+                switch (nextT) {
+                    case "pR" -> { //cuando se cierran parentesis
+                        return validateSeparatorR();
+                    }
+                    default -> {
+                        return isOperation();
+                    }
                 }
             }
-            
         }
         return false;
     }

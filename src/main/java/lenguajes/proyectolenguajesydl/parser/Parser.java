@@ -2,6 +2,7 @@ package lenguajes.proyectolenguajesydl.parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.text.DefaultEditorKit;
 import lenguajes.proyectolenguajesydl.lexer.Lexer;
 import lenguajes.proyectolenguajesydl.lexer.Token;
 import lenguajes.proyectolenguajesydl.util.Position;
@@ -18,13 +19,14 @@ public class Parser {
     private int breaksAllowed, returnsAllowed;
     private Separator separator;
     private ExpressionVerificator eVerificator;
-
+    private Structure structureV;
     public Parser() {
         this.errors = new ArrayList<>();
         separator = new Separator();
         breaksAllowed = 0;
         returnsAllowed = 0;
-        eVerificator = new ExpressionVerificator(this.errors);
+        eVerificator = new ExpressionVerificator(this);
+        structureV = new Structure();
     }
 
     public void analiceAll(Lexer lexer) {
@@ -40,7 +42,7 @@ public class Parser {
         
     }
 
-    public String getErrors() {
+    public String getReportErrors() {
         String analisis = "ERRORES SINTACTICOS: \n";
         for (int i = 0; i < errors.size(); i++) {
             SyntaxError error = errors.get(i);
@@ -53,6 +55,9 @@ public class Parser {
             analisis += "No hay Errores sintacticos :D";
         }
         return analisis;
+    }
+    public List<SyntaxError> getErrors(){
+        return this.errors;
     }
 
     /**
@@ -110,7 +115,8 @@ public class Parser {
         int noLine = tokens.get(currentNoTkn).getLine();
         fin = validateOneLine(currentNoTkn, fin, tokens);
         int status = 0;
-        while (currentNoTkn < fin) {
+        boolean read = true;
+        while (currentNoTkn < fin && read) {
             String type = tokens.get(currentNoTkn).getSubType();
             switch (status) {
                 case 0 -> {
@@ -128,11 +134,18 @@ public class Parser {
                             status = 2;
                         case "Asignacion" ->
                             status = 3;
+                        case "pL" ->{
+                            validateStructure(tokens.subList(currentNoTkn, fin),
+                                    Structure.USE_FUNCTION, errors);
+                            status = 4;
+                            currentNoTkn = fin;
+                        }
                         default -> {
-                            errors.add(new SyntaxError(tokens.get(currentNoTkn).getPosition(),
-                                    "Se esperaba una coma o una asignacion"));
+                            //errors.add(new SyntaxError(tokens.get(currentNoTkn).getPosition(),
+                            //        "Se esperaba una coma, una asignacion o una llamada a una funcion"));
                             currentNoTkn--; // nos deja en la misma posicion
-                            status = 3;
+                            read = false; //interrumpir flujo
+                           
                         }
                     }
                 }
@@ -149,7 +162,9 @@ public class Parser {
                     }
                 }
                 case 3 -> {
-                    validateExpression(tokens, "coma", noLine);
+                    currentNoTkn = eVerificator.validate(tokens, "coma", 
+                            noLine, currentNoTkn);
+                    //validateExpression(tokens, "coma", noLine);
                     status = 4;
                 }
                 case 4 -> {
@@ -165,7 +180,9 @@ public class Parser {
                     }
                 }
                 case 5 -> {
-                    validateExpression(tokens, "coma", noLine);
+                    currentNoTkn = eVerificator.validate(tokens, "coma", 
+                            noLine, currentNoTkn);
+                    //validateExpression(tokens, "coma", noLine);
                     status = 4;
                 }
             }
@@ -264,8 +281,10 @@ public class Parser {
                     status = 1;
                 }
                 case 1 -> {
-                    validateExpression(tokens, "dos_puntos",
-                            tokens.get(currentNoTkn).getLine());
+                    currentNoTkn = eVerificator.validate(tokens, "dos_puntos", 
+                            tokens.get(currentNoTkn).getLine(), currentNoTkn);
+                    //validateExpression(tokens, "dos_puntos",
+                    //        tokens.get(currentNoTkn).getLine());
                     status = 2;
                 }
                 case 2 -> {
@@ -418,7 +437,9 @@ public class Parser {
                     status = 3;
                 }
                 case 3 -> {
-                    validateExpression(tokens, "dos_puntos", tokens.get(currentNoTkn).getLine());
+                    currentNoTkn = eVerificator.validate(tokens, "dos_puntos", 
+                            tokens.get(currentNoTkn).getLine(), currentNoTkn);
+                    //validateExpression(tokens, "dos_puntos", tokens.get(currentNoTkn).getLine());
                     status = 4;
                 }
                 case 4 -> {
@@ -581,7 +602,9 @@ public class Parser {
                     status = 1;
                 }
                 case 1 -> {
-                    validateExpression(tokens, "", tokens.get(currentNoTkn).getLine());
+                    currentNoTkn = eVerificator.validate(tokens, "", 
+                            tokens.get(currentNoTkn).getLine(), currentNoTkn);
+                    //validateExpression(tokens, "", tokens.get(currentNoTkn).getLine());
                     status = 2;
                 }
             }
@@ -594,7 +617,62 @@ public class Parser {
         }
     }
 
-    private void validateUseFunction(List<Token> tokens, int end) {
+    protected void validateStructure(List<Token> sentence, int type, List<SyntaxError> errorsList) {
+        boolean read = true;
+        int index = 0;
+        int status = 0;
+        ExpressionVerificator ev = new ExpressionVerificator(this);
+        String[] delimitadors = {"coma", structureV.getDelimitadorR(type)};
+        while (index<sentence.size() && read) { 
+            String typeTkn = sentence.get(index).getSubType();
+            switch (status) {
+                case 0 -> {
+                    if (!typeTkn.equals(structureV.getDelimitadorL(type))) { //
+                        throw new AssertionError("No se esta trando de validar una estructura");
+                    }
+                    status = 1;
+                }
+                case 1 -> {
+                    if(typeTkn.equals(structureV.getDelimitadorR(type))){
+                        status = 2;
+                    }else{
+                        index = ev.validate(sentence, delimitadors,
+                                sentence.get(index).getLine(), index);
+                        status = 3;
+                    }
+                }
+                case 2 -> read = false;
+                case 3 -> {
+                    if(typeTkn.equals("coma")){
+                        status = 4;
+                    }else if(typeTkn.equals(structureV.getDelimitadorR(type))){
+                        status = 2;
+                    }else{
+                        errorsList.add(new SyntaxError(sentence.get(index).getPosition(),
+                                "Se esperaba una coma o un cierre de sentencia"));
+                        index--; // nos deja en la misma posicion
+                        read = false;
+                    }
+                }
+                case 4 -> {
+                    index = ev.validate(sentence, delimitadors,
+                                sentence.get(index).getLine(), index);
+                    status = 3;
+                }
+            }
+            index++;
+        }//end of while
+        if(status != 2){
+            String message = switch (status) {
+                case 1 -> "Cierre de sentencia o expresion esperada";
+                case 3 -> "Coma o cierre de sentencia esperada";
+                case 4 -> "Expresion esperada";
+                default -> "Error inesperado";
+            };
+            Token endTkn = sentence.get(index - 1);
+            errors.add(new SyntaxError(new Position(endTkn.getColumna() + endTkn.length(), endTkn.getLine()),
+                    message));
+        }
         
     }
 
@@ -621,18 +699,5 @@ public class Parser {
         return i++;
     }
 
-    private void validateExpression(List<Token> tokens, String typeTknEnd, int currentLine) {
-        int end = separator.findEndOfExpression(tokens, currentNoTkn, typeTknEnd, currentLine);
-        System.out.println("fin de expresion" +  end);
-        if (currentNoTkn == end) { //cuando la expresion no exite
-            Token tkn = tokens.get(currentNoTkn);
-            errors.add(new SyntaxError(new Position(tkn.getColumna(),
-                    currentLine), "Se esperaba una expresion"));
-        } else{
-            List<Token> expression = tokens.subList(currentNoTkn, end);
-            eVerificator.validate(expression);
-        }
-        currentNoTkn = end - 1; //no perder la secuencia incluso si ocurre algun error
-    }
-
+    
 }

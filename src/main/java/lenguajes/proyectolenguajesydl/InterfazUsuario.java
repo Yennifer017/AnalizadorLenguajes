@@ -587,7 +587,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
         parser.analiceAll(lexer);
         displayAnalisis.setText(lexer.getErrors() 
                 + "\n---------------------------------------\n" 
-                + parser.getErrors());
+                + parser.getReportErrors());
     }//GEN-LAST:event_bSintacticoActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

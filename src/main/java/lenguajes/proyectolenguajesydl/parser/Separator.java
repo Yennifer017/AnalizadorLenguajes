@@ -12,7 +12,7 @@ import lenguajes.proyectolenguajesydl.lexer.Token;
 public class Separator {
 
     private Regex ex;
-    public Separator() {
+    protected Separator() {
         ex = new Regex();
     }
 
@@ -55,7 +55,9 @@ public class Separator {
      * encuentra el fin de un bloque, este incluye varios statments
      *
      * @param tokens la lista de tokens a analizar
-     * @param init inicio
+     * @param init inicio el inicio del analisis de la lista de tokens
+     * @param bigIdentation, la identacion dentro del cual se encuentra el bloque
+     * @param errors, la lista de errores lexicos para ir agreando mas en caso necesario
      * @return el fin del bloque
      */
     public int findEndOfBlock(List<Token> tokens, int init, int bigIdentation, List<SyntaxError> errors) {
@@ -76,31 +78,44 @@ public class Separator {
     }
 
     public int findEndOfExpression(List<Token> tokens, int init, String typeTknEnd, int noLine) {
-        //fin de expresion puede ser: otra linea, un caracter indicado, 
+        String[] delimitador = {typeTknEnd};
+        return findEndOfExpression(tokens, init, delimitador, noLine);
+        
+    }
+
+    public int findEndOfExpression(List<Token> tokens, int init, String[] delimitadors, int noLine ){
         Stack<String> stack = new Stack<>();
-       
         for (int i = init; i < tokens.size(); i++) {
+            boolean crop = true;
             Token currentTkn = tokens.get(i);
             String subT = currentTkn.getSubType();
             switch (subT) {
                 case "pL", "cL", "lL" -> stack.push(subT);
-                case "pR", "cR", "lR" -> { //AQUI HAY UN ERROR
+                case "pR", "cR", "lR" -> {
                     if(!stack.isEmpty()){
                         if(ex.isComplementario(stack.peek(), subT)){
                             stack.pop();
+                            crop = false;
                         }
                     }
                 }
             }
             if( (currentTkn.getLine() != noLine) 
-                    || (currentTkn.getSubType().equals(typeTknEnd) && stack.isEmpty()) ){
+                    || (isDelimitador(subT, delimitadors) && stack.isEmpty() && crop) ){
                 return i;
             }    
         }
         return tokens.size();
-        
     }
-
+    private boolean isDelimitador(String typeTkn, String[] delimitadors){
+        for (String delimitador : delimitadors) {
+            if (typeTkn.equals(delimitador)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public int findEndOfLine(List<Token> tokens, int init){
         int line = tokens.get(init).getLine();
         for (int i = init + 1; i < tokens.size(); i++) {
