@@ -12,7 +12,7 @@ import lenguajes.proyectolenguajesydl.lexer.Token;
 public class Separator {
 
     private Regex ex;
-    protected Separator() {
+    public Separator() {
         ex = new Regex();
     }
 
@@ -83,6 +83,7 @@ public class Separator {
         
     }
 
+    //HAY UN ERROR CUANDO CORTA UN PARENTESIS
     public int findEndOfExpression(List<Token> tokens, int init, String[] delimitadors, int noLine ){
         Stack<String> stack = new Stack<>();
         for (int i = init; i < tokens.size(); i++) {
@@ -107,6 +108,40 @@ public class Separator {
         }
         return tokens.size();
     }
+    
+    public int finEndOfExpressionIncludeSeparator(List<Token> tokens, int init, String[] delimitadors, int noLine){
+        boolean first = true;
+        Stack<String> stack = new Stack<>();
+        for (int i = init; i < tokens.size(); i++) {
+            boolean crop = true;
+            Token currentTkn = tokens.get(i);
+            String subT = currentTkn.getSubType();
+            switch (subT) {
+                case "pL", "cL", "lL" -> {
+                    if(first){
+                        first = false;
+                    }else{
+                        stack.push(subT);
+                    }
+                }
+                case "pR", "cR", "lR" -> {
+                    if(!stack.isEmpty()){
+                        if(ex.isComplementario(stack.peek(), subT)){
+                            stack.pop();
+                            crop = false;
+                        }
+                    }
+                }
+            }
+            if( (currentTkn.getLine() != noLine) 
+                    || (isDelimitador(subT, delimitadors) && stack.isEmpty() && crop) ){
+                return i+1;
+            }   
+        }
+        return tokens.size();
+    }
+    
+    
     private boolean isDelimitador(String typeTkn, String[] delimitadors){
         for (String delimitador : delimitadors) {
             if (typeTkn.equals(delimitador)) {

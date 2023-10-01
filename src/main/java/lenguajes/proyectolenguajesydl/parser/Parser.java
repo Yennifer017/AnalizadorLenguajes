@@ -2,7 +2,6 @@ package lenguajes.proyectolenguajesydl.parser;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.text.DefaultEditorKit;
 import lenguajes.proyectolenguajesydl.lexer.Lexer;
 import lenguajes.proyectolenguajesydl.lexer.Token;
 import lenguajes.proyectolenguajesydl.util.Position;
@@ -627,7 +626,7 @@ public class Parser {
             String typeTkn = sentence.get(index).getSubType();
             switch (status) {
                 case 0 -> {
-                    if (!typeTkn.equals(structureV.getDelimitadorL(type))) { //
+                    if (!typeTkn.equals(structureV.getDelimitadorL(type))) { 
                         throw new AssertionError("No se esta trando de validar una estructura");
                     }
                     status = 1;
@@ -641,7 +640,10 @@ public class Parser {
                         status = 3;
                     }
                 }
-                case 2 -> read = false;
+                case 2 -> {
+                    index--;
+                    read = false;
+                }
                 case 3 -> {
                     if(typeTkn.equals("coma")){
                         status = 4;
@@ -672,6 +674,9 @@ public class Parser {
             Token endTkn = sentence.get(index - 1);
             errors.add(new SyntaxError(new Position(endTkn.getColumna() + endTkn.length(), endTkn.getLine()),
                     message));
+        }else if(index<sentence.size() && status == 2){
+            errors.add(new SyntaxError(sentence.get(index).getPosition(),
+                    "Codigo inesperado a la derecha"));
         }
         
     }

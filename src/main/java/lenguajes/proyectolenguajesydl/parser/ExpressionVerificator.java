@@ -29,15 +29,6 @@ public class ExpressionVerificator {
     }
 
     public int validate(List<Token> tokens, String typeTknEnd, int currentLine, int init) {
-        /*int end = separator.findEndOfExpression(tokens, init, typeTknEnd, currentLine);
-        if (init == end) { //cuando la expresion no exite
-            Token tkn = tokens.get(init);
-            errors.add(new SyntaxError(new Position(tkn.getColumna(),
-                    currentLine), "Se esperaba una expresion"));
-        } else {
-            validate(tokens.subList(init, end));
-        }
-        return end - 1; //no perder la secuencia incluso si ocurre algun error*/
         String[] delimtador = {typeTknEnd};
         return validate(tokens, delimtador , currentLine, init);
     }
@@ -69,8 +60,6 @@ public class ExpressionVerificator {
             } catch (Exception e) {
                 System.out.println("Ocurrio una excepcion inesperada");
             }
-                
-            //}
         }
     }
 
@@ -78,11 +67,10 @@ public class ExpressionVerificator {
         System.out.println(element + "elemento conflictivo");
         String message = switch (element) {
             case "E" -> "Expresion esperada";
-            case "O" -> "Operacion (aritmetica, comparativa, otra) esperada";
-            case "E+" -> "Codigo a la derecha no esperado";
+            case "E+" -> "Codigo a la derecha no esperado, se necesita un conector u operacion";
             case "SR+" -> "Separador de cierre inesperado";
-            case "pL" -> "Se esperaba un token de cierre";
-            case "n" -> "Se esperaba un numero (int o float) o un identificador";   
+            case "pL" -> "Se esperaba un token de cierre"; 
+            case "e" -> "Se esperaba un else para el operador ternario"; 
             default -> "Error inesperado";
         };
         Token tkn;
@@ -129,11 +117,11 @@ public class ExpressionVerificator {
     }
 
     private void validateTkns() {
-        int tknRest = expression.size() - noTkn;
+        //int tknRest = expression.size() - noTkn;
         boolean read = true;
-        while (tknRest > 1 && read) {
-            String type = expression.get(noTkn).getSubType();
-            switch (type) {
+        while (noTkn<expression.size() && read) {
+            String subType = expression.get(noTkn).getSubType();
+            switch (subType) {
                 case "Identificador", "int", "float", "Cadena", "True", "False" -> 
                     read = validateValues();
                 case "pL" -> 
@@ -142,94 +130,52 @@ public class ExpressionVerificator {
                     read = validateSeparatorR();
                 case "suma", "resta" -> 
                     read = validateNumbers();
-                case "exponente", "division", "modulo", "multiplicacion" ->
+                case "exponente", "division", "modulo", "multiplicacion", "and", "or",
+                        "igual", "diferente", "mayor_que", "menor_que", "mayor_o_igual_que", "menor_o_igual_que"->
                     read = validateOperations();
+                case "not" ->
+                    read = validateNegation();
+                case "cL" -> 
+                    read = validateArray();
+                case "if", "else" ->
+                    read = validateTernaryOp();
                 default -> {
                     read = false;
                     noTkn--;
                 }
             }
-
             noTkn++;
-            tknRest = expression.size() - noTkn;
-        }
-        //sobra un token
-        validateLastTkn();
-        
-    }
-    private void validateLastTkn(){
-        if(!stack.isEmpty() && noTkn < expression.size()){
-            Token tkn = expression.get(noTkn);
-            switch (tkn.getSubType()) {
-
-                case "int", "float", "Cadena", "True", "False", "Identificador":
-                    if(stack.peek().equals("E")){
-                        stack.pop();
-                        noTkn++;
-                    }
-                    break;
-                case "pR":
-                    if(ex.isComplementario(stack.peek(), tkn.getSubType())){
-                        stack.pop();
-                        noTkn++;
-                    }
-                    
-                    break;
-                default:
-                    
+        } //end of while
+        if(noTkn != expression.size()){
+            if(stack.isEmpty()){
+                stack.push("E+");
             }
-        }else if(noTkn != expression.size()){
-            stack.push("E+");
         }
     }
-    
-    
     private boolean validateValues(){
         if (expressionOK()) { //si se esperaba una expresion
-            if (expression.get(noTkn).getSubType().equals("Identificador") 
-                    && expression.get(noTkn + 1).getSubType().equals("pL")) {
-                noTkn++;
-                //String[] delimitadors = {"coma", "pR"};
-                //VERIFICAR QUE NO HAGA NADA RARO*******************************************************
-                int end = separator.findEndOfExpression(expression, noTkn, "pR", 
-                        expression.get(noTkn).getLine());
-                /*parser.validateStructure(expression.subList(noTkn, end),
-                        Structure.USE_FUNCTION , errors);*/
-                List<Token> sentence = expression.subList(noTkn, end);
-                parser.validateStructure(sentence,
-                        Structure.USE_FUNCTION , errors);
-                noTkn = end - 1;
-                return true;
-                
-            } else {
-                noTkn++;
-                String nextT = expression.get(noTkn).getSubType();
+            try {
+                if (expression.get(noTkn).getSubType().equals("Identificador")
+                        && expression.get(noTkn + 1).getSubType().equals("pL")) {
+                    noTkn++;
+                    String[] delimitador = {"pR"};
+                    int end = separator.finEndOfExpressionIncludeSeparator(expression, noTkn,
+                            delimitador, expression.get(noTkn - 1).getLine());
+                    List<Token> sentence = expression.subList(noTkn, end);
+                    parser.validateStructure(sentence,
+                            Structure.USE_FUNCTION, errors);
+                    noTkn = end - 1;
+                    return true;
 
-                switch (nextT) {
-                    case "pR" -> { //cuando se cierran parentesis
-                        return validateSeparatorR();
-                    }
-                    default -> {
-                        return isOperation();
-                    }
                 }
+            } catch (IndexOutOfBoundsException e) {
+                //no hacer nada
             }
+            return true; 
+        }else{
+            noTkn--;
+            return false;
         }
-        return false;
-    }
-    
-    
-    private boolean isOperation() {
-        stack.push("E");
-        stack.push("O");
-        switch (expression.get(noTkn).getType()) {
-            case "Comparativo", "Aritmetico", "Logico" -> {
-                stack.pop();
-                return true;
-            }
-            default -> noTkn--;
-        }
-        return false;
     }
     
     private boolean validateSeparatorL(){
@@ -248,6 +194,7 @@ public class ExpressionVerificator {
                 return true;
             }
         }
+        noTkn--; //nos deja en la misma posicion
         stack.push("SR+");
         return false;
     }
@@ -269,45 +216,77 @@ public class ExpressionVerificator {
     }
     
     private boolean validateNumbers(){
-        if(noTkn == 0){ //si viene de primero
-            stack.pop();
-            stack.push("n");
-            noTkn++;
-            switch (expression.get(noTkn).getSubType()) {
-                case "int", "float", "Identificador" -> {
-                    stack.pop();
-                    return true;
-                }
-                default -> {
-                    noTkn--;
+        if (!stack.isEmpty()) {
+            if (stack.peek().equals("E")) {
+                stack.pop();
+            }/*else{
                     return false;
-                }
-            }
-        }else{
-            if(!stack.isEmpty()){
-                if(stack.peek().equals("E")){
-                    stack.pop();
-                }else{
-                    return false;
-                }
-            }
-            stack.push("E");
-            return true;
+                }*/
         }
-        
+        stack.push("E");
+        return true;
     }
     
     private boolean validateOperations(){
         if(noTkn != 0){ //que no sea el inicial
             Token anterior = expression.get(noTkn-1);
             switch (anterior.getSubType()) {
-                case "exponente", "division", "modulo", "multiplicacion":
+                case "exponente", "division", "modulo", "multiplicacion", "and", "or",
+                        "igual", "diferente", "mayor_que", "menor_que", "mayor_o_igual_que", "menor_o_igual_que":
+                    noTkn--; //dejar en la misma posicion
                     return false;
                 default:
                     stack.push("E");
                     return true;
             }
         }
+        noTkn--;
         return false;
     }
+    
+    private boolean validateArray() {
+        if ((noTkn != 0 && expression.get(noTkn - 1).getSubType().equals("cR"))
+                || expressionOK()) {
+            String[] delimitador = {"cR"};
+            int end = separator.finEndOfExpressionIncludeSeparator(expression, noTkn,
+                    delimitador, expression.get(noTkn).getLine());
+            parser.validateStructure(expression.subList(noTkn, end), Structure.ARRAY,
+                    errors);
+            noTkn = end - 1;
+            return true;
+        }
+        return false;
+    }
+    
+    private boolean validateTernaryOp(){
+        switch (expression.get(noTkn).getSubType()) {
+            case "if" -> {
+                if (stack.isEmpty() || !stack.peek().equals("E")) {
+                    stack.push("E");
+                    stack.push("e");
+                    stack.push("E");
+                    return true;
+                }
+            }
+            case "else" -> {
+                if (!stack.isEmpty() && stack.peek().equals("e")){
+                    stack.pop();
+                    return true;
+                }
+            }
+            default -> throw new AssertionError();
+        }
+        noTkn--;
+        return false;
+    }
+    private boolean validateNegation(){
+        if(expressionOK()){
+            stack.push("E");
+            return true;
+        }else{
+            noTkn--;
+            return false;
+        }
+    }
+    
 }

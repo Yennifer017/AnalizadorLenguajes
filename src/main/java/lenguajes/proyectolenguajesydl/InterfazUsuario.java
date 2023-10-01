@@ -5,9 +5,12 @@ import lenguajes.proyectolenguajesydl.lexer.Lexer;
 import java.awt.event.*;
 import java.io.File;
 import javax.swing.*;
+import lenguajes.proyectolenguajesydl.lexer.Empaquetador;
 import lenguajes.proyectolenguajesydl.parser.Parser;
 import lenguajes.proyectolenguajesydl.util.*;
 
+import lenguajes.proyectolenguajesydl.parser.elements.Function;
+import java.util.List;
 /**
  *
  * @author yenni
@@ -23,6 +26,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
     private final String FILE_NAME, FILE_EXTENSION;
     private int counterFile;
     private String currentPath;
+    private Empaquetador empaquetador;
     Reportero rep;
     /**
      * Creates new form InterfazUsuario
@@ -588,6 +592,24 @@ public class InterfazUsuario extends javax.swing.JFrame {
         displayAnalisis.setText(lexer.getErrors() 
                 + "\n---------------------------------------\n" 
                 + parser.getReportErrors());
+        
+        //REMOVE THE NEXT CODE, IS FOR TEST
+        this.empaquetador = new Empaquetador(lexer, parser);
+        try {
+            List<Function> functions = empaquetador.getFunctions();
+            System.out.println("total de funciones: " + functions.size());
+            for (int i = 0; i < functions.size(); i++) {
+                System.out.println("Funcion: " + functions.get(i).getName());
+                List<String> params = functions.get(i).getParameters();
+                System.out.println("    Parametros (" + params.size() + ")");
+                for (String param : params) {
+                    System.out.println("      -> " + param);
+                }
+                System.out.println("\n");
+            }
+        } catch (Exception e) {
+            System.out.println("hay errores sintacticos");
+        }
     }//GEN-LAST:event_bSintacticoActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
