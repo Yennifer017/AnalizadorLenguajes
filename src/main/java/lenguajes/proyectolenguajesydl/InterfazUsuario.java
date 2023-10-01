@@ -5,7 +5,7 @@ import lenguajes.proyectolenguajesydl.lexer.Lexer;
 import java.awt.event.*;
 import java.io.File;
 import javax.swing.*;
-import lenguajes.proyectolenguajesydl.lexer.Empaquetador;
+import lenguajes.proyectolenguajesydl.parser.elements.Empaquetador;
 import lenguajes.proyectolenguajesydl.parser.Parser;
 import lenguajes.proyectolenguajesydl.util.*;
 
@@ -593,11 +593,12 @@ public class InterfazUsuario extends javax.swing.JFrame {
                 + "\n---------------------------------------\n" 
                 + parser.getReportErrors());
         
-        //REMOVE THE NEXT CODE, IS FOR TEST
+        //REMOVE THE NEXT CODE, IT IS FOR TEST
         this.empaquetador = new Empaquetador(lexer, parser);
         try {
             List<Function> functions = empaquetador.getFunctions();
             System.out.println("total de funciones: " + functions.size());
+            System.out.println("-----------------------------------------");
             for (int i = 0; i < functions.size(); i++) {
                 System.out.println("Funcion: " + functions.get(i).getName());
                 List<String> params = functions.get(i).getParameters();

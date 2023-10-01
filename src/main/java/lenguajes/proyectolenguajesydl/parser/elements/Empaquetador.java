@@ -1,11 +1,12 @@
 
-package lenguajes.proyectolenguajesydl.lexer;
+package lenguajes.proyectolenguajesydl.parser.elements;
 
 import java.util.ArrayList;
 import java.util.List;
+import lenguajes.proyectolenguajesydl.lexer.Lexer;
+import lenguajes.proyectolenguajesydl.lexer.Token;
 import lenguajes.proyectolenguajesydl.parser.Parser;
 import lenguajes.proyectolenguajesydl.parser.Separator;
-import lenguajes.proyectolenguajesydl.parser.elements.Function;
 
 /**
  *
@@ -52,7 +53,17 @@ public class Empaquetador {
         }
     }
     
-    
+    public List<Variable> getSimbolTable(){
+        List<Token> tokens = lexer.getTokens();
+        int index = 0;
+        while (index < tokens.size()) {
+            int endStmt = separator.findEndOfStmt(tokens,index);
+            System.out.println("fin de statment:" + endStmt);
+            
+       
+        }
+        return null;
+    }
     
     
 }

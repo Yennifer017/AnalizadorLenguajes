@@ -65,7 +65,6 @@ public class Parser {
     private void analiceBlock(int fin) {
         while (currentNoTkn < fin) {
             int endStmt = separator.findEndOfStmt(lexer.getTokens(), currentNoTkn);
-            System.out.println("fin de statment:" + endStmt);
             analiceStmt(endStmt, lexer.getTokens());
         }
     }

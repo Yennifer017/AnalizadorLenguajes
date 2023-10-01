@@ -154,22 +154,30 @@ public class ExpressionVerificator {
     }
     private boolean validateValues(){
         if (expressionOK()) { //si se esperaba una expresion
-            try {
-                if (expression.get(noTkn).getSubType().equals("Identificador")
-                        && expression.get(noTkn + 1).getSubType().equals("pL")) {
-                    noTkn++;
-                    String[] delimitador = {"pR"};
-                    int end = separator.finEndOfExpressionIncludeSeparator(expression, noTkn,
-                            delimitador, expression.get(noTkn - 1).getLine());
-                    List<Token> sentence = expression.subList(noTkn, end);
-                    parser.validateStructure(sentence,
-                            Structure.USE_FUNCTION, errors);
-                    noTkn = end - 1;
-                    return true;
-
+            if (expression.get(noTkn).getSubType().equals("Identificador")) {
+                String[] delimitador = new String[1];
+                int type;
+                switch (expression.get(noTkn + 1).getSubType()) {
+                    case "pL" ->{
+                        type = Structure.USE_FUNCTION;
+                        delimitador[0] = "pR";
+                    }
+                    case "cL" ->{
+                        type = Structure.ARRAY;
+                        delimitador[0] = "cR";
+                    }
+                    default -> {
+                        return true;
+                    }
                 }
-            } catch (IndexOutOfBoundsException e) {
-                //no hacer nada
+                noTkn++;
+                int end = separator.finEndOfExpressionIncludeSeparator(expression, noTkn,
+                        delimitador, expression.get(noTkn - 1).getLine());
+                List<Token> sentence = expression.subList(noTkn, end);
+                parser.validateStructure(sentence,
+                        type, errors);
+                noTkn = end - 1;
+                return true;
             }
             return true; 
         }else{
@@ -219,9 +227,7 @@ public class ExpressionVerificator {
         if (!stack.isEmpty()) {
             if (stack.peek().equals("E")) {
                 stack.pop();
-            }/*else{
-                    return false;
-                }*/
+            }
         }
         stack.push("E");
         return true;
