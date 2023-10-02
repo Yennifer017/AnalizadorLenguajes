@@ -15,10 +15,12 @@ public class Lexer {
     private String lecturaTkn;
     private boolean readAll;
     private Regex ex;
+    
     public Lexer() {
         noLinea = 0;
         tokens = new ArrayList<>();
         ex = new Regex();
+       
     }
 
     public void analyze(String texto){
@@ -150,13 +152,24 @@ public class Lexer {
     private void analyzeCombinableTkn(String texto){
         while (true) {
             if ((index + 1) < texto.length()) {
+                char currentChar = texto.charAt(index);
                 char nextChar = texto.charAt(index + 1);
-                if (ex.isCombinable(nextChar)) {
+                boolean readTheSame = false;
+                if(currentChar == '*' || currentChar == '/'){
+                    readTheSame = true;
+                }
+                if(nextChar == '=' || (nextChar == currentChar && readTheSame)){
+                    lecturaTkn += nextChar;
+                    actualizarIndex();
+                }else{
+                    break;
+                }
+                /*if (ex.isCombinable(nextChar)) {
                     lecturaTkn += nextChar;
                     actualizarIndex();
                 } else {
                     break;
-                }
+                }*/
             } else {
                 break;
             }

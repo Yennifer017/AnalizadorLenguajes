@@ -117,7 +117,6 @@ public class ExpressionVerificator {
     }
 
     private void validateTkns() {
-        //int tknRest = expression.size() - noTkn;
         boolean read = true;
         while (noTkn<expression.size() && read) {
             String subType = expression.get(noTkn).getSubType();
@@ -137,6 +136,8 @@ public class ExpressionVerificator {
                     read = validateNegation();
                 case "cL" -> 
                     read = validateArray();
+                case "lL" ->
+                    read = validateDictionary();
                 case "if", "else" ->
                     read = validateTernaryOp();
                 default -> {
@@ -156,27 +157,31 @@ public class ExpressionVerificator {
         if (expressionOK()) { //si se esperaba una expresion
             if (expression.get(noTkn).getSubType().equals("Identificador")) {
                 String[] delimitador = new String[1];
-                int type;
-                switch (expression.get(noTkn + 1).getSubType()) {
-                    case "pL" ->{
-                        type = Structure.USE_FUNCTION;
-                        delimitador[0] = "pR";
+                try {
+                    int type;
+                    switch (expression.get(noTkn + 1).getSubType()) {
+                        case "pL" -> {
+                            type = Structure.USE_FUNCTION;
+                            delimitador[0] = "pR";
+                        }
+                        case "cL" -> {
+                            type = Structure.ARRAY;
+                            delimitador[0] = "cR";
+                        }
+                        default -> {
+                            return true;
+                        }
                     }
-                    case "cL" ->{
-                        type = Structure.ARRAY;
-                        delimitador[0] = "cR";
-                    }
-                    default -> {
-                        return true;
-                    }
+                    noTkn++;
+                    int end = separator.finEndOfExpressionIncludeSeparator(expression, noTkn,
+                            delimitador, expression.get(noTkn - 1).getLine());
+                    List<Token> sentence = expression.subList(noTkn, end);
+                    parser.validateStructure(sentence,
+                            type, errors);
+                    noTkn = end - 1;
+                } catch (IndexOutOfBoundsException e) {
+                    System.out.println("excepcion controlada");
                 }
-                noTkn++;
-                int end = separator.finEndOfExpressionIncludeSeparator(expression, noTkn,
-                        delimitador, expression.get(noTkn - 1).getLine());
-                List<Token> sentence = expression.subList(noTkn, end);
-                parser.validateStructure(sentence,
-                        type, errors);
-                noTkn = end - 1;
                 return true;
             }
             return true; 
@@ -258,6 +263,17 @@ public class ExpressionVerificator {
                     delimitador, expression.get(noTkn).getLine());
             parser.validateStructure(expression.subList(noTkn, end), Structure.ARRAY,
                     errors);
+            noTkn = end - 1;
+            return true;
+        }
+        return false;
+    }
+    private boolean validateDictionary(){
+        if(expressionOK()){
+            String[] delimitador = {"lR"};
+            int end = separator.finEndOfExpressionIncludeSeparator(expression, noTkn,
+                    delimitador, expression.get(noTkn).getLine());
+            parser.validateDictionary(expression.subList(noTkn, end), errors);
             noTkn = end - 1;
             return true;
         }

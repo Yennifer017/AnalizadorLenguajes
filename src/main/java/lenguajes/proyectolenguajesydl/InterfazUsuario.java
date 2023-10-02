@@ -9,8 +9,6 @@ import lenguajes.proyectolenguajesydl.parser.elements.Empaquetador;
 import lenguajes.proyectolenguajesydl.parser.Parser;
 import lenguajes.proyectolenguajesydl.util.*;
 
-import lenguajes.proyectolenguajesydl.parser.elements.Function;
-import java.util.List;
 /**
  *
  * @author yenni
@@ -127,19 +125,20 @@ public class InterfazUsuario extends javax.swing.JFrame {
         bSaveAs = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         bClear = new javax.swing.JButton();
-        bLexico = new javax.swing.JButton();
+        bFilter = new javax.swing.JButton();
         scrollEditor = new javax.swing.JScrollPane();
         editor = new javax.swing.JTextPane();
         scrollDisAnalisis = new javax.swing.JScrollPane();
         displayAnalisis = new javax.swing.JTextPane();
         lCol = new javax.swing.JLabel();
         displayC = new javax.swing.JLabel();
-        bSintactico = new javax.swing.JButton();
+        bAnalisis = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         displayReporte = new javax.swing.JTable();
         bGraph = new javax.swing.JButton();
         bSaveReporte = new javax.swing.JButton();
+        bTknsFilter = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -262,14 +261,14 @@ public class InterfazUsuario extends javax.swing.JFrame {
             }
         });
 
-        bLexico.setBackground(new java.awt.Color(7, 7, 110));
-        bLexico.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        bLexico.setForeground(new java.awt.Color(255, 255, 255));
-        bLexico.setText("Analisis Lexico");
-        bLexico.setFocusable(false);
-        bLexico.addActionListener(new java.awt.event.ActionListener() {
+        bFilter.setBackground(new java.awt.Color(7, 7, 110));
+        bFilter.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        bFilter.setForeground(new java.awt.Color(255, 255, 255));
+        bFilter.setText("Detalles de errores");
+        bFilter.setFocusable(false);
+        bFilter.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bLexicoActionPerformed(evt);
+                bFilterActionPerformed(evt);
             }
         });
 
@@ -315,14 +314,14 @@ public class InterfazUsuario extends javax.swing.JFrame {
         displayC.setForeground(new java.awt.Color(204, 204, 204));
         displayC.setText("0000");
 
-        bSintactico.setBackground(new java.awt.Color(7, 7, 110));
-        bSintactico.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        bSintactico.setForeground(new java.awt.Color(255, 255, 255));
-        bSintactico.setText("Analisis Sintactico");
-        bSintactico.setFocusable(false);
-        bSintactico.addActionListener(new java.awt.event.ActionListener() {
+        bAnalisis.setBackground(new java.awt.Color(7, 7, 110));
+        bAnalisis.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        bAnalisis.setForeground(new java.awt.Color(255, 255, 255));
+        bAnalisis.setText("Analizar");
+        bAnalisis.setFocusable(false);
+        bAnalisis.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bSintacticoActionPerformed(evt);
+                bAnalisisActionPerformed(evt);
             }
         });
 
@@ -340,11 +339,11 @@ public class InterfazUsuario extends javax.swing.JFrame {
                                 .addComponent(lCol, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(displayC, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(bLexico, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+                            .addComponent(bFilter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(bClear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(bSintactico, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
-                        .addComponent(scrollDisAnalisis, javax.swing.GroupLayout.DEFAULT_SIZE, 596, Short.MAX_VALUE)))
+                            .addComponent(bAnalisis, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                        .addComponent(scrollDisAnalisis, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -352,22 +351,20 @@ public class InterfazUsuario extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(30, 30, 30)
                 .addComponent(scrollEditor, javax.swing.GroupLayout.PREFERRED_SIZE, 316, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(32, 32, 32)
-                        .addComponent(scrollDisAnalisis, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lCol, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(displayC))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(bClear, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(bLexico, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(bSintactico, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(39, Short.MAX_VALUE))
+                        .addComponent(bAnalisis, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(9, 9, 9)
+                        .addComponent(bFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(scrollDisAnalisis, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(41, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 60, 790, 590));
@@ -453,20 +450,31 @@ public class InterfazUsuario extends javax.swing.JFrame {
             }
         });
 
+        bTknsFilter.setBackground(new java.awt.Color(7, 7, 110));
+        bTknsFilter.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        bTknsFilter.setForeground(new java.awt.Color(255, 255, 255));
+        bTknsFilter.setText("Detalle de tokens");
+        bTknsFilter.setFocusable(false);
+        bTknsFilter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bTknsFilterActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(28, 28, 28)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(78, 78, 78)
+                .addGap(28, 28, 28)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addComponent(bTknsFilter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(bGraph, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(56, 56, 56)
-                        .addComponent(bSaveReporte, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(bSaveReporte, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(29, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -474,10 +482,11 @@ public class InterfazUsuario extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(32, 32, 32)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 313, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30)
+                .addGap(29, 29, 29)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(bGraph, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(bSaveReporte, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(bSaveReporte, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bTknsFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(168, Short.MAX_VALUE))
         );
 
@@ -490,12 +499,6 @@ public class InterfazUsuario extends javax.swing.JFrame {
         currentPath = archivo.getPath();
         editor.setText(archivo.readTextFile(currentPath));
     }//GEN-LAST:event_bOpenFileActionPerformed
-
-    private void bLexicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bLexicoActionPerformed
-        lexer.analyzeAll(editor.getText());
-        displayAnalisis.setText(lexer.getErrors());
-        rep.setReporte(displayReporte, lexer);
-    }//GEN-LAST:event_bLexicoActionPerformed
 
     private void bClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bClearActionPerformed
         editor.setText("");
@@ -561,8 +564,8 @@ public class InterfazUsuario extends javax.swing.JFrame {
     private void bHelpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bHelpActionPerformed
         JOptionPane.showMessageDialog(null, """
                                             Puedes consultar el manual de usuario en el 
-                                            siguiente enlace:
-                                            //enlace aqui""", "Ayuda", 
+                                            siguiente enlace que se incluye en el repositorio
+                                            de git del proyecto.""", "Ayuda", 
             JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_bHelpActionPerformed
 
@@ -586,15 +589,17 @@ public class InterfazUsuario extends javax.swing.JFrame {
         archivo.saveAs(lexer.getReporte(), ".txt");
     }//GEN-LAST:event_bSaveReporteActionPerformed
 
-    private void bSintacticoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSintacticoActionPerformed
+    private void bAnalisisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bAnalisisActionPerformed
         lexer.analyzeAll(editor.getText());
+        rep.setReporte(displayReporte, lexer);
         parser.analiceAll(lexer);
-        displayAnalisis.setText(lexer.getErrors() 
+        displayAnalisis.setText(
+                lexer.getErrors() 
                 + "\n---------------------------------------\n" 
                 + parser.getReportErrors());
         
-        //REMOVE THE NEXT CODE, IT IS FOR TEST
-        this.empaquetador = new Empaquetador(lexer, parser);
+        //REMOVE THE NEXT CODE, IT'S FOR TEST
+        /*this.empaquetador = new Empaquetador(lexer, parser);
         try {
             List<Function> functions = empaquetador.getFunctions();
             System.out.println("total de funciones: " + functions.size());
@@ -608,22 +613,31 @@ public class InterfazUsuario extends javax.swing.JFrame {
                 }
                 System.out.println("\n");
             }
-        } catch (Exception e) {
+        } catch ( e) {
             System.out.println("hay errores sintacticos");
-        }
-    }//GEN-LAST:event_bSintacticoActionPerformed
+        }*/
+    }//GEN-LAST:event_bAnalisisActionPerformed
+
+    private void bFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bFilterActionPerformed
+        // agregar un filtro para errores
+    }//GEN-LAST:event_bFilterActionPerformed
+
+    private void bTknsFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bTknsFilterActionPerformed
+        // agregar un filtro para tokens
+    }//GEN-LAST:event_bTknsFilterActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton bAnalisis;
     private javax.swing.JButton bClear;
     private javax.swing.JButton bCreditos;
+    private javax.swing.JButton bFilter;
     private javax.swing.JButton bGraph;
     private javax.swing.JButton bHelp;
-    private javax.swing.JButton bLexico;
     private javax.swing.JButton bOpenFile;
     private javax.swing.JButton bSave;
     private javax.swing.JButton bSaveAs;
     private javax.swing.JButton bSaveReporte;
-    private javax.swing.JButton bSintactico;
+    private javax.swing.JButton bTknsFilter;
     private javax.swing.JTextPane displayAnalisis;
     private javax.swing.JLabel displayC;
     private javax.swing.JTable displayReporte;

@@ -575,6 +575,15 @@ public class Parser {
             currentNoTkn--;
         }
     }
+    private int validateOnePos(Token token, String correctType, String correctTypeName, int index){
+        String type = token.getSubType();
+        if (!type.equals(correctType)) {
+            errors.add(new SyntaxError(token.getPosition(),
+                    "Se esperaba " + correctTypeName));
+            return index - 1;
+        }
+        return index;
+    }
 
     private void validateBreakStmt(List<Token> tokens, int end) {
         end = validateOneLine(currentNoTkn, end, tokens);
@@ -671,15 +680,91 @@ public class Parser {
                 default -> "Error inesperado";
             };
             Token endTkn = sentence.get(index - 1);
-            errors.add(new SyntaxError(new Position(endTkn.getColumna() + endTkn.length(), endTkn.getLine()),
+            errorsList.add(new SyntaxError(new Position(endTkn.getColumna() + endTkn.length(), endTkn.getLine()),
                     message));
         }else if(index<sentence.size() && status == 2){
-            errors.add(new SyntaxError(sentence.get(index).getPosition(),
+            errorsList.add(new SyntaxError(sentence.get(index).getPosition(),
                     "Codigo inesperado a la derecha"));
         }
         
     }
 
+    protected void validateDictionary(List<Token> sentence, List<SyntaxError> errorsList){
+        int status = 0;
+        int index = 0;
+        int noLine = sentence.get(index).getLine();
+        boolean read = true;
+        String[] delimitadores = {"dos_puntos", "coma", "lR"};
+        ExpressionVerificator ev = new ExpressionVerificator(this);
+        while (index < sentence.size() && read) {   
+            String typeTkn = sentence.get(index).getSubType();
+            switch (status) {
+                case 0 -> {
+                    if (!typeTkn.equals("lL")) { 
+                        throw new AssertionError("No se esta trando de validar una estructura");
+                    }
+                    status = 1;
+                }
+                case 1 -> {
+                    if(typeTkn.equals("lR")){
+                        status = 2;
+                    }else{
+                        index = ev.validate(sentence, delimitadores,
+                                noLine, index);
+                        status = 3;
+                    }
+                }
+                case 2 -> {
+                    index--;
+                    read = false;
+                }
+                case 3 -> {
+                    index  = validateOnePos(sentence.get(index), 
+                            "dos_puntos", "dos puntos", index);
+                    status = 4;
+                }
+                case 4 -> {
+                    index = ev.validate(sentence, delimitadores, noLine, index);
+                    status = 5;
+                }
+                case 5 -> {
+                    switch (typeTkn) {
+                        case "coma":
+                            index = validateOnePos(sentence.get(index), "coma",
+                            "coma", index);
+                            status = 6;
+                            break;
+                        case "lR":
+                            status = 2;
+                            break;
+                        default:
+                            index--;
+                            read = false;
+                    }
+                }
+                case 6 -> {
+                    index = ev.validate(sentence, delimitadores, noLine, index);
+                    status = 3;
+                }
+            }
+            index++;
+        } //end of while
+        if(status != 2){
+            String message = switch (status) {
+                case 1 -> "Expresion o cierre de sentencia esperada";
+                case 3 -> "Se esperaban dos puntos";
+                case 4, 6 -> "Expresion esperada";
+                case 5 -> "coma o cierre de sentencia esperada";
+                default -> "Error inesperado";
+            };
+            Token endTkn = sentence.get(index - 1);
+            errorsList.add(new SyntaxError(new Position(endTkn.getColumna() + endTkn.length(), endTkn.getLine()),
+                    message));
+        }else if(index<sentence.size() && status == 2){
+            errorsList.add(new SyntaxError(sentence.get(index).getPosition(),
+                    "Codigo inesperado a la derecha"));
+        }
+    }
     private void analiceSubBlock(List<Token> tokens, int bigIdentation) {
         String typeTkn = tokens.get(currentNoTkn).getSubType();
         if (!typeTkn.equals("elif") && !typeTkn.equals("else")) {

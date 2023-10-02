@@ -30,7 +30,7 @@ public class Regex {
 
     public boolean isCombinable(char character) {
         return switch (character) {
-            case '!', '-', '*', '/', '+', '=', '>', '<' ->
+            case '!', '-', '*', '/', '+', '=', '>', '<', '%' ->
                 true;
             default ->
                 false;

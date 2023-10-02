@@ -7,6 +7,7 @@ import lenguajes.proyectolenguajesydl.lexer.Lexer;
 import lenguajes.proyectolenguajesydl.lexer.Token;
 import lenguajes.proyectolenguajesydl.parser.Parser;
 import lenguajes.proyectolenguajesydl.parser.Separator;
+import lenguajes.proyectolenguajesydl.parser.SyntaxException;
 
 /**
  *
@@ -24,7 +25,7 @@ public class Empaquetador {
         this.separator = new Separator();
     }
     
-    public List<Function> getFunctions(){
+    public List<Function> getFunctions() throws SyntaxException{
         if(parser.getErrors().isEmpty()){ //solo si no hay errores sintacticos
             List<Token> tokens = lexer.getTokens();
             List<Function> functions = new ArrayList<>();
@@ -49,7 +50,7 @@ public class Empaquetador {
             }
             return functions;
         }else{
-            throw new AssertionError();
+            throw new SyntaxException();
         }
     }
     
