@@ -5,8 +5,9 @@ import lenguajes.proyectolenguajesydl.lexer.Lexer;
 import java.awt.event.*;
 import java.io.File;
 import javax.swing.*;
-import lenguajes.proyectolenguajesydl.parser.elements.Empaquetador;
 import lenguajes.proyectolenguajesydl.parser.Parser;
+import lenguajes.proyectolenguajesydl.parser.*;
+import java.util.List;
 import lenguajes.proyectolenguajesydl.util.*;
 
 /**
@@ -25,7 +26,6 @@ public class InterfazUsuario extends javax.swing.JFrame {
     private int counterFile;
     private String currentPath;
     private Reportes reportesDisplay;
-    private Empaquetador empaquetador;
     private Reportero rep;
     /**
      * Creates new form InterfazUsuario
@@ -42,7 +42,7 @@ public class InterfazUsuario extends javax.swing.JFrame {
         FILE_NAME = "graph";
         FILE_EXTENSION = ".png";
         counterFile = 0;
-        parser = new Parser();
+        parser = new Parser(lexer);
         initStyle();
         initTable();
         initButtons();
@@ -605,30 +605,11 @@ public class InterfazUsuario extends javax.swing.JFrame {
     private void bAnalisisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bAnalisisActionPerformed
         lexer.analyzeAll(editor.getText());
         rep.setTokensReporte(displayReporte, lexer);
-        parser.analiceAll(lexer);
+        parser.analiceAll();
         displayAnalisis.setText(
                 lexer.getErrorsDetails()
                 + "\n---------------------------------------\n" 
                 + parser.getReportErrors());
-        
-        //REMOVE THE NEXT CODE, IT'S FOR TEST
-        /*this.empaquetador = new Empaquetador(lexer, parser);
-        try {
-            List<Function> functions = empaquetador.getFunctions();
-            System.out.println("total de funciones: " + functions.size());
-            System.out.println("-----------------------------------------");
-            for (int i = 0; i < functions.size(); i++) {
-                System.out.println("Funcion: " + functions.get(i).getName());
-                List<String> params = functions.get(i).getParameters();
-                System.out.println("    Parametros (" + params.size() + ")");
-                for (String param : params) {
-                    System.out.println("      -> " + param);
-                }
-                System.out.println("\n");
-            }
-        } catch ( e) {
-            System.out.println("hay errores sintacticos");
-        }*/
     }//GEN-LAST:event_bAnalisisActionPerformed
 
     private void bTknsFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bTknsFilterActionPerformed

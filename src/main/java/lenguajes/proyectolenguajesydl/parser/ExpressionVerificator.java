@@ -16,14 +16,14 @@ public class ExpressionVerificator {
     private Stack<String> stack = new Stack<>();
     private int noTkn;
     private List<Token> expression;
-    private Regex ex;
+    private Structure structure;
     private Separator separator;
     private Parser parser;
     protected ExpressionVerificator(Parser parser) {
         this.errors = parser.getErrors();
         this.parser = parser;
         stack = new Stack<>();
-        ex = new Regex();
+        structure = new Structure();
         noTkn = 0;
         separator = new Separator();
     }
@@ -35,7 +35,6 @@ public class ExpressionVerificator {
     
     public int validate(List<Token> tokens, String[] delimitadors, int currentLine, int init) {
         int end = separator.findEndOfExpression(tokens, init, delimitadors, currentLine);
-        System.out.println("fin de expresion" + end);
         if (init == end) { //cuando la expresion no exite
             Token tkn = tokens.get(init);
             errors.add(new SyntaxError(new Position(tkn.getColumna(),
@@ -202,7 +201,7 @@ public class ExpressionVerificator {
     }
     private boolean validateSeparatorR(){
         if(!stack.isEmpty()){
-            if(ex.isComplementario(stack.peek(), expression.get(noTkn).getSubType())){
+            if(structure.isComplementario(stack.peek(), expression.get(noTkn).getSubType())){
                 stack.pop();
                 return true;
             }

@@ -11,20 +11,15 @@ import lombok.Getter;
  */
 @Getter
 public class Function {
-    private Token token;
     private List<String> parameters;
-    private int index;
+    private int indexStart;
     private List<Token> usos;
             
-    public Function(Token token, List<String> parameters, int index) {
-        this.token = token;
+    public Function(int indexStart, List<String> parameters) {
         this.parameters = parameters;
-        this.index = index;
+        this.indexStart = indexStart;
     }
     
-    public String getName(){
-        return token.getContenido();
-    }
     public void setUsos(List<Token> usos){
         this.usos = usos;
     }

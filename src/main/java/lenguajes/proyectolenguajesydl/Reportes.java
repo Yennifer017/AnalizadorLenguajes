@@ -1,4 +1,3 @@
-
 package lenguajes.proyectolenguajesydl;
 
 import javax.swing.JFrame;
@@ -6,8 +5,9 @@ import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import lenguajes.proyectolenguajesydl.lexer.Lexer;
 import lenguajes.proyectolenguajesydl.parser.Parser;
+import lenguajes.proyectolenguajesydl.parser.Registrador;
 import lenguajes.proyectolenguajesydl.parser.SyntaxException;
-import lenguajes.proyectolenguajesydl.parser.elements.Empaquetador;
+import lenguajes.proyectolenguajesydl.util.Render;
 import lenguajes.proyectolenguajesydl.util.Reportero;
 
 /**
@@ -20,33 +20,49 @@ public class Reportes extends javax.swing.JFrame {
     private Parser parser;
     private Lexer lexer;
     private Reportero reportero;
-    private Empaquetador empaquetador;
+    private Registrador registrador;
+
     /**
      * Creates new form Reportes
+     *
      * @param anterior
      * @param lexer
      * @param parser
      */
-    public Reportes(JFrame anterior, Lexer lexer, Parser parser ) {
+    public Reportes(JFrame anterior, Lexer lexer, Parser parser) {
         initComponents();
         this.setLocationRelativeTo(null);
         this.anterior = anterior;
         this.lexer = lexer;
         this.parser = parser;
         this.reportero = new Reportero();
-        this.empaquetador = new Empaquetador(lexer, parser);
+        this.registrador = parser.getRegistrador();
         ocultar(repFuncDisplay);
-       
+        ocultar(repSyntaxErrors);
+        ocultar(repLexError);
+        ocultar(repListInstructions);
+
     }
 
-    private void ocultar(JInternalFrame frame){
+    private void ocultar(JInternalFrame frame) {
         frame.setEnabled(false);
         frame.setVisible(false);
     }
-    private void mostrar(JInternalFrame frame){
+
+    private void mostrar(JInternalFrame frame) {
         frame.setEnabled(true);
         frame.setVisible(true);
     }
+
+    private void mostrarMssSyntaxError() {
+        JOptionPane.showMessageDialog(null, """
+                                            Se han encontrado errores de sintaxis, no se ha 
+                                            podido generar el reporte, por favor corrige los 
+                                            errores y vuelve a intentarlo""",
+                "Errores sintacticos contrados",
+                JOptionPane.ERROR_MESSAGE);
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -90,6 +106,12 @@ public class Reportes extends javax.swing.JFrame {
         jLabel7 = new javax.swing.JLabel();
         totalLexErrrors = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
+        repListInstructions = new javax.swing.JInternalFrame();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel8 = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        listInstRep = new javax.swing.JTable();
+        jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -116,6 +138,11 @@ public class Reportes extends javax.swing.JFrame {
 
         bInstructions.setFont(new java.awt.Font("Dialog", 1, 13)); // NOI18N
         bInstructions.setText("Lista de instrucciones");
+        bInstructions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bInstructionsActionPerformed(evt);
+            }
+        });
 
         bSyntaxError.setFont(new java.awt.Font("Dialog", 1, 13)); // NOI18N
         bSyntaxError.setText("Errores sintacticos");
@@ -170,8 +197,7 @@ public class Reportes extends javax.swing.JFrame {
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addComponent(bMethodReport, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(bLexErrors, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(bSyntaxError, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(8, 8, 8))
+                                    .addComponent(bSyntaxError, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addComponent(jLabel4)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(20, 20, 20)
@@ -230,21 +256,21 @@ public class Reportes extends javax.swing.JFrame {
         funReport.setForeground(new java.awt.Color(0, 0, 0));
         funReport.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "Nombre", "Parametros", "No. de veces llamada"
+                "Linea", "Columna", "Nombre", "Parametros", "No. de veces llamada"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Integer.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false
+                true, true, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -261,10 +287,13 @@ public class Reportes extends javax.swing.JFrame {
         if (funReport.getColumnModel().getColumnCount() > 0) {
             funReport.getColumnModel().getColumn(0).setMinWidth(60);
             funReport.getColumnModel().getColumn(0).setPreferredWidth(60);
-            funReport.getColumnModel().getColumn(0).setMaxWidth(10);
+            funReport.getColumnModel().getColumn(0).setMaxWidth(60);
             funReport.getColumnModel().getColumn(1).setMinWidth(60);
             funReport.getColumnModel().getColumn(1).setPreferredWidth(60);
-            funReport.getColumnModel().getColumn(1).setMaxWidth(10);
+            funReport.getColumnModel().getColumn(1).setMaxWidth(60);
+            funReport.getColumnModel().getColumn(4).setMinWidth(120);
+            funReport.getColumnModel().getColumn(4).setPreferredWidth(120);
+            funReport.getColumnModel().getColumn(4).setMaxWidth(120);
         }
 
         jLabel2.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
@@ -572,6 +601,109 @@ public class Reportes extends javax.swing.JFrame {
 
         getContentPane().add(repLexError, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
+        repListInstructions.setVisible(true);
+
+        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+
+        jLabel8.setFont(new java.awt.Font("Arial", 1, 36)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel8.setText("Lista de instrucciones");
+
+        listInstRep.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        listInstRep.setForeground(new java.awt.Color(0, 0, 0));
+        listInstRep.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Nivel Identado", "Linea", "Columna", "Tipo"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                true, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        listInstRep.setColumnSelectionAllowed(true);
+        jScrollPane4.setViewportView(listInstRep);
+        listInstRep.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        if (listInstRep.getColumnModel().getColumnCount() > 0) {
+            listInstRep.getColumnModel().getColumn(0).setMinWidth(80);
+            listInstRep.getColumnModel().getColumn(0).setPreferredWidth(80);
+            listInstRep.getColumnModel().getColumn(0).setMaxWidth(60);
+            listInstRep.getColumnModel().getColumn(1).setMinWidth(60);
+            listInstRep.getColumnModel().getColumn(1).setPreferredWidth(60);
+            listInstRep.getColumnModel().getColumn(1).setMaxWidth(10);
+            listInstRep.getColumnModel().getColumn(2).setMinWidth(60);
+            listInstRep.getColumnModel().getColumn(2).setPreferredWidth(60);
+            listInstRep.getColumnModel().getColumn(2).setMaxWidth(10);
+        }
+
+        jButton3.setBackground(new java.awt.Color(255, 0, 0));
+        jButton3.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        jButton3.setText("X");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(31, 31, 31)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel8)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton3))
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 822, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(37, Short.MAX_VALUE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(36, 36, 36)
+                        .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(23, 23, 23)
+                        .addComponent(jButton3)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 252, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(115, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout repListInstructionsLayout = new javax.swing.GroupLayout(repListInstructions.getContentPane());
+        repListInstructions.getContentPane().setLayout(repListInstructionsLayout);
+        repListInstructionsLayout.setHorizontalGroup(
+            repListInstructionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        repListInstructionsLayout.setVerticalGroup(
+            repListInstructionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        getContentPane().add(repListInstructions, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -586,17 +718,12 @@ public class Reportes extends javax.swing.JFrame {
 
     private void bMethodReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bMethodReportActionPerformed
         try {
-            reportero.setFunctionsRep(funReport, empaquetador);
-            totalFuncDisplay.setText(String.valueOf(empaquetador.getFunctions().size()));
+            reportero.setFunctionsRep(funReport, registrador);
+            totalFuncDisplay.setText(String.valueOf(registrador.getFunctions().size()));
             ocultar(index);
             mostrar(repFuncDisplay);
         } catch (SyntaxException e) {
-            JOptionPane.showMessageDialog(null, """
-                                            Se han encontrado errores de sintaxis, no se ha 
-                                            podido generar el reporte, por favor corrige los 
-                                            errores y vuelve a intentarlo""", 
-                    "Errores sintacticos contrados", 
-                JOptionPane.ERROR_MESSAGE);
+            mostrarMssSyntaxError();
         }
     }//GEN-LAST:event_bMethodReportActionPerformed
 
@@ -606,7 +733,7 @@ public class Reportes extends javax.swing.JFrame {
     }//GEN-LAST:event_bAtrasGlobalActionPerformed
 
     private void bSyntaxErrorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSyntaxErrorActionPerformed
-        reportero.setSyntaxErrorRep(syntaxErrorsRep,parser.getErrors());
+        reportero.setSyntaxErrorRep(syntaxErrorsRep, parser.getErrors());
         totalSyntaxErrors.setText(String.valueOf(parser.getErrors().size()));
         ocultar(index);
         mostrar(repSyntaxErrors);
@@ -616,7 +743,6 @@ public class Reportes extends javax.swing.JFrame {
         reportero.setLexErrorRep(lexErrorRep, lexer.getErrors());
         totalLexErrrors.setText(String.valueOf(lexer.getErrors().size()));
         ocultar(index);
-        ocultar(repSyntaxErrors);
         mostrar(repLexError);
     }//GEN-LAST:event_bLexErrorsActionPerformed
 
@@ -629,6 +755,22 @@ public class Reportes extends javax.swing.JFrame {
         ocultar(repSyntaxErrors);
         mostrar(index);
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        ocultar(repListInstructions);
+        mostrar(index);
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void bInstructionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bInstructionsActionPerformed
+        try {
+            reportero.setListInstRep(listInstRep, registrador);	
+            this.listInstRep.setDefaultRenderer(Object.class, new Render());
+            ocultar(index);
+            mostrar(repListInstructions);
+        } catch (SyntaxException e) {
+            mostrarMssSyntaxError();
+        }
+    }//GEN-LAST:event_bInstructionsActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -644,6 +786,7 @@ public class Reportes extends javax.swing.JFrame {
     private javax.swing.JInternalFrame index;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -651,16 +794,21 @@ public class Reportes extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTable lexErrorRep;
+    private javax.swing.JTable listInstRep;
     private javax.swing.JPanel panel;
     private javax.swing.JInternalFrame repFuncDisplay;
     private javax.swing.JInternalFrame repLexError;
+    private javax.swing.JInternalFrame repListInstructions;
     private javax.swing.JInternalFrame repSyntaxErrors;
     private javax.swing.JTable syntaxErrorsRep;
     private javax.swing.JLabel totalFuncDisplay;
