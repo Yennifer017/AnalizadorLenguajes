@@ -2,7 +2,6 @@ package lenguajes.proyectolenguajesydl.parser;
 
 import java.util.List;
 import java.util.Stack;
-import lenguajes.proyectolenguajesydl.lexer.Regex;
 import lenguajes.proyectolenguajesydl.lexer.Token;
 import lenguajes.proyectolenguajesydl.util.Position;
 
@@ -70,6 +69,7 @@ public class ExpressionVerificator {
             case "SR+" -> "Separador de cierre inesperado";
             case "pL" -> "Se esperaba un token de cierre"; 
             case "e" -> "Se esperaba un else para el operador ternario"; 
+            case "TE" -> "Se esta tratando de operar un tipo de dato incompatible"; 
             default -> "Error inesperado";
         };
         Token tkn;
@@ -102,7 +102,7 @@ public class ExpressionVerificator {
         } catch (Exception e) {
             return false;
         }
-        switch (type) {
+        switch (type) { 
             case "int", "float", "Cadena", "True", "False", "Identificador" -> {
                 try {
                     stack.pop();
@@ -120,14 +120,20 @@ public class ExpressionVerificator {
         while (noTkn<expression.size() && read) {
             String subType = expression.get(noTkn).getSubType();
             switch (subType) {
-                case "Identificador", "int", "float", "Cadena", "True", "False" -> 
-                    read = validateValues();
+                case "int", "float", "True", "False" -> 
+                    read = validateSimpleEx();
+                case "Identificador" -> 
+                    read = validateIdentifier();
+                case "Cadena" -> 
+                    read = validateString();    
                 case "pL" -> 
                     read = validateSeparatorL();
                 case "pR" -> 
                     read = validateSeparatorR();
-                case "suma", "resta" -> 
-                    read = validateNumbers();
+                case "suma" -> 
+                    read = validateNumber();
+                case "resta" -> 
+                    read = validateSubs();
                 case "exponente", "division", "modulo", "multiplicacion", "and", "or",
                         "igual", "diferente", "mayor_que", "menor_que", "mayor_o_igual_que", "menor_o_igual_que"->
                     read = validateOperations();
@@ -152,11 +158,11 @@ public class ExpressionVerificator {
             }
         }
     }
-    private boolean validateValues(){
+    private boolean validateIdentifier(){
         if (expressionOK()) { //si se esperaba una expresion
-            if (expression.get(noTkn).getSubType().equals("Identificador")) {
-                String[] delimitador = new String[1];
+            //if (expression.get(noTkn).getSubType().equals("Identificador")) {
                 try {
+                    String[] delimitador = new String[1];
                     int type;
                     switch (expression.get(noTkn + 1).getSubType()) {
                         case "pL" -> {
@@ -178,12 +184,37 @@ public class ExpressionVerificator {
                     parser.validateStructure(sentence,
                             type, errors);
                     noTkn = end - 1;
-                } catch (IndexOutOfBoundsException e) {
-                    System.out.println("excepcion controlada");
+                } catch (IndexOutOfBoundsException e) { 
+                    return true;
                 }
+            //}
+            return true; 
+        }else{
+            noTkn--;
+            return false;
+        }
+    }
+    private boolean validateSimpleEx(){
+        boolean valid = expressionOK();
+        if(!valid){
+            noTkn--;
+        }
+        return valid;
+    }
+    private boolean validateString(){
+        if (expressionOK()) { //si se esperaba una expresion
+            try {
+                switch (expression.get(noTkn - 1).getSubType()) {
+                    case "resta", "exponente", "division", "modulo", "multiplicacion":
+                        noTkn--;
+                        stack.push("TE");
+                        return false;
+                    default:
+                        return true;
+                }
+            } catch (IndexOutOfBoundsException e) { //cuando no hay mas del String
                 return true;
             }
-            return true; 
         }else{
             noTkn--;
             return false;
@@ -227,7 +258,7 @@ public class ExpressionVerificator {
         }
     }
     
-    private boolean validateNumbers(){
+    private boolean validateNumber(){
         if (!stack.isEmpty()) {
             if (stack.peek().equals("E")) {
                 stack.pop();
@@ -235,6 +266,17 @@ public class ExpressionVerificator {
         }
         stack.push("E");
         return true;
+    }
+    private boolean validateSubs(){
+        try {
+            if (expression.get(noTkn - 1).getSubType().equals("Cadena")) {
+                stack.push("TE");
+                noTkn--;
+                return false;
+            }
+        } catch (IndexOutOfBoundsException e) {
+        }
+        return validateNumber();
     }
     
     private boolean validateOperations(){
@@ -245,6 +287,16 @@ public class ExpressionVerificator {
                         "igual", "diferente", "mayor_que", "menor_que", "mayor_o_igual_que", "menor_o_igual_que":
                     noTkn--; //dejar en la misma posicion
                     return false;
+                case "Cadena":
+                    switch (expression.get(noTkn).getType()) {
+                        case "Aritmetico":
+                            noTkn--;
+                            stack.push("TE");
+                            return false;
+                        default:
+                            stack.push("E");
+                            return true;
+                    }
                 default:
                     stack.push("E");
                     return true;

@@ -41,7 +41,11 @@ public class Parser {
         lexer.deleteNoUtilTkns();
         try {
             analiceSubBlock(lexer.getTokens(), lexer.getToken(currentNoTkn).getColumna());
-            registrador.empaquetarDatos();
+            try {
+                registrador.empaquetarDatos();
+            } catch (Exception e) {
+                System.out.println("algo que definitivamente no debio salir mal, salio mal");
+            }
         } catch (NullPointerException e) {
             System.out.println(e);
         }
@@ -146,7 +150,26 @@ public class Parser {
                     }
                 }
                 case 1 -> {
-                    switch (type) {
+                    if(type.contains("Asignacion")){
+                        status = 3;
+                    }else{
+                        switch (type) {
+                            case "coma" ->
+                                status = 2;
+                            case "pL" -> {
+                                validateStructure(tokens.subList(currentNoTkn, fin),
+                                        Structure.USE_FUNCTION, errors);
+                                status = 4;
+                                currentNoTkn = fin;
+                            }
+                            default -> {
+                                currentNoTkn--; // nos deja en la misma posicion
+                                read = false; //interrumpir flujo
+
+                            }
+                        }
+                    }
+                    /*switch (type) {
                         case "coma" ->
                             status = 2;
                         case "Asignacion" ->
@@ -158,13 +181,11 @@ public class Parser {
                             currentNoTkn = fin;
                         }
                         default -> {
-                            //errors.add(new SyntaxError(tokens.get(currentNoTkn).getPosition(),
-                            //        "Se esperaba una coma, una asignacion o una llamada a una funcion"));
                             currentNoTkn--; // nos deja en la misma posicion
                             read = false; //interrumpir flujo
                            
                         }
-                    }
+                    }*/
                 }
                 case 2 -> {
                     switch (type) {
@@ -209,7 +230,7 @@ public class Parser {
             String message = "Error inesperado";
             switch (status) {
                 case 1 ->
-                    message = "Se esperaba una coma o una asignacion";
+                    message = "Se esperaba una coma, una asignacion o parentesis para el uso de una funcion";
                 case 2 ->
                     message = "Se esperaba un identificador";
                 case 3, 5 ->

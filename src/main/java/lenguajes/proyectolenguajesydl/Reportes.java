@@ -40,6 +40,8 @@ public class Reportes extends javax.swing.JFrame {
         ocultar(repFuncDisplay);
         ocultar(repSyntaxErrors);
         ocultar(repLexError);
+        ocultar(repSymbolTBlock);
+        ocultar(repSymbolT);
         ocultar(repListInstructions);
 
     }
@@ -112,6 +114,18 @@ public class Reportes extends javax.swing.JFrame {
         jScrollPane4 = new javax.swing.JScrollPane();
         listInstRep = new javax.swing.JTable();
         jButton3 = new javax.swing.JButton();
+        repSymbolTBlock = new javax.swing.JInternalFrame();
+        jPanel6 = new javax.swing.JPanel();
+        jLabel10 = new javax.swing.JLabel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        symbolTableBlocks = new javax.swing.JTable();
+        bExitSTB = new javax.swing.JButton();
+        repSymbolT = new javax.swing.JInternalFrame();
+        jPanel5 = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        symbolTable = new javax.swing.JTable();
+        bExitTS = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -127,6 +141,11 @@ public class Reportes extends javax.swing.JFrame {
 
         bTableSymbolG.setFont(new java.awt.Font("Dialog", 1, 13)); // NOI18N
         bTableSymbolG.setText("Tabla de simbolos global");
+        bTableSymbolG.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bTableSymbolGActionPerformed(evt);
+            }
+        });
 
         bTableSimbolB.setFont(new java.awt.Font("Dialog", 1, 13)); // NOI18N
         bTableSimbolB.setText("Tabla de simbolos por bloque");
@@ -644,7 +663,7 @@ public class Reportes extends javax.swing.JFrame {
         if (listInstRep.getColumnModel().getColumnCount() > 0) {
             listInstRep.getColumnModel().getColumn(0).setMinWidth(80);
             listInstRep.getColumnModel().getColumn(0).setPreferredWidth(80);
-            listInstRep.getColumnModel().getColumn(0).setMaxWidth(60);
+            listInstRep.getColumnModel().getColumn(0).setMaxWidth(80);
             listInstRep.getColumnModel().getColumn(1).setMinWidth(60);
             listInstRep.getColumnModel().getColumn(1).setPreferredWidth(60);
             listInstRep.getColumnModel().getColumn(1).setMaxWidth(10);
@@ -704,11 +723,221 @@ public class Reportes extends javax.swing.JFrame {
 
         getContentPane().add(repListInstructions, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
+        repSymbolTBlock.setVisible(true);
+
+        jPanel6.setBackground(new java.awt.Color(255, 255, 255));
+
+        jLabel10.setFont(new java.awt.Font("Arial", 1, 36)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel10.setText("Tabla de simbolos por Bloque de Codigo");
+
+        symbolTableBlocks.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        symbolTableBlocks.setForeground(new java.awt.Color(0, 0, 0));
+        symbolTableBlocks.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "Indentacion", "Simbolo", "Tipo", "Valor", "Linea", "Columna"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        symbolTableBlocks.setColumnSelectionAllowed(true);
+        jScrollPane6.setViewportView(symbolTableBlocks);
+        symbolTableBlocks.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        if (symbolTableBlocks.getColumnModel().getColumnCount() > 0) {
+            symbolTableBlocks.getColumnModel().getColumn(0).setMinWidth(65);
+            symbolTableBlocks.getColumnModel().getColumn(0).setPreferredWidth(65);
+            symbolTableBlocks.getColumnModel().getColumn(0).setMaxWidth(65);
+            symbolTableBlocks.getColumnModel().getColumn(4).setMinWidth(60);
+            symbolTableBlocks.getColumnModel().getColumn(4).setPreferredWidth(60);
+            symbolTableBlocks.getColumnModel().getColumn(4).setMaxWidth(10);
+            symbolTableBlocks.getColumnModel().getColumn(5).setMinWidth(60);
+            symbolTableBlocks.getColumnModel().getColumn(5).setPreferredWidth(60);
+            symbolTableBlocks.getColumnModel().getColumn(5).setMaxWidth(10);
+        }
+
+        bExitSTB.setBackground(new java.awt.Color(255, 0, 0));
+        bExitSTB.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        bExitSTB.setText("X");
+        bExitSTB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bExitSTBActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(31, 31, 31)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel6Layout.createSequentialGroup()
+                        .addComponent(jLabel10)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(bExitSTB))
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 822, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(37, Short.MAX_VALUE))
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(36, 36, 36)
+                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(23, 23, 23)
+                        .addComponent(bExitSTB)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 326, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(41, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout repSymbolTBlockLayout = new javax.swing.GroupLayout(repSymbolTBlock.getContentPane());
+        repSymbolTBlock.getContentPane().setLayout(repSymbolTBlockLayout);
+        repSymbolTBlockLayout.setHorizontalGroup(
+            repSymbolTBlockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        repSymbolTBlockLayout.setVerticalGroup(
+            repSymbolTBlockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        getContentPane().add(repSymbolTBlock, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+
+        repSymbolT.setVisible(true);
+
+        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
+
+        jLabel9.setFont(new java.awt.Font("Arial", 1, 36)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel9.setText("Tabla de simbolos");
+
+        symbolTable.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
+        symbolTable.setForeground(new java.awt.Color(0, 0, 0));
+        symbolTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "Simbolo", "Tipo", "Valor", "Linea", "Columna"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        symbolTable.setColumnSelectionAllowed(true);
+        jScrollPane5.setViewportView(symbolTable);
+        symbolTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        if (symbolTable.getColumnModel().getColumnCount() > 0) {
+            symbolTable.getColumnModel().getColumn(3).setMinWidth(60);
+            symbolTable.getColumnModel().getColumn(3).setPreferredWidth(60);
+            symbolTable.getColumnModel().getColumn(3).setMaxWidth(10);
+            symbolTable.getColumnModel().getColumn(4).setMinWidth(60);
+            symbolTable.getColumnModel().getColumn(4).setPreferredWidth(60);
+            symbolTable.getColumnModel().getColumn(4).setMaxWidth(10);
+        }
+
+        bExitTS.setBackground(new java.awt.Color(255, 0, 0));
+        bExitTS.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        bExitTS.setText("X");
+        bExitTS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bExitTSActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(31, 31, 31)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel5Layout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(bExitTS))
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 822, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(37, Short.MAX_VALUE))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(36, 36, 36)
+                        .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(23, 23, 23)
+                        .addComponent(bExitTS)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 326, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(41, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout repSymbolTLayout = new javax.swing.GroupLayout(repSymbolT.getContentPane());
+        repSymbolT.getContentPane().setLayout(repSymbolTLayout);
+        repSymbolTLayout.setHorizontalGroup(
+            repSymbolTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        repSymbolTLayout.setVerticalGroup(
+            repSymbolTLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        getContentPane().add(repSymbolT, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void bTableSimbolBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bTableSimbolBActionPerformed
-        // TODO add your handling code here:
+        try {
+            reportero.setSymbolTable(symbolTableBlocks, registrador, true);
+            this.symbolTableBlocks.setDefaultRenderer(Object.class, new Render());
+            ocultar(index);
+            mostrar(repSymbolTBlock);
+        } catch (SyntaxException e) {
+            mostrarMssSyntaxError();
+        }
     }//GEN-LAST:event_bTableSimbolBActionPerformed
 
     private void bAtras1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bAtras1ActionPerformed
@@ -729,7 +958,6 @@ public class Reportes extends javax.swing.JFrame {
 
     private void bAtrasGlobalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bAtrasGlobalActionPerformed
         this.setVisible(false);
-        anterior.setVisible(true);
     }//GEN-LAST:event_bAtrasGlobalActionPerformed
 
     private void bSyntaxErrorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSyntaxErrorActionPerformed
@@ -772,10 +1000,32 @@ public class Reportes extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_bInstructionsActionPerformed
 
+    private void bExitTSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bExitTSActionPerformed
+        ocultar(repSymbolT);
+        mostrar(index);
+    }//GEN-LAST:event_bExitTSActionPerformed
+
+    private void bExitSTBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bExitSTBActionPerformed
+        ocultar(repSymbolTBlock);
+        mostrar(index);
+    }//GEN-LAST:event_bExitSTBActionPerformed
+
+    private void bTableSymbolGActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bTableSymbolGActionPerformed
+        try {
+            reportero.setSymbolTable(symbolTable, registrador, false);
+            ocultar(index);
+            mostrar(repSymbolT);
+        } catch (SyntaxException e) {
+            mostrarMssSyntaxError();
+        }
+    }//GEN-LAST:event_bTableSymbolGActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bAtras1;
     private javax.swing.JButton bAtrasGlobal;
+    private javax.swing.JButton bExitSTB;
+    private javax.swing.JButton bExitTS;
     private javax.swing.JButton bInstructions;
     private javax.swing.JButton bLexErrors;
     private javax.swing.JButton bMethodReport;
@@ -788,6 +1038,7 @@ public class Reportes extends javax.swing.JFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -795,21 +1046,30 @@ public class Reportes extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JTable lexErrorRep;
     private javax.swing.JTable listInstRep;
     private javax.swing.JPanel panel;
     private javax.swing.JInternalFrame repFuncDisplay;
     private javax.swing.JInternalFrame repLexError;
     private javax.swing.JInternalFrame repListInstructions;
+    private javax.swing.JInternalFrame repSymbolT;
+    private javax.swing.JInternalFrame repSymbolTBlock;
     private javax.swing.JInternalFrame repSyntaxErrors;
+    private javax.swing.JTable symbolTable;
+    private javax.swing.JTable symbolTableBlocks;
     private javax.swing.JTable syntaxErrorsRep;
     private javax.swing.JLabel totalFuncDisplay;
     private javax.swing.JLabel totalLexErrrors;

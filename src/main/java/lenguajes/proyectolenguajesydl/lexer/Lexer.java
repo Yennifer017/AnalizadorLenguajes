@@ -50,12 +50,6 @@ public class Lexer {
             analisis += errors.get(i).toString();
             analisis += "\n";
         }
-        /*for (int i = 0; i < tokens.size(); i++) {
-            if(tokens.get(i).getType().equalsIgnoreCase("error")){
-                analisis += tokens.get(i).toString();
-                analisis += "\n";
-            }
-        }*/
         if(analisis.equals("ERRORES LEXICOS: \n")){
             analisis += "No hay Errores lexicos :)";
         }
@@ -355,7 +349,7 @@ public class Lexer {
     }
     private String getSubTypeTkn(String lexema, String typeTkn){
         switch (typeTkn) {
-            case "Asignacion", "Identificador", "int", "float", "Cadena", "Comentario":
+            case "Identificador", "int", "float", "Cadena", "Comentario":
                 return typeTkn;
             case "Reservada", "boolean", "Logico":
                 return lexema;
@@ -365,13 +359,13 @@ public class Lexer {
                 return getSubTypeComp(lexema);
             case "Otro":
                 return getSubTypeOtro(lexema);
-            /*case "Asignacion":
+            case "Asignacion":
                 if(lexema.length() != 1){
                     String arit = lexema.substring(0, lexema.length()-1);
                     return getSubTypeAritmetico(arit) + "_" + typeTkn;
                 }else{  
                     return typeTkn;
-                }*/
+                }
             default:
                 return "error";
         }

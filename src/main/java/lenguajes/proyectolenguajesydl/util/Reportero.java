@@ -9,8 +9,10 @@ import lenguajes.proyectolenguajesydl.lexer.Lexer;
 import lenguajes.proyectolenguajesydl.lexer.Token;
 import lenguajes.proyectolenguajesydl.parser.Registrador;
 import lenguajes.proyectolenguajesydl.parser.Registro;
+import lenguajes.proyectolenguajesydl.parser.Separator;
 import lenguajes.proyectolenguajesydl.parser.SyntaxError;
 import lenguajes.proyectolenguajesydl.parser.SyntaxException;
+import lenguajes.proyectolenguajesydl.parser.elements.Assignation;
 
 /**
  *
@@ -56,6 +58,25 @@ public class Reportero {
         data[0] = errors.get(row).getPosition().getFila() + 1;
         data[1] = errors.get(row).getPosition().getColumna() + 1;
         data[2] = errors.get(row).getContenido();
+        return data;
+    }
+    private Object[] getDataSymbolTable(List<Token> tokens, Assignation asignacion,
+            boolean includeIndentation){
+        Object[] data;
+        int index = 0;
+        if(includeIndentation){
+            data = new Object[6];
+            data[index] = asignacion.getIdentationLevel();
+            index++;
+        }else{
+            data = new Object[5];
+        }
+        data[index] = asignacion.getName();
+        data[index+1] = asignacion.getType();
+        data[index+2] = asignacion.getValor();
+        data[index+3] = asignacion.getLinea() + 1;
+        data[index+4] = asignacion.getColumna() + 1;
+        
         return data;
     }
     private Object[] getNullRow(int columas){
@@ -111,10 +132,19 @@ public class Reportero {
     public void setListInstRep(JTable table, Registrador registrador) throws SyntaxException{
         clearTable(table, false);
         List<Registro> registros = registrador.getRegistros();
-        List<Token> tokens = registrador.getListTokens();
         DefaultTableModel tb = (DefaultTableModel) table.getModel();
         for (int i = 0; i < registros.size(); i++) {
-            tb.addRow(getDataInstructions(tokens, registros, i));
+            tb.addRow(getDataInstructions(registrador.getListTokens(), registros, i));
+        }
+    }
+    public void setSymbolTable(JTable table, Registrador registrador, boolean includeIndentation) 
+            throws SyntaxException{
+        clearTable(table, false);
+        List<Assignation> asignaciones = registrador.getDataForSymbolTable();
+        /*List<Registro> registros = registrador.getRegistrosForST();*/
+        DefaultTableModel tb = (DefaultTableModel) table.getModel();
+        for (Assignation asignacion : asignaciones) {
+            tb.addRow(getDataSymbolTable(registrador.getListTokens(), asignacion, includeIndentation));
         }
     }
     

@@ -617,7 +617,6 @@ public class InterfazUsuario extends javax.swing.JFrame {
     }//GEN-LAST:event_bTknsFilterActionPerformed
 
     private void bReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bReportesActionPerformed
-        this.setVisible(false);
         reportesDisplay.setVisible(true);
     }//GEN-LAST:event_bReportesActionPerformed
 
