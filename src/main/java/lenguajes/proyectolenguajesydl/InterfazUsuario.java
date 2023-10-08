@@ -5,8 +5,9 @@ import lenguajes.proyectolenguajesydl.lexer.Lexer;
 import java.awt.event.*;
 import java.io.File;
 import javax.swing.*;
-import lenguajes.proyectolenguajesydl.parser.elements.Empaquetador;
 import lenguajes.proyectolenguajesydl.parser.Parser;
+import lenguajes.proyectolenguajesydl.parser.*;
+import java.util.List;
 import lenguajes.proyectolenguajesydl.util.*;
 
 /**
@@ -24,8 +25,8 @@ public class InterfazUsuario extends javax.swing.JFrame {
     private final String FILE_NAME, FILE_EXTENSION;
     private int counterFile;
     private String currentPath;
-    private Empaquetador empaquetador;
-    Reportero rep;
+    private Reportes reportesDisplay;
+    private Reportero rep;
     /**
      * Creates new form InterfazUsuario
      */
@@ -41,11 +42,12 @@ public class InterfazUsuario extends javax.swing.JFrame {
         FILE_NAME = "graph";
         FILE_EXTENSION = ".png";
         counterFile = 0;
-        parser = new Parser();
+        parser = new Parser(lexer);
         initStyle();
         initTable();
         initButtons();
         currentPath = "";
+        reportesDisplay =  new Reportes(this, lexer, parser);
     }
     private void initNumeracion(){
         numEditor = new NumberLine(editor);
@@ -123,9 +125,9 @@ public class InterfazUsuario extends javax.swing.JFrame {
         bCreditos = new javax.swing.JButton();
         title = new javax.swing.JLabel();
         bSaveAs = new javax.swing.JButton();
+        bReportes = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         bClear = new javax.swing.JButton();
-        bFilter = new javax.swing.JButton();
         scrollEditor = new javax.swing.JScrollPane();
         editor = new javax.swing.JTextPane();
         scrollDisAnalisis = new javax.swing.JScrollPane();
@@ -211,6 +213,17 @@ public class InterfazUsuario extends javax.swing.JFrame {
             }
         });
 
+        bReportes.setBackground(new java.awt.Color(7, 7, 110));
+        bReportes.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
+        bReportes.setForeground(new java.awt.Color(255, 255, 255));
+        bReportes.setText("Ver reportes");
+        bReportes.setFocusable(false);
+        bReportes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bReportesActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -223,25 +236,35 @@ public class InterfazUsuario extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(bSaveAs, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(94, 94, 94)
-                .addComponent(title, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 106, Short.MAX_VALUE)
-                .addComponent(bHelp, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(title, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 62, Short.MAX_VALUE)
+                .addComponent(bReportes, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(44, 44, 44)
+                .addComponent(bHelp, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(bCreditos, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(59, 59, 59))
+                .addComponent(bCreditos, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(40, 40, 40))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(bOpenFile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
-                    .addComponent(bHelp, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(bCreditos, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(bSaveAs, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(bSave, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(12, 12, 12))
-            .addComponent(title, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(bOpenFile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
+                            .addComponent(bSaveAs, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(bSave, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(12, 12, 12))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(title, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(bReportes, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(bCreditos, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(bHelp, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap())))
         );
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1300, 60));
@@ -258,17 +281,6 @@ public class InterfazUsuario extends javax.swing.JFrame {
         bClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bClearActionPerformed(evt);
-            }
-        });
-
-        bFilter.setBackground(new java.awt.Color(7, 7, 110));
-        bFilter.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
-        bFilter.setForeground(new java.awt.Color(255, 255, 255));
-        bFilter.setText("Detalles de errores");
-        bFilter.setFocusable(false);
-        bFilter.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bFilterActionPerformed(evt);
             }
         });
 
@@ -334,15 +346,18 @@ public class InterfazUsuario extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(scrollEditor)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addComponent(lCol, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(displayC, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(bFilter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(bClear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(bAnalisis, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                                .addComponent(displayC, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 38, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(bAnalisis, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(bClear, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(scrollDisAnalisis, javax.swing.GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -357,12 +372,11 @@ public class InterfazUsuario extends javax.swing.JFrame {
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lCol, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(displayC))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(32, 32, 32)
                         .addComponent(bClear, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(18, 18, 18)
                         .addComponent(bAnalisis, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(9, 9, 9)
-                        .addComponent(bFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(24, 24, 24))
                     .addComponent(scrollDisAnalisis, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(41, Short.MAX_VALUE))
         );
@@ -563,9 +577,8 @@ public class InterfazUsuario extends javax.swing.JFrame {
 
     private void bHelpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bHelpActionPerformed
         JOptionPane.showMessageDialog(null, """
-                                            Puedes consultar el manual de usuario en el 
-                                            siguiente enlace que se incluye en el repositorio
-                                            de git del proyecto.""", "Ayuda", 
+                                            El manual de usuario del programa se encuentra
+                                            en el repositorio de git.""", "Ayuda", 
             JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_bHelpActionPerformed
 
@@ -584,56 +597,37 @@ public class InterfazUsuario extends javax.swing.JFrame {
 
     private void bSaveReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSaveReporteActionPerformed
         lexer.analyzeAll(editor.getText());
-        displayAnalisis.setText(lexer.getErrors());
-        rep.setReporte(displayReporte, lexer);
+        displayAnalisis.setText(lexer.getErrorsDetails());
+        rep.setTokensReporte(displayReporte, lexer);
         archivo.saveAs(lexer.getReporte(), ".txt");
     }//GEN-LAST:event_bSaveReporteActionPerformed
 
     private void bAnalisisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bAnalisisActionPerformed
         lexer.analyzeAll(editor.getText());
-        rep.setReporte(displayReporte, lexer);
-        parser.analiceAll(lexer);
+        rep.setTokensReporte(displayReporte, lexer);
+        parser.analiceAll();
         displayAnalisis.setText(
-                lexer.getErrors() 
+                lexer.getErrorsDetails()
                 + "\n---------------------------------------\n" 
                 + parser.getReportErrors());
-        
-        //REMOVE THE NEXT CODE, IT'S FOR TEST
-        /*this.empaquetador = new Empaquetador(lexer, parser);
-        try {
-            List<Function> functions = empaquetador.getFunctions();
-            System.out.println("total de funciones: " + functions.size());
-            System.out.println("-----------------------------------------");
-            for (int i = 0; i < functions.size(); i++) {
-                System.out.println("Funcion: " + functions.get(i).getName());
-                List<String> params = functions.get(i).getParameters();
-                System.out.println("    Parametros (" + params.size() + ")");
-                for (String param : params) {
-                    System.out.println("      -> " + param);
-                }
-                System.out.println("\n");
-            }
-        } catch ( e) {
-            System.out.println("hay errores sintacticos");
-        }*/
     }//GEN-LAST:event_bAnalisisActionPerformed
-
-    private void bFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bFilterActionPerformed
-        // agregar un filtro para errores
-    }//GEN-LAST:event_bFilterActionPerformed
 
     private void bTknsFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bTknsFilterActionPerformed
         // agregar un filtro para tokens
     }//GEN-LAST:event_bTknsFilterActionPerformed
 
+    private void bReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bReportesActionPerformed
+        reportesDisplay.setVisible(true);
+    }//GEN-LAST:event_bReportesActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bAnalisis;
     private javax.swing.JButton bClear;
     private javax.swing.JButton bCreditos;
-    private javax.swing.JButton bFilter;
     private javax.swing.JButton bGraph;
     private javax.swing.JButton bHelp;
     private javax.swing.JButton bOpenFile;
+    private javax.swing.JButton bReportes;
     private javax.swing.JButton bSave;
     private javax.swing.JButton bSaveAs;
     private javax.swing.JButton bSaveReporte;

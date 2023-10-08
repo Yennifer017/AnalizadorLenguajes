@@ -2,7 +2,6 @@ package lenguajes.proyectolenguajesydl.parser;
 
 import java.util.List;
 import java.util.Stack;
-import lenguajes.proyectolenguajesydl.lexer.Regex;
 import lenguajes.proyectolenguajesydl.lexer.Token;
 
 /**
@@ -11,9 +10,9 @@ import lenguajes.proyectolenguajesydl.lexer.Token;
  */
 public class Separator {
 
-    private Regex ex;
+    private Structure structure;
     public Separator() {
-        ex = new Regex();
+        structure = new Structure();
     }
 
     
@@ -94,7 +93,7 @@ public class Separator {
                 case "pL", "cL", "lL" -> stack.push(subT);
                 case "pR", "cR", "lR" -> {
                     if(!stack.isEmpty()){
-                        if(ex.isComplementario(stack.peek(), subT)){
+                        if(structure.isComplementario(stack.peek(), subT)){
                             stack.pop();
                             crop = false;
                         }
@@ -126,7 +125,7 @@ public class Separator {
                 }
                 case "pR", "cR", "lR" -> {
                     if(!stack.isEmpty()){
-                        if(ex.isComplementario(stack.peek(), subT)){
+                        if(structure.isComplementario(stack.peek(), subT)){
                             stack.pop();
                             crop = false;
                         }

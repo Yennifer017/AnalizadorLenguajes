@@ -151,9 +151,4 @@ public class Regex {
         };
     }
     
-    public boolean isComplementario(String specificT1, String specificT2){
-        return (specificT1.equals("pL") && specificT2.equals("pR")) ||
-                (specificT1.equals("cL") && specificT2.equals("cR")) ||
-                (specificT1.equals("lL") && specificT2.equals("lR"));
-    }
 }

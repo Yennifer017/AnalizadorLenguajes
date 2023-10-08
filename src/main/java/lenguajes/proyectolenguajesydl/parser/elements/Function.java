@@ -3,20 +3,24 @@ package lenguajes.proyectolenguajesydl.parser.elements;
 
 import java.util.List;
 import lenguajes.proyectolenguajesydl.lexer.Token;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
  *
  * @author yenni
  */
-@AllArgsConstructor @Getter
+@Getter
 public class Function {
-    private Token token;
     private List<String> parameters;
-    private int index;
+    private int indexStart;
+    private List<Token> usos;
+            
+    public Function(int indexStart, List<String> parameters) {
+        this.parameters = parameters;
+        this.indexStart = indexStart;
+    }
     
-    public String getName(){
-        return token.getContenido();
+    public void setUsos(List<Token> usos){
+        this.usos = usos;
     }
 }

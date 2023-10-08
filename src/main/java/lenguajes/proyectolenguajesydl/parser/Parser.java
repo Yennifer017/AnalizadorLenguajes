@@ -19,24 +19,35 @@ public class Parser {
     private Separator separator;
     private ExpressionVerificator eVerificator;
     private Structure structureV;
-    public Parser() {
+    private int identationLevel;
+    private Registrador registrador;
+    public Parser(Lexer lexer) {
         this.errors = new ArrayList<>();
         separator = new Separator();
         breaksAllowed = 0;
         returnsAllowed = 0;
         eVerificator = new ExpressionVerificator(this);
         structureV = new Structure();
+        identationLevel = 0;
+        this.lexer = lexer;
+        registrador = new Registrador(this,lexer);
     }
 
-    public void analiceAll(Lexer lexer) {
+    public void analiceAll() {
+        registrador.clear();
         errors.clear();
-        this.lexer = lexer;
+        //this.lexer = lexer;
         currentNoTkn = 0;
         lexer.deleteNoUtilTkns();
         try {
             analiceSubBlock(lexer.getTokens(), lexer.getToken(currentNoTkn).getColumna());
+            try {
+                registrador.empaquetarDatos();
+            } catch (Exception e) {
+                System.out.println("algo que definitivamente no debio salir mal, salio mal");
+            }
         } catch (NullPointerException e) {
-            System.out.println("No hay codigo para analizar");
+            System.out.println(e);
         }
         
     }
@@ -58,32 +69,43 @@ public class Parser {
     public List<SyntaxError> getErrors(){
         return this.errors;
     }
-
+    public Registrador getRegistrador(){
+        return this.registrador;
+    }
     /**
      * clasifica las definicines de statmets y las analiza por separado
      */
     private void analiceBlock(int fin) {
+        identationLevel++;
         while (currentNoTkn < fin) {
             int endStmt = separator.findEndOfStmt(lexer.getTokens(), currentNoTkn);
             analiceStmt(endStmt, lexer.getTokens());
         }
+        identationLevel--;
     }
 
     private void analiceStmt(int fin, List<Token> tokens) {
         Token inicial = tokens.get(currentNoTkn);
         switch (inicial.getSubType()) {
-            case "Identificador" ->
+            case "Identificador" ->{
+                registrador.addRegistro(identationLevel, currentNoTkn);
                 validateAssignation(fin, tokens);
+            }
             case "if" ->
                 validateIfBlock(fin, tokens);
-            case "for" ->
+            case "for" ->{
+                registrador.addRegistro(identationLevel, currentNoTkn);
                 validateForBlock(tokens, fin);
+            }
             case "while" ->
                 validateWhileBlock(tokens, fin);
-            case "def" ->
+            case "def" ->{
+                registrador.addRegistro(identationLevel, currentNoTkn);
                 validateDefBlock(tokens, fin);
+            }
             case "break" -> {
                 if (breaksAllowed > 0) {
+                    registrador.addRegistro(identationLevel, currentNoTkn);
                     validateBreakStmt(tokens, fin);
                 } else {
                     errors.add(new SyntaxError(inicial.getPosition(),
@@ -92,6 +114,7 @@ public class Parser {
             }
             case "return" -> {
                 if (returnsAllowed > 0) {
+                    registrador.addRegistro(identationLevel, currentNoTkn);
                     validateReturnStmt(tokens, fin);
                 } else {
                     errors.add(new SyntaxError(inicial.getPosition(),
@@ -127,7 +150,26 @@ public class Parser {
                     }
                 }
                 case 1 -> {
-                    switch (type) {
+                    if(type.contains("Asignacion")){
+                        status = 3;
+                    }else{
+                        switch (type) {
+                            case "coma" ->
+                                status = 2;
+                            case "pL" -> {
+                                validateStructure(tokens.subList(currentNoTkn, fin),
+                                        Structure.USE_FUNCTION, errors);
+                                status = 4;
+                                currentNoTkn = fin;
+                            }
+                            default -> {
+                                currentNoTkn--; // nos deja en la misma posicion
+                                read = false; //interrumpir flujo
+
+                            }
+                        }
+                    }
+                    /*switch (type) {
                         case "coma" ->
                             status = 2;
                         case "Asignacion" ->
@@ -139,13 +181,11 @@ public class Parser {
                             currentNoTkn = fin;
                         }
                         default -> {
-                            //errors.add(new SyntaxError(tokens.get(currentNoTkn).getPosition(),
-                            //        "Se esperaba una coma, una asignacion o una llamada a una funcion"));
                             currentNoTkn--; // nos deja en la misma posicion
                             read = false; //interrumpir flujo
                            
                         }
-                    }
+                    }*/
                 }
                 case 2 -> {
                     switch (type) {
@@ -190,7 +230,7 @@ public class Parser {
             String message = "Error inesperado";
             switch (status) {
                 case 1 ->
-                    message = "Se esperaba una coma o una asignacion";
+                    message = "Se esperaba una coma, una asignacion o parentesis para el uso de una funcion";
                 case 2 ->
                     message = "Se esperaba un identificador";
                 case 3, 5 ->
@@ -276,6 +316,7 @@ public class Parser {
                     if (!type.equals(conditional)) {
                         throw new AssertionError("No se esta validando un conditional statment");
                     }
+                    registrador.addRegistro(identationLevel, currentNoTkn);
                     status = 1;
                 }
                 case 1 -> {
@@ -325,9 +366,9 @@ public class Parser {
             switch (status) {
                 case 0 -> {
                     if (!type.equals("else")) {
-                        System.out.println(currentNoTkn + "numero de token desde else stmt");
                         throw new AssertionError("No se esta validando un else statment");
                     }
+                    registrador.addRegistro(identationLevel, currentNoTkn);
                     status = 1;
                 }
                 case 1 -> {
