@@ -43,6 +43,7 @@ public class Reportes extends javax.swing.JFrame {
         ocultar(repSymbolTBlock);
         ocultar(repSymbolT);
         ocultar(repListInstructions);
+        
 
     }
 
@@ -141,6 +142,7 @@ public class Reportes extends javax.swing.JFrame {
 
         bTableSymbolG.setFont(new java.awt.Font("Dialog", 1, 13)); // NOI18N
         bTableSymbolG.setText("Tabla de simbolos global");
+        bTableSymbolG.setFocusable(false);
         bTableSymbolG.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bTableSymbolGActionPerformed(evt);
@@ -149,6 +151,7 @@ public class Reportes extends javax.swing.JFrame {
 
         bTableSimbolB.setFont(new java.awt.Font("Dialog", 1, 13)); // NOI18N
         bTableSimbolB.setText("Tabla de simbolos por bloque");
+        bTableSimbolB.setFocusable(false);
         bTableSimbolB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bTableSimbolBActionPerformed(evt);
@@ -157,6 +160,7 @@ public class Reportes extends javax.swing.JFrame {
 
         bInstructions.setFont(new java.awt.Font("Dialog", 1, 13)); // NOI18N
         bInstructions.setText("Lista de instrucciones");
+        bInstructions.setFocusable(false);
         bInstructions.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bInstructionsActionPerformed(evt);
@@ -165,6 +169,7 @@ public class Reportes extends javax.swing.JFrame {
 
         bSyntaxError.setFont(new java.awt.Font("Dialog", 1, 13)); // NOI18N
         bSyntaxError.setText("Errores sintacticos");
+        bSyntaxError.setFocusable(false);
         bSyntaxError.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bSyntaxErrorActionPerformed(evt);
@@ -173,6 +178,7 @@ public class Reportes extends javax.swing.JFrame {
 
         bLexErrors.setFont(new java.awt.Font("Dialog", 1, 13)); // NOI18N
         bLexErrors.setText("Errores lexicos");
+        bLexErrors.setFocusable(false);
         bLexErrors.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bLexErrorsActionPerformed(evt);
@@ -181,6 +187,7 @@ public class Reportes extends javax.swing.JFrame {
 
         bMethodReport.setFont(new java.awt.Font("Dialog", 1, 13)); // NOI18N
         bMethodReport.setText("Reporte de metodos");
+        bMethodReport.setFocusable(false);
         bMethodReport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bMethodReportActionPerformed(evt);
@@ -191,6 +198,7 @@ public class Reportes extends javax.swing.JFrame {
         bAtrasGlobal.setFont(new java.awt.Font("Dialog", 0, 14)); // NOI18N
         bAtrasGlobal.setForeground(new java.awt.Color(255, 255, 255));
         bAtrasGlobal.setText("X");
+        bAtrasGlobal.setFocusable(false);
         bAtrasGlobal.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bAtrasGlobalActionPerformed(evt);
@@ -326,6 +334,7 @@ public class Reportes extends javax.swing.JFrame {
         bAtras1.setBackground(new java.awt.Color(204, 0, 0));
         bAtras1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         bAtras1.setText("X");
+        bAtras1.setFocusable(false);
         bAtras1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bAtras1ActionPerformed(evt);
@@ -443,6 +452,7 @@ public class Reportes extends javax.swing.JFrame {
         jButton2.setBackground(new java.awt.Color(255, 0, 0));
         jButton2.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jButton2.setText("X");
+        jButton2.setFocusable(false);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -560,6 +570,7 @@ public class Reportes extends javax.swing.JFrame {
         jButton1.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setText("X");
+        jButton1.setFocusable(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -675,6 +686,7 @@ public class Reportes extends javax.swing.JFrame {
         jButton3.setBackground(new java.awt.Color(255, 0, 0));
         jButton3.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jButton3.setText("X");
+        jButton3.setFocusable(false);
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
@@ -778,6 +790,7 @@ public class Reportes extends javax.swing.JFrame {
         bExitSTB.setBackground(new java.awt.Color(255, 0, 0));
         bExitSTB.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         bExitSTB.setText("X");
+        bExitSTB.setFocusable(false);
         bExitSTB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bExitSTBActionPerformed(evt);
@@ -878,6 +891,7 @@ public class Reportes extends javax.swing.JFrame {
         bExitTS.setBackground(new java.awt.Color(255, 0, 0));
         bExitTS.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         bExitTS.setText("X");
+        bExitTS.setFocusable(false);
         bExitTS.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bExitTSActionPerformed(evt);

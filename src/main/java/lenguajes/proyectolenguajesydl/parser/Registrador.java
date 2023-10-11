@@ -37,6 +37,7 @@ public class Registrador {
     }
    
     protected void clear(){
+        assignations.clear();
         registros.clear();
     }
     protected void empaquetarDatos(){
@@ -84,31 +85,13 @@ public class Registrador {
     }
     
     public List<Assignation> getDataForSymbolTable() throws SyntaxException{
-        //advertencias.clear();
         if(parser.getErrors().isEmpty()){
-            /*List<Token> tokens = lexer.getTokens();
-            //List<Registro> registrosST = new ArrayList<>();
-            List<Assignation> assignations = new ArrayList<>();
-            for (Registro registro : registros) {
-                String subType = tokens.get(registro.getIndexInList()).getSubType();
-                if(subType.equals("Identificador")){
-                    this.addAssignations(registro, tokens, assignations);
-                }
-            }
-            //mostrarAdvertencias();*/
             return assignations;
         }else{
             throw new SyntaxException();
         }
         
     }
-    /*private void mostrarAdvertencias(){
-        for (SyntaxError advertencia : advertencias) {
-            System.out.println(advertencia.getPosition().getFila() + "-linea -- columna-" + advertencia.getPosition().getColumna());
-            System.out.println("---- detalles " + advertencia.getDetails());
-            System.out.println("\n");
-        }
-    }*/
     private void addAssignations(Registro registro, List<Token> tokens, List<Assignation> assignations){
         int init = registro.getIndexInList();
         int end = separator.findEndOfLine(tokens, init);
@@ -122,9 +105,16 @@ public class Registrador {
             Token inicial = assignationTkns.get(0);
             assignations.add(new Assignation(
                     registro.getIdentationLevel(), 
+                    inicial.getContenido(), 
+                    "Funcion", 
+                    Assignation.NO_APPLY, 
+                    inicial.getPosition()
+            ));
+            /*assignations.add(new Assignation(
+                    registro.getIdentationLevel(), 
                     inicial.getContenido(), "Funcion",Assignation.NO_APPLY, 
                     inicial.getLine(), inicial.getColumna()
-            ));
+            ));*/
         }
         
     }
@@ -145,7 +135,7 @@ public class Registrador {
         assignations.add(new Assignation(
                 registro.getIdentationLevel(),
                 inicial.getContenido(), type, value,
-                inicial.getLine(), inicial.getColumna()
+                inicial.getPosition()
         ));
         if (endOfExpression != assignationTkns.size()) {
             parser.getErrors().add(new SyntaxError(assignationTkns.get(endOfExpression).getPosition(),
@@ -186,7 +176,7 @@ public class Registrador {
                 assignations.add(new Assignation(
                         registro.getIdentationLevel(),
                         identifier.getContenido(), type, value,
-                        identifier.getLine(), identifier.getColumna()
+                        identifier.getPosition()
                 ));
                 noIdentifier++;
             }else if(noIdentifier == identifiers.size()){      

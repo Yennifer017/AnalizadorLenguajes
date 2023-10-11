@@ -9,7 +9,6 @@ import lenguajes.proyectolenguajesydl.lexer.Lexer;
 import lenguajes.proyectolenguajesydl.lexer.Token;
 import lenguajes.proyectolenguajesydl.parser.Registrador;
 import lenguajes.proyectolenguajesydl.parser.Registro;
-import lenguajes.proyectolenguajesydl.parser.Separator;
 import lenguajes.proyectolenguajesydl.parser.SyntaxError;
 import lenguajes.proyectolenguajesydl.parser.SyntaxException;
 import lenguajes.proyectolenguajesydl.parser.elements.Assignation;
@@ -74,8 +73,8 @@ public class Reportero {
         data[index] = asignacion.getName();
         data[index+1] = asignacion.getType();
         data[index+2] = asignacion.getValor();
-        data[index+3] = asignacion.getLinea() + 1;
-        data[index+4] = asignacion.getColumna() + 1;
+        data[index+3] = asignacion.getPosition().getFila()+ 1;
+        data[index+4] = asignacion.getPosition().getColumna() + 1;
         
         return data;
     }
